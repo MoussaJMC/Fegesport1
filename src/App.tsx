@@ -19,31 +19,52 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
+// Admin pages
+import AdminLayout from './pages/admin/AdminLayout';
+import LoginPage from './pages/admin/LoginPage';
+import DashboardPage from './pages/admin/DashboardPage';
+
 function App() {
   return (
     <ErrorBoundary>
       <Router>
         <div className="flex flex-col min-h-screen">
           <Toaster position="top-right" />
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/news" element={<NewsPage />} />
-              <Route path="/news/:id" element={<NewsArticlePage />} />
-              <Route path="/membership" element={<MembershipPage />} />
-              <Route path="/membership/community" element={<CommunityPage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
-              <Route path="/partners" element={<PartnersPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/events/:id" element={<EventPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </main>
-          <Footer />
+          <Routes>
+            {/* Admin routes */}
+            <Route path="/admin/login" element={<LoginPage />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<DashboardPage />} />
+              {/* Add other admin routes here */}
+            </Route>
+
+            {/* Public routes */}
+            <Route
+              element={
+                <>
+                  <Navbar />
+                  <main className="flex-grow">
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/about" element={<AboutPage />} />
+                      <Route path="/news" element={<NewsPage />} />
+                      <Route path="/news/:id" element={<NewsArticlePage />} />
+                      <Route path="/membership" element={<MembershipPage />} />
+                      <Route path="/membership/community" element={<CommunityPage />} />
+                      <Route path="/resources" element={<ResourcesPage />} />
+                      <Route path="/partners" element={<PartnersPage />} />
+                      <Route path="/contact" element={<ContactPage />} />
+                      <Route path="/events/:id" element={<EventPage />} />
+                      <Route path="/privacy" element={<PrivacyPage />} />
+                      <Route path="/terms" element={<TermsPage />} />
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                </>
+              }
+            />
+          </Routes>
         </div>
       </Router>
     </ErrorBoundary>
