@@ -1,0 +1,40 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "news": "News",
+    "membership": "Membership",
+    "resources": "Resources",
+    "partners": "Partners",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "GUINEAN ESPORTS FEDERATION",
+      "subtitle": "Promoting and developing esports in Guinea",
+      "cta": "Join us"
+    },
+    "about": {
+      "title": "ABOUT FEGUIESPORT",
+      "description": "The Guinean Esports Federation (FEGUIESPORT) is the official national organization for esports in Guinea. Our mission is to promote, structure, and represent Guinean esports at the national and international level."
+    },
+    "news": {
+      "title": "LATEST NEWS",
+      "viewAll": "View all news"
+    },
+    "events": {
+      "title": "UPCOMING EVENTS",
+      "viewAll": "View all events"
+    },
+    "join": {
+      "title": "JOIN THE COMMUNITY",
+      "description": "Whether you're a player, a club, or a potential partner, find out how to be part of the Guinean esports movement.",
+      "cta": "Become a member"
+    }
+  },
+  "footer": {
+    "rights": "© 2025 FEGUIESPORT. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  }
+}

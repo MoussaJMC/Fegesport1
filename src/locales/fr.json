@@ -1,0 +1,40 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos",
+    "news": "Actualités",
+    "membership": "Adhésion",
+    "resources": "Ressources",
+    "partners": "Partenaires",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "FÉDÉRATION GUINÉENNE D'ESPORT",
+      "subtitle": "Promouvoir et développer l'esport en Guinée",
+      "cta": "Rejoignez-nous"
+    },
+    "about": {
+      "title": "À PROPOS DE LA FEGUIESPORT",
+      "description": "La Fédération Guinéenne d'Esport (FEGUIESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."
+    },
+    "news": {
+      "title": "ACTUALITÉS RÉCENTES",
+      "viewAll": "Voir toutes les actualités"
+    },
+    "events": {
+      "title": "ÉVÉNEMENTS À VENIR",
+      "viewAll": "Voir tous les événements"
+    },
+    "join": {
+      "title": "REJOIGNEZ LA COMMUNAUTÉ",
+      "description": "Que vous soyez un joueur, un club, ou un partenaire potentiel, découvrez comment faire partie du mouvement esport guinéen.",
+      "cta": "Devenir membre"
+    }
+  },
+  "footer": {
+    "rights": "© 2025 FEGUIESPORT. Tous droits réservés.",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation"
+  }
+}
