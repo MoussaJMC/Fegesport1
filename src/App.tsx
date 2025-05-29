@@ -23,6 +23,11 @@ import NotFoundPage from './pages/NotFoundPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import LoginPage from './pages/admin/LoginPage';
 import DashboardPage from './pages/admin/DashboardPage';
+import NewsAdminPage from './pages/admin/NewsAdminPage';
+import EventsAdminPage from './pages/admin/EventsAdminPage';
+import MembersAdminPage from './pages/admin/MembersAdminPage';
+import PartnersAdminPage from './pages/admin/PartnersAdminPage';
+import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 
 function App() {
   return (
@@ -35,7 +40,11 @@ function App() {
             <Route path="/admin/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<DashboardPage />} />
-              {/* Add other admin routes here */}
+              <Route path="news" element={<NewsAdminPage />} />
+              <Route path="events" element={<EventsAdminPage />} />
+              <Route path="members" element={<MembersAdminPage />} />
+              <Route path="partners" element={<PartnersAdminPage />} />
+              <Route path="messages" element={<MessagesAdminPage />} />
             </Route>
 
             {/* Public routes */}
@@ -45,7 +54,7 @@ function App() {
                   <Navbar />
                   <main className="flex-grow">
                     <Routes>
-                      <Route path="/\" element={<HomePage />} />
+                      <Route path="/" element={<HomePage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/news" element={<NewsPage />} />
                       <Route path="/news/:id" element={<NewsArticlePage />} />
