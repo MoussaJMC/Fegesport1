@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -32,9 +32,10 @@ import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <div className="flex flex-col min-h-screen">
-          <Toaster position="top-right" />
+      <div className="flex flex-col min-h-screen">
+        <Toaster position="top-right" />
+        <Navbar />
+        <main className="flex-grow">
           <Routes>
             {/* Admin routes */}
             <Route path="/admin/login" element={<LoginPage />} />
@@ -48,34 +49,23 @@ function App() {
             </Route>
 
             {/* Public routes */}
-            <Route
-              element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <Routes>
-                      <Route path="/\" element={<HomePage />} />
-                      <Route path="/about" element={<AboutPage />} />
-                      <Route path="/news" element={<NewsPage />} />
-                      <Route path="/news/:id" element={<NewsArticlePage />} />
-                      <Route path="/membership" element={<MembershipPage />} />
-                      <Route path="/membership/community" element={<CommunityPage />} />
-                      <Route path="/resources" element={<ResourcesPage />} />
-                      <Route path="/partners" element={<PartnersPage />} />
-                      <Route path="/contact" element={<ContactPage />} />
-                      <Route path="/events/:id" element={<EventPage />} />
-                      <Route path="/privacy" element={<PrivacyPage />} />
-                      <Route path="/terms" element={<TermsPage />} />
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </>
-              }
-            />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:id" element={<NewsArticlePage />} />
+            <Route path="/membership" element={<MembershipPage />} />
+            <Route path="/membership/community" element={<CommunityPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/partners" element={<PartnersPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/events/:id" element={<EventPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </div>
-      </Router>
+        </main>
+        <Footer />
+      </div>
     </ErrorBoundary>
   );
 }
