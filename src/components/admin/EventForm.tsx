@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
 const eventSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, 'Le titre est requis'),
   description: z.string().min(1, 'La description est requise'),
   date: z.string().min(1, 'La date est requise'),
@@ -35,7 +36,7 @@ const EventForm: React.FC<EventFormProps> = ({ initialData, onSuccess, onCancel 
 
   const onSubmit = async (data: EventFormData) => {
     try {
-      if (initialData) {
+      if (initialData?.id) {
         const { error } = await supabase
           .from('events')
           .update(data)

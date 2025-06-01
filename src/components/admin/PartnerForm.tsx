@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
 const partnerSchema = z.object({
+  id: z.string().uuid().optional(),
   name: z.string().min(1, 'Le nom est requis'),
   logo_url: z.string().url('URL invalide').optional(),
   website: z.string().url('URL invalide').optional(),
@@ -35,7 +36,7 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ initialData, onSuccess, onCan
 
   const onSubmit = async (data: PartnerFormData) => {
     try {
-      if (initialData) {
+      if (initialData?.id) {
         const { error } = await supabase
           .from('partners')
           .update(data)

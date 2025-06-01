@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
 const newsSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, 'Le titre est requis'),
   excerpt: z.string().min(1, 'Le résumé est requis'),
   content: z.string().min(1, 'Le contenu est requis'),
@@ -30,7 +31,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      if (initialData) {
+      if (initialData?.id) {
         const { error } = await supabase
           .from('news')
           .update(data)

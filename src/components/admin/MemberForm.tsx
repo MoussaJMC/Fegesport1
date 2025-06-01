@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
 const memberSchema = z.object({
+  id: z.string().uuid().optional(),
   first_name: z.string().min(1, 'Le prénom est requis'),
   last_name: z.string().min(1, 'Le nom est requis'),
   email: z.string().email('Email invalide'),
@@ -35,7 +36,7 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
 
   const onSubmit = async (data: MemberFormData) => {
     try {
-      if (initialData) {
+      if (initialData?.id) {
         const { error } = await supabase
           .from('members')
           .update(data)
