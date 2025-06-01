@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -36,39 +36,42 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           {/* Admin routes */}
-          <Route path="/admin/login" element={<LoginPage />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="news" element={<NewsAdminPage />} />
-            <Route path="events" element={<EventsAdminPage />} />
-            <Route path="members" element={<MembersAdminPage />} />
-            <Route path="partners" element={<PartnersAdminPage />} />
-            <Route path="messages" element={<MessagesAdminPage />} />
+          <Route path="/admin">
+            <Route path="login" element={<LoginPage />} />
+            <Route element={<AdminLayout />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="news" element={<NewsAdminPage />} />
+              <Route path="events" element={<EventsAdminPage />} />
+              <Route path="members" element={<MembersAdminPage />} />
+              <Route path="partners" element={<PartnersAdminPage />} />
+              <Route path="messages" element={<MessagesAdminPage />} />
+            </Route>
           </Route>
 
           {/* Public routes */}
-          <Route path="/" element={
+          <Route element={
             <>
               <Navbar />
               <main className="flex-grow">
-                <Outlet />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/news/:id" element={<NewsArticlePage />} />
+                  <Route path="/membership" element={<MembershipPage />} />
+                  <Route path="/membership/community" element={<CommunityPage />} />
+                  <Route path="/resources" element={<ResourcesPage />} />
+                  <Route path="/partners" element={<PartnersPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/events/:id" element={<EventPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
               </main>
               <Footer />
             </>
           }>
-            <Route index element={<HomePage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="news" element={<NewsPage />} />
-            <Route path="news/:id" element={<NewsArticlePage />} />
-            <Route path="membership" element={<MembershipPage />} />
-            <Route path="membership/community" element={<CommunityPage />} />
-            <Route path="resources" element={<ResourcesPage />} />
-            <Route path="partners" element={<PartnersPage />} />
-            <Route path="contact" element={<ContactPage />} />
-            <Route path="events/:id" element={<EventPage />} />
-            <Route path="privacy" element={<PrivacyPage />} />
-            <Route path="terms" element={<TermsPage />} />
-            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </div>
