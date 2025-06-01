@@ -7,24 +7,12 @@ export default defineConfig({
     port: 5173,
     host: '0.0.0.0',
     hmr: {
-      host: 'localhost'
+      clientPort: 443
     }
   },
   optimizeDeps: {
     exclude: [
-      'lucide-react',
-      'fluent-ffmpeg',
-      'nodemailer',
-      'whatsapp-web.js'
-    ],
-  },
-  build: {
-    rollupOptions: {
-      external: [
-        'fluent-ffmpeg',
-        'nodemailer',
-        'whatsapp-web.js'
-      ]
-    }
+      'lucide-react'
+    ]
   }
 });
