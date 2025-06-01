@@ -22,6 +22,9 @@ const LoginPage: React.FC = () => {
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: import.meta.env.VITE_ADMIN_EMAIL || '',
+    }
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -30,7 +33,8 @@ const LoginPage: React.FC = () => {
       toast.success('Connexion réussie');
       navigate(from, { replace: true });
     } catch (error) {
-      toast.error('Erreur de connexion');
+      console.error('Login error:', error);
+      toast.error('Identifiants invalides');
     }
   };
 
