@@ -21,9 +21,16 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
 
+# Primary domain configuration
 [[redirects]]
-  from = "https://fegesport224.org/*"
-  to = "/:splat"
+  from = "https://www.fegesport224.org/*"
+  to = "https://fegesport224.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.fegesport224.org/*"
+  to = "https://fegesport224.org/:splat"
   status = 301
   force = true
 
