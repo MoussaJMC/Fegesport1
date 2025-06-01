@@ -9,6 +9,9 @@
   status = 200
   force = true
 
+[build.environment]
+  VITE_SUPABASE_URL = "https://wcbutfzydmsgkpnhulyw.supabase.co"
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -16,5 +19,4 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     Content-Security-Policy = "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: *.pexels.com; connect-src 'self' https: wss:; frame-src 'self' https:;"
