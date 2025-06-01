@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -29,6 +29,14 @@ import MembersAdminPage from './pages/admin/MembersAdminPage';
 import PartnersAdminPage from './pages/admin/PartnersAdminPage';
 import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 
+const PublicLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <Navbar />
+    <main className="flex-grow">{children}</main>
+    <Footer />
+  </>
+);
+
 function App() {
   return (
     <ErrorBoundary>
@@ -47,29 +55,19 @@ function App() {
           </Route>
 
           {/* Public routes */}
-          <Route path="/" element={
-            <>
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route index element={<HomePage />} />
-                  <Route path="about" element={<AboutPage />} />
-                  <Route path="news" element={<NewsPage />} />
-                  <Route path="news/:id" element={<NewsArticlePage />} />
-                  <Route path="membership" element={<MembershipPage />} />
-                  <Route path="membership/community" element={<CommunityPage />} />
-                  <Route path="resources" element={<ResourcesPage />} />
-                  <Route path="partners" element={<PartnersPage />} />
-                  <Route path="contact" element={<ContactPage />} />
-                  <Route path="events/:id" element={<EventPage />} />
-                  <Route path="privacy" element={<PrivacyPage />} />
-                  <Route path="terms" element={<TermsPage />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </main>
-              <Footer />
-            </>
-          } />
+          <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+          <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
+          <Route path="/news" element={<PublicLayout><NewsPage /></PublicLayout>} />
+          <Route path="/news/:id" element={<PublicLayout><NewsArticlePage /></PublicLayout>} />
+          <Route path="/membership" element={<PublicLayout><MembershipPage /></PublicLayout>} />
+          <Route path="/membership/community" element={<PublicLayout><CommunityPage /></PublicLayout>} />
+          <Route path="/resources" element={<PublicLayout><ResourcesPage /></PublicLayout>} />
+          <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
+          <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+          <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
+          <Route path="/privacy" element={<PublicLayout><PrivacyPage /></PublicLayout>} />
+          <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
+          <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
         </Routes>
       </div>
     </ErrorBoundary>
