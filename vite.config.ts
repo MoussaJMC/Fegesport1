@@ -13,5 +13,9 @@ export default defineConfig({
   preview: {
     port: 5173,
     host: true
+  },
+  base: './',
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
   }
 });
