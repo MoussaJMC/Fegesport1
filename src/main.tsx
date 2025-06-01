@@ -1,4 +1,4 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import App from './App';
@@ -9,12 +9,17 @@ import './utils/i18n';
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
 
-createRoot(rootElement).render(
-  <React.StrictMode>
-    <HashRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </HashRouter>
-  </React.StrictMode>
-);
+const root = createRoot(rootElement);
+
+// Ensure the app mounts after the DOM is fully loaded
+window.addEventListener('load', () => {
+  root.render(
+    <StrictMode>
+      <HashRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </HashRouter>
+    </StrictMode>
+  );
+});
