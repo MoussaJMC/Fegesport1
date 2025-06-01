@@ -4,25 +4,24 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validate environment variables
-if (!supabaseUrl || supabaseUrl === 'your-project-id.supabase.co') {
-  console.warn('Missing or invalid VITE_SUPABASE_URL. Using development fallback.');
+if (!supabaseUrl || supabaseUrl === 'your-project-url') {
+  throw new Error('Missing or invalid VITE_SUPABASE_URL. Please set a valid Supabase URL in your .env file.');
 }
 
 if (!supabaseAnonKey || supabaseAnonKey === 'your-anon-key') {
-  console.warn('Missing or invalid VITE_SUPABASE_ANON_KEY. Using development fallback.');
+  throw new Error('Missing or invalid VITE_SUPABASE_ANON_KEY. Please set a valid anon key in your .env file.');
 }
 
-// Create Supabase client with error handling
-export const supabase = createClient(
-  supabaseUrl || 'https://your-project-id.supabase.co',
-  supabaseAnonKey || 'your-anon-key',
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  }
-);
+// Ensure URL is properly formatted
+const formattedUrl = supabaseUrl.startsWith('http') ? supabaseUrl : `https://${supabaseUrl}`;
+
+// Create Supabase client
+export const supabase = createClient(formattedUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
 // Auth helpers
 export const signIn = async (email: string, password: string) => {
