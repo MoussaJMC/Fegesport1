@@ -9,9 +9,6 @@
   status = 200
   force = true
 
-[build.environment]
-  NETLIFY_SITE_URL = "https://fegesport224.org"
-
 [[headers]]
   for = "/*"
   [headers.values]
