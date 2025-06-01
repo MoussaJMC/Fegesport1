@@ -30,9 +30,9 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    commonjsOptions: {
-      transformMixedEsModules: true
-    },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks: {
