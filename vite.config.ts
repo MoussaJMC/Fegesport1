@@ -5,14 +5,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    host: '0.0.0.0',
+    host: true,
     hmr: {
-      clientPort: 443
+      clientPort: 443,
+      host: 'localhost'
     }
   },
-  optimizeDeps: {
-    exclude: [
-      'lucide-react'
-    ]
+  preview: {
+    port: 5173,
+    host: true
   }
 });
