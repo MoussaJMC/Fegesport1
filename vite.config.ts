@@ -14,7 +14,7 @@ export default defineConfig({
     port: 5173,
     host: true
   },
-  base: './',
+  base: '/',
   optimizeDeps: {
     include: [
       'react', 
