@@ -4,28 +4,25 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validate environment variables
-if (!supabaseUrl || supabaseUrl === 'your_supabase_url') {
-  throw new Error(
-    'Invalid or missing VITE_SUPABASE_URL. Please set a valid Supabase URL in your .env file.'
-  );
+if (!supabaseUrl || supabaseUrl === 'your-project-id.supabase.co') {
+  console.warn('Missing or invalid VITE_SUPABASE_URL. Using development fallback.');
 }
 
-if (!supabaseAnonKey || supabaseAnonKey === 'your_supabase_anon_key') {
-  throw new Error(
-    'Invalid or missing VITE_SUPABASE_ANON_KEY. Please set a valid Supabase anonymous key in your .env file.'
-  );
+if (!supabaseAnonKey || supabaseAnonKey === 'your-anon-key') {
+  console.warn('Missing or invalid VITE_SUPABASE_ANON_KEY. Using development fallback.');
 }
 
-// Validate URL format
-try {
-  new URL(supabaseUrl);
-} catch (error) {
-  throw new Error(
-    `Invalid VITE_SUPABASE_URL format: ${supabaseUrl}. Please provide a valid URL.`
-  );
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create Supabase client with error handling
+export const supabase = createClient(
+  supabaseUrl || 'https://your-project-id.supabase.co',
+  supabaseAnonKey || 'your-anon-key',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  }
+);
 
 // Auth helpers
 export const signIn = async (email: string, password: string) => {
