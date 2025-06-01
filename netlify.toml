@@ -11,6 +11,8 @@
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
+  conditions = {Path = "!/sitemap.xml"}
 
 [[headers]]
   for = "/*"
@@ -47,7 +49,4 @@
 
 [context.production.environment]
   NODE_ENV = "production"
-
-# Custom domain settings
-[context.production.environment]
   SITE_URL = "https://fegesport224.org"

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -15,25 +16,17 @@ export default defineConfig({
     host: true
   },
   base: '/',
-  optimizeDeps: {
-    include: [
-      'react', 
-      'react-dom', 
-      'react-router-dom', 
-      '@supabase/supabase-js',
-      'framer-motion',
-      'lucide-react',
-      'sonner',
-      'i18next',
-      'react-i18next'
-    ]
-  },
   build: {
     sourcemap: true,
     outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        sitemap: resolve(__dirname, 'public/sitemap.xml'),
+        robots: resolve(__dirname, 'public/robots.txt')
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
