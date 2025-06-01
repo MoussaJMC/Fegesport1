@@ -16,7 +16,7 @@ export default defineConfig({
   },
   base: './',
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js']
   },
   build: {
     sourcemap: true,
@@ -24,7 +24,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'lucide-react', 'sonner']
+          ui: ['framer-motion', 'lucide-react', 'sonner'],
+          supabase: ['@supabase/supabase-js']
         }
       }
     }

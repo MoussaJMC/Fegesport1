@@ -12,7 +12,7 @@ if (!rootElement) throw new Error('Failed to find the root element');
 const root = createRoot(rootElement);
 
 // Ensure the app mounts after the DOM is fully loaded
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   root.render(
     <StrictMode>
       <HashRouter>

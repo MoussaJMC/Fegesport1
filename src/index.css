@@ -74,3 +74,9 @@
     @apply bg-white rounded-lg overflow-hidden shadow-md transition-shadow hover:shadow-lg;
   }
 }
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
