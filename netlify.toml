@@ -21,7 +21,7 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
 
-# Primary domain configuration
+# Domain configuration
 [[redirects]]
   from = "https://www.fegesport224.org/*"
   to = "https://fegesport224.org/:splat"
@@ -39,3 +39,15 @@
   to = "https://fegesport224.org/:splat"
   status = 301
   force = true
+
+# Primary domain
+[context.production]
+  command = "npm run build"
+  publish = "dist"
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+# Custom domain settings
+[context.production.environment]
+  SITE_URL = "https://fegesport224.org"
