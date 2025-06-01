@@ -16,15 +16,29 @@ export default defineConfig({
   },
   base: './',
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js']
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom', 
+      '@supabase/supabase-js',
+      'framer-motion',
+      'lucide-react',
+      'sonner',
+      'i18next',
+      'react-i18next'
+    ]
   },
   build: {
     sourcemap: true,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           ui: ['framer-motion', 'lucide-react', 'sonner'],
+          i18n: ['i18next', 'react-i18next'],
           supabase: ['@supabase/supabase-js']
         }
       }

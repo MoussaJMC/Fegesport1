@@ -6,13 +6,12 @@ import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
 import './utils/i18n';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Failed to find the root element');
+const mount = () => {
+  const rootElement = document.getElementById('root');
+  if (!rootElement) throw new Error('Failed to find the root element');
 
-const root = createRoot(rootElement);
+  const root = createRoot(rootElement);
 
-// Ensure the app mounts after the DOM is fully loaded
-window.addEventListener('DOMContentLoaded', () => {
   root.render(
     <StrictMode>
       <HashRouter>
@@ -22,4 +21,10 @@ window.addEventListener('DOMContentLoaded', () => {
       </HashRouter>
     </StrictMode>
   );
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mount);
+} else {
+  mount();
+}
