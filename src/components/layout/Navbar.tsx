@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ const Navbar: React.FC = () => {
   const [membershipMenuOpen, setMembershipMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -54,6 +56,10 @@ const Navbar: React.FC = () => {
     { name: t('navigation.partners'), path: '/partners' },
     { name: t('navigation.contact'), path: '/contact' },
   ];
+
+  if (isAuthenticated) {
+    navItems.push({ name: 'Administration', path: '/admin' });
+  }
 
   return (
     <header
@@ -171,6 +177,18 @@ const Navbar: React.FC = () => {
                 </motion.div>
               )}
             </div>
+
+            {/* Admin Icon */}
+            {isAuthenticated && (
+              <Link
+                to="/admin"
+                className={`ml-4 p-2 rounded-full transition-colors ${
+                  scrolled ? 'text-gray-300 hover:text-primary-500' : 'text-white hover:text-primary-300'
+                }`}
+              >
+                <User size={20} />
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
