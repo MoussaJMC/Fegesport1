@@ -3,16 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Validate environment variables
-if (!supabaseUrl || supabaseUrl === 'your-project-url') {
-  throw new Error('Missing or invalid VITE_SUPABASE_URL. Please set a valid Supabase URL in your .env file.');
+if (!supabaseUrl) {
+  throw new Error('Missing VITE_SUPABASE_URL');
 }
 
-if (!supabaseAnonKey || supabaseAnonKey === 'your-anon-key') {
-  throw new Error('Missing or invalid VITE_SUPABASE_ANON_KEY. Please set a valid anon key in your .env file.');
+if (!supabaseAnonKey) {
+  throw new Error('Missing VITE_SUPABASE_ANON_KEY');
 }
 
-// Create Supabase client with additional options
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
@@ -30,14 +28,6 @@ export const signIn = async (email: string, password: string) => {
     });
 
     if (error) throw error;
-    if (!data.user) throw new Error('No user data returned');
-
-    // Verify admin role
-    const { role } = data.user.app_metadata;
-    if (role !== 'admin') {
-      throw new Error('Unauthorized: Admin access required');
-    }
-
     return data;
   } catch (error) {
     console.error('Sign in error:', error);
