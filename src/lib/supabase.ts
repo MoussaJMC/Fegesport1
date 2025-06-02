@@ -12,34 +12,37 @@ if (!supabaseAnonKey || supabaseAnonKey === 'your-anon-key') {
   throw new Error('Missing or invalid VITE_SUPABASE_ANON_KEY. Please set a valid anon key in your .env file.');
 }
 
-// Ensure URL is properly formatted
-const formattedUrl = supabaseUrl.startsWith('http') ? supabaseUrl : `https://${supabaseUrl}`;
-
-// Create Supabase client
-export const supabase = createClient(formattedUrl, supabaseAnonKey, {
+// Create Supabase client with additional options
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
-  },
+    persistSession: true,
+    detectSessionInUrl: true
+  }
 });
 
 // Auth helpers
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (error) throw error;
-  return data;
-};
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-export const signUp = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-  if (error) throw error;
-  return data;
+    if (error) throw error;
+    if (!data.user) throw new Error('No user data returned');
+
+    // Verify admin role
+    const { role } = data.user.app_metadata;
+    if (role !== 'admin') {
+      throw new Error('Unauthorized: Admin access required');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Sign in error:', error);
+    throw error;
+  }
 };
 
 export const signOut = async () => {
