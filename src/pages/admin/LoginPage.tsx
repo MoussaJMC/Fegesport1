@@ -20,11 +20,8 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/admin';
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: import.meta.env.VITE_ADMIN_EMAIL || '',
-    }
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -32,9 +29,14 @@ const LoginPage: React.FC = () => {
       await login(data.email, data.password);
       toast.success('Connexion réussie');
       navigate(from, { replace: true });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Identifiants invalides');
+      if (error.message === 'Invalid login credentials') {
+        setError('email', { message: 'Email ou mot de passe incorrect' });
+        setError('password', { message: 'Email ou mot de passe incorrect' });
+      } else {
+        toast.error('Une erreur est survenue lors de la connexion');
+      }
     }
   };
 
@@ -83,12 +85,13 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  <Lock className="h-5 w-5 text-primary-500 group-hover:text-primary-400" />
-                </span>
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                  Connexion en cours...
+                </div>
               ) : 'Se connecter'}
             </button>
           </div>
