@@ -27,16 +27,12 @@ const LoginPage: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      toast.success('Connexion réussie');
       navigate(from, { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
-      if (error.message === 'Invalid login credentials') {
-        setError('email', { message: 'Email ou mot de passe incorrect' });
-        setError('password', { message: 'Email ou mot de passe incorrect' });
-      } else {
-        toast.error('Une erreur est survenue lors de la connexion');
-      }
+      setError('email', { message: 'Identifiants invalides' });
+      setError('password', { message: 'Identifiants invalides' });
+      toast.error('Identifiants invalides');
     }
   };
 
@@ -100,5 +96,3 @@ const LoginPage: React.FC = () => {
     </div>
   );
 };
-
-export default LoginPage;

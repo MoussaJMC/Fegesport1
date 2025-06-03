@@ -43,17 +43,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       if (!data.user) throw new Error('No user data returned');
       
-      // Check if user has admin role
-      if (data.user.app_metadata.role !== 'admin') {
+      // Check if user has admin role in user_metadata
+      const isAdmin = data.user.user_metadata?.role === 'admin';
+      if (!isAdmin) {
         await supabase.auth.signOut();
         throw new Error('Unauthorized access');
       }
 
+      toast.success('Connexion réussie');
       return data;
     } catch (error: any) {
       console.error('Login error:', error);
       if (error.message === 'Invalid login credentials' || error.message === 'Unauthorized access') {
-        throw new Error('Invalid login credentials');
+        throw new Error('Identifiants invalides');
       }
       throw error;
     }
