@@ -17,10 +17,17 @@ export default defineConfig({
   },
   base: '/',
   build: {
-    sourcemap: true,
+    sourcemap: false,
     outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),

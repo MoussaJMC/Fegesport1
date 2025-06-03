@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NODE_ENV = "production"
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 
@@ -22,6 +23,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
 # Domain configuration
 [[redirects]]
