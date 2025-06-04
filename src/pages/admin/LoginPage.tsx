@@ -30,9 +30,9 @@ const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
-      setError('email', { message: 'Identifiants invalides' });
-      setError('password', { message: 'Identifiants invalides' });
-      toast.error('Identifiants invalides');
+      setError('email', { message: error.message });
+      setError('password', { message: error.message });
+      toast.error(error.message);
     }
   };
 

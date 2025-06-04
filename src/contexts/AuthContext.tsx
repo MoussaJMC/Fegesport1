@@ -40,24 +40,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password
       });
 
-      if (error) throw error;
-      if (!data.user) throw new Error('No user data returned');
+      if (error) {
+        throw new Error('Identifiants invalides');
+      }
+
+      if (!data.user) {
+        throw new Error('Aucun utilisateur trouvé');
+      }
 
       // Check if user has admin role in user_metadata
       const isAdmin = data.user.user_metadata?.role === 'admin';
       if (!isAdmin) {
         await supabase.auth.signOut();
-        throw new Error('Unauthorized access');
+        throw new Error('Accès non autorisé');
       }
 
       toast.success('Connexion réussie');
-      return data;
     } catch (error: any) {
       console.error('Login error:', error);
-      if (error.message === 'Invalid login credentials' || error.message === 'Unauthorized access') {
-        throw new Error('Identifiants invalides');
-      }
-      throw error;
+      throw new Error(error.message || 'Erreur de connexion');
     }
   };
 
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success('Déconnexion réussie');
     } catch (error) {
       console.error('Logout error:', error);
-      throw error;
+      toast.error('Erreur lors de la déconnexion');
     }
   };
 
