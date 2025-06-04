@@ -37,13 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password,
-        options: {
-          // Explicitly disable CAPTCHA by setting gotrue option
-          gotrue: {
-            captcha_token: null
-          }
-        }
+        password
       });
       
       if (error) throw error;
