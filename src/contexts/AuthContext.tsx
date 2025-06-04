@@ -39,10 +39,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password
       });
-      
+
       if (error) throw error;
       if (!data.user) throw new Error('No user data returned');
-      
+
       // Check if user has admin role in user_metadata
       const isAdmin = data.user.user_metadata?.role === 'admin';
       if (!isAdmin) {
