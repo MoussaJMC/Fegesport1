@@ -1,0 +1,68 @@
+-- Drop existing create_admin_policies function
+DROP FUNCTION IF EXISTS public.create_admin_policies CASCADE;
+
+-- Recreate function with explicit search path
+CREATE OR REPLACE FUNCTION public.create_admin_policies()
+RETURNS void
+SECURITY DEFINER
+SET search_path = public, pg_temp
+LANGUAGE plpgsql AS $$
+BEGIN
+  -- Add policies for each table that needs admin access
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'news' AND policyname = 'Admin has full access to news'
+  ) THEN
+    CREATE POLICY "Admin has full access to news" ON public.news
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'events' AND policyname = 'Admin has full access to events'
+  ) THEN
+    CREATE POLICY "Admin has full access to events" ON public.events
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'members' AND policyname = 'Admin has full access to members'
+  ) THEN
+    CREATE POLICY "Admin has full access to members" ON public.members
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'partners' AND policyname = 'Admin has full access to partners'
+  ) THEN
+    CREATE POLICY "Admin has full access to partners" ON public.partners
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'contact_messages' AND policyname = 'Admin has full access to contact_messages'
+  ) THEN
+    CREATE POLICY "Admin has full access to contact_messages" ON public.contact_messages
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
+  END IF;
+END;
+$$;
+
+-- Grant execute permission on the function
+GRANT EXECUTE ON FUNCTION public.create_admin_policies TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_admin_policies TO anon;
+
+-- Update auth settings
+ALTER SYSTEM SET auth.otp_expiry_seconds = 3600; -- Set OTP expiry to 1 hour
+ALTER SYSTEM SET auth.enable_leaked_password_protection = true; -- Enable leaked password protection
+
+-- Reload configuration
+SELECT pg_reload_conf();
