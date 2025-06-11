@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
-import { Lock, AlertCircle } from 'lucide-react';
+import { Lock, AlertCircle, RefreshCw } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -36,13 +36,26 @@ const LoginPage: React.FC = () => {
       if (error.message.includes('Email ou mot de passe incorrect')) {
         setError('email', { message: 'Vérifiez vos identifiants' });
         setError('password', { message: 'Vérifiez vos identifiants' });
-      } else if (error.message.includes('Service temporairement indisponible')) {
-        setError('root', { message: error.message });
+      } else if (error.message.includes('temporairement indisponible') || 
+                 error.message.includes('maintenance') ||
+                 error.message.includes('Erreur serveur')) {
+        setError('root', { 
+          message: error.message,
+          type: 'server_error'
+        });
+      } else if (error.message.includes('Accès non autorisé')) {
+        setError('root', { 
+          message: error.message,
+          type: 'access_denied'
+        });
       } else {
         setError('root', { message: error.message });
       }
     }
   };
+
+  const isServerError = errors.root?.type === 'server_error';
+  const isAccessDenied = errors.root?.type === 'access_denied';
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -57,20 +70,41 @@ const LoginPage: React.FC = () => {
         </div>
         
         {errors.root && (
-          <div className="rounded-md bg-red-50 p-4">
+          <div className={`rounded-md p-4 ${
+            isServerError ? 'bg-yellow-50' : 'bg-red-50'
+          }`}>
             <div className="flex">
               <div className="flex-shrink-0">
-                <AlertCircle className="h-5 w-5 text-red-400" />
+                {isServerError ? (
+                  <RefreshCw className="h-5 w-5 text-yellow-400" />
+                ) : (
+                  <AlertCircle className="h-5 w-5 text-red-400" />
+                )}
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Erreur de connexion
+                <h3 className={`text-sm font-medium ${
+                  isServerError ? 'text-yellow-800' : 'text-red-800'
+                }`}>
+                  {isServerError ? 'Service temporairement indisponible' : 
+                   isAccessDenied ? 'Accès refusé' : 'Erreur de connexion'}
                 </h3>
-                <div className="mt-2 text-sm text-red-700">
+                <div className={`mt-2 text-sm ${
+                  isServerError ? 'text-yellow-700' : 'text-red-700'
+                }`}>
                   <p>{errors.root.message}</p>
-                  {errors.root.message?.includes('Service temporairement indisponible') && (
+                  {isServerError && (
+                    <div className="mt-3 space-y-1">
+                      <p className="text-xs font-medium">Que faire ?</p>
+                      <ul className="text-xs list-disc list-inside space-y-1">
+                        <li>Attendez quelques minutes et réessayez</li>
+                        <li>Vérifiez votre connexion internet</li>
+                        <li>Si le problème persiste, contactez l'administrateur système</li>
+                      </ul>
+                    </div>
+                  )}
+                  {isAccessDenied && (
                     <p className="mt-2 text-xs">
-                      Si le problème persiste, veuillez contacter l'administrateur système.
+                      Seuls les administrateurs peuvent accéder à cette section.
                     </p>
                   )}
                 </div>
@@ -133,6 +167,11 @@ const LoginPage: React.FC = () => {
           <p className="text-xs text-gray-500">
             En cas de problème technique, contactez l'administrateur système
           </p>
+          {import.meta.env.MODE === 'development' && (
+            <p className="text-xs text-gray-400 mt-2">
+              Mode développement - Vérifiez la console pour plus de détails
+            </p>
+          )}
         </div>
       </div>
     </div>

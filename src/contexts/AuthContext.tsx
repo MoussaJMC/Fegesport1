@@ -46,18 +46,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('Supabase auth error:', error);
         
-        // Handle specific error types
+        // Handle specific error types with more detailed error handling
         if (error.message.includes('Database error querying schema')) {
-          throw new Error('Service temporairement indisponible. Veuillez réessayer dans quelques minutes.');
+          throw new Error('Le service d\'authentification est temporairement indisponible. Cela peut être dû à une maintenance de la base de données. Veuillez réessayer dans quelques minutes.');
         } else if (error.message.includes('Invalid login credentials')) {
           throw new Error('Email ou mot de passe incorrect');
         } else if (error.message.includes('Email not confirmed')) {
           throw new Error('Veuillez confirmer votre email avant de vous connecter');
         } else if (error.message.includes('Too many requests')) {
           throw new Error('Trop de tentatives de connexion. Veuillez patienter avant de réessayer.');
+        } else if (error.message.includes('unexpected_failure')) {
+          throw new Error('Erreur serveur inattendue. Le service pourrait être en maintenance. Veuillez réessayer plus tard.');
+        } else if (error.status === 500) {
+          throw new Error('Erreur serveur (500). Le service d\'authentification pourrait être temporairement indisponible.');
         } else {
           // Generic error message for other cases
-          throw new Error('Erreur de connexion. Veuillez vérifier vos identifiants et réessayer.');
+          throw new Error(`Erreur de connexion: ${error.message}`);
         }
       }
 
@@ -76,9 +80,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // Log additional debugging information
-      console.error('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-      console.error('Environment:', import.meta.env.MODE);
+      // Only log debugging information in development
+      if (import.meta.env.MODE === 'development') {
+        console.error('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+        console.error('Environment:', import.meta.env.MODE);
+      }
       
       const errorMessage = error.message || 'Une erreur est survenue lors de la connexion';
       toast.error(errorMessage);

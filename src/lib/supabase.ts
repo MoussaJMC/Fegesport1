@@ -16,6 +16,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'feguiesport-admin'
+    }
   }
 });
 
@@ -26,7 +31,15 @@ export const signIn = async (email: string, password: string) => {
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      // Enhanced error handling for better debugging
+      console.error('Supabase sign in error:', {
+        message: error.message,
+        status: error.status,
+        name: error.name
+      });
+      throw error;
+    }
     return data;
   } catch (error) {
     console.error('Sign in error:', error);
@@ -35,6 +48,29 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Supabase sign out error:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Sign out error:', error);
+    throw error;
+  }
+};
+
+// Health check function to test Supabase connection
+export const checkSupabaseHealth = async () => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('count').limit(1);
+    if (error) {
+      console.error('Supabase health check failed:', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Supabase health check error:', error);
+    return false;
+  }
 };
