@@ -19,7 +19,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+      }
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
@@ -41,26 +44,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        // Pass through the original Supabase error
-        throw error;
+        console.error('Supabase auth error:', error);
+        
+        // Handle specific error types
+        if (error.message.includes('Database error querying schema')) {
+          throw new Error('Service temporairement indisponible. Veuillez réessayer dans quelques minutes.');
+        } else if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email ou mot de passe incorrect');
+        } else if (error.message.includes('Email not confirmed')) {
+          throw new Error('Veuillez confirmer votre email avant de vous connecter');
+        } else if (error.message.includes('Too many requests')) {
+          throw new Error('Trop de tentatives de connexion. Veuillez patienter avant de réessayer.');
+        } else {
+          // Generic error message for other cases
+          throw new Error('Erreur de connexion. Veuillez vérifier vos identifiants et réessayer.');
+        }
       }
 
       if (!data.user) {
-        throw new Error('No user data returned');
+        throw new Error('Aucune donnée utilisateur retournée');
       }
 
       // Check if user has admin role in user_metadata
       const isAdmin = data.user.user_metadata?.role === 'admin';
       if (!isAdmin) {
         await supabase.auth.signOut();
-        throw new Error('Unauthorized access - Admin role required');
+        throw new Error('Accès non autorisé - Rôle administrateur requis');
       }
 
-      toast.success('Login successful');
+      toast.success('Connexion réussie');
     } catch (error: any) {
       console.error('Login error:', error);
-      // Use the error message from Supabase when available
-      const errorMessage = error.message || 'An error occurred during login';
+      
+      // Log additional debugging information
+      console.error('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.error('Environment:', import.meta.env.MODE);
+      
+      const errorMessage = error.message || 'Une erreur est survenue lors de la connexion';
       toast.error(errorMessage);
       throw error;
     }
@@ -69,11 +89,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      toast.success('Successfully logged out');
+      if (error) {
+        console.error('Logout error:', error);
+        throw error;
+      }
+      toast.success('Déconnexion réussie');
     } catch (error: any) {
       console.error('Logout error:', error);
-      const errorMessage = error.message || 'Error during logout';
+      const errorMessage = error.message || 'Erreur lors de la déconnexion';
       toast.error(errorMessage);
       throw error;
     }
