@@ -66,9 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Enhanced error handling with more specific messages
         if (error.message.includes('Database error querying schema')) {
-          throw new Error('Le service d\'authentification rencontre des problèmes techniques. Cela peut être dû à une maintenance de la base de données Supabase. Veuillez réessayer dans quelques minutes ou contacter l\'administrateur si le problème persiste.');
+          throw new Error('🔧 Problème technique Supabase détecté\n\nLe service d\'authentification rencontre des difficultés avec sa base de données. Ceci est généralement temporaire et peut être causé par :\n\n• Maintenance programmée de Supabase\n• Surcharge temporaire du serveur\n• Problème de connectivité réseau\n\nActions recommandées :\n✓ Attendez 2-3 minutes et réessayez\n✓ Vérifiez status.supabase.com\n✓ Contactez l\'administrateur si le problème persiste');
         } else if (error.message.includes('unexpected_failure')) {
-          throw new Error('Erreur serveur inattendue de Supabase. Le service pourrait être en maintenance. Veuillez réessayer plus tard.');
+          throw new Error('⚠️ Erreur serveur Supabase inattendue\n\nLe service pourrait être temporairement indisponible ou en maintenance. Cette erreur est généralement résolue automatiquement.\n\nVeuillez réessayer dans quelques minutes.');
         } else if (error.message.includes('Invalid login credentials')) {
           throw new Error('Email ou mot de passe incorrect');
         } else if (error.message.includes('Email not confirmed')) {
@@ -76,14 +76,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else if (error.message.includes('Too many requests')) {
           throw new Error('Trop de tentatives de connexion. Veuillez patienter avant de réessayer.');
         } else if (error.status === 500) {
-          throw new Error('Erreur serveur (500). Le service d\'authentification Supabase pourrait être temporairement indisponible.');
+          throw new Error('🚨 Erreur serveur Supabase (500)\n\nLe service d\'authentification rencontre des problèmes techniques internes. Ceci indique généralement :\n\n• Problème de base de données Supabase\n• Maintenance en cours\n• Surcharge du service\n\nVeuillez réessayer dans quelques minutes ou vérifier status.supabase.com');
         } else if (error.status === 503) {
-          throw new Error('Service temporairement indisponible (503). Supabase pourrait être en maintenance.');
+          throw new Error('🔧 Service Supabase temporairement indisponible (503)\n\nMaintenance programmée ou surcharge du service en cours.\n\nVeuillez réessayer dans quelques minutes.');
         } else if (error.status === 502 || error.status === 504) {
-          throw new Error('Problème de connectivité avec Supabase. Veuillez réessayer dans quelques instants.');
+          throw new Error('🌐 Problème de connectivité Supabase\n\nProblème de passerelle ou timeout du serveur.\n\nVeuillez réessayer dans quelques instants.');
         } else {
           // Generic error message for other cases
-          throw new Error(`Erreur de connexion Supabase: ${error.message}`);
+          throw new Error(`Erreur de connexion Supabase: ${error.message}\n\nCode d'erreur: ${error.status || 'N/A'}`);
         }
       }
 
