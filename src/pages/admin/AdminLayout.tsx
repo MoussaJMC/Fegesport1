@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell 
+  MessageSquare, LogOut, Menu, X, Bell, Activity 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,6 +30,7 @@ const AdminLayout: React.FC = () => {
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/admin' },
+    { icon: Activity, label: 'Diagnostic', path: '/admin/diagnostic' },
     { icon: Newspaper, label: 'Actualités', path: '/admin/news' },
     { icon: Calendar, label: 'Événements', path: '/admin/events' },
     { icon: Users, label: 'Membres', path: '/admin/members' },

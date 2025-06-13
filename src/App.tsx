@@ -23,6 +23,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import LoginPage from './pages/admin/LoginPage';
 import DashboardPage from './pages/admin/DashboardPage';
+import DiagnosticPage from './pages/admin/DiagnosticPage';
 import NewsAdminPage from './pages/admin/NewsAdminPage';
 import EventsAdminPage from './pages/admin/EventsAdminPage';
 import MembersAdminPage from './pages/admin/MembersAdminPage';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="diagnostic" element={<DiagnosticPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
             <Route path="members" element={<MembersAdminPage />} />
