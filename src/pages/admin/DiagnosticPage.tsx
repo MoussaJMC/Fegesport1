@@ -356,7 +356,7 @@ const DiagnosticPage: React.FC = () => {
             <li>Cliquez "Add user"</li>
             <li>Email: admin@fegesport.org</li>
             <li>Mot de passe: Admin@2025!</li>
-            <li>Dans "User Metadata", ajoutez: {"role": "admin"}</li>
+            <li>Dans "User Metadata", ajoutez: {`{"role": "admin"}`}</li>
           </ul>
           
           <p className="mt-4"><strong>2. Via SQL (si vous avez accès superuser):</strong></p>
