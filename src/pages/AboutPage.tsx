@@ -207,7 +207,7 @@ const AboutPage: React.FC = () => {
                 <p className="text-primary-600 font-medium mb-4">Directrice Marketing</p>
                 <p className="text-gray-600">
                   Spécialiste en marketing digital, Fatoumata développe la stratégie de communication 
-                  et les partenariats de la FEGUIESPORT.
+                  et les partenariats de la FEGESPORT.
                 </p>
               </div>
             </div>
