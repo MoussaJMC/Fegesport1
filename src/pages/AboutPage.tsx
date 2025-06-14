@@ -264,7 +264,7 @@ const AboutPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 1
               </div>
-              <h3 className="text-xl font-bold mb-2">Fondation (2024)</h3>
+              <h3 className="text-xl font-bold mb-2">Fondation (2009-2013)</h3>
               <p className="text-gray-600 mb-4">
                 Création de la FEGESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer 
                 et développer l'écosystème esport national.
@@ -275,9 +275,9 @@ const AboutPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 2
               </div>
-              <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2025)</h3>
+              <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2017)</h3>
               <p className="text-gray-600 mb-4">
-                Obtention de la reconnaissance officielle par le Ministère de la Jeunesse et des Sports, faisant de 
+                Obtention de la reconnaissance officielle par l'Administration du territoir (la ville de Conakry) puis le Ministère de la Jeunesse et des Sports, faisant de 
                 la FEGESPORT l'organe officiel de gouvernance de l'esport en Guinée.
               </p>
             </div>
@@ -286,7 +286,7 @@ const AboutPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 3
               </div>
-              <h3 className="text-xl font-bold mb-2">Premiers Championnats Nationaux (2025)</h3>
+              <h3 className="text-xl font-bold mb-2">Premiers Championnats Nationaux (2018-Nos jours)</h3>
               <p className="text-gray-600 mb-4">
                 Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport, 
                 établissant les standards de compétition pour le pays.
@@ -297,9 +297,9 @@ const AboutPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 4
               </div>
-              <h3 className="text-xl font-bold mb-2">Affiliation Internationale (2025)</h3>
+              <h3 className="text-xl font-bold mb-2">Affiliation Internationale (2019 - Nos jours)</h3>
               <p className="text-gray-600 mb-4">
-                Affiliation aux principales fédérations internationales d'esport, permettant aux équipes guinéennes 
+                Affiliation aux principales fédérations internationales d'esport ACDS, WESCO, IESF & GEF, permettant aux équipes guinéennes 
                 de participer aux compétitions internationales sous les couleurs nationales.
               </p>
             </div>
