@@ -278,7 +278,7 @@ const AboutPage: React.FC = () => {
               <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2025)</h3>
               <p className="text-gray-600 mb-4">
                 Obtention de la reconnaissance officielle par le Ministère de la Jeunesse et des Sports, faisant de 
-                la FEGUIESPORT l'organe officiel de gouvernance de l'esport en Guinée.
+                la FEGESPORT l'organe officiel de gouvernance de l'esport en Guinée.
               </p>
             </div>
 
