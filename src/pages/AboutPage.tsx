@@ -122,7 +122,7 @@ const AboutPage: React.FC = () => {
               <p className="text-gray-600">
                 Nous embrassons l'innovation et cherchons constamment à améliorer et à faire évoluer l'écosystème esport guinéen.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
