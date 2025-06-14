@@ -15,7 +15,7 @@ const NewsPage: React.FC = () => {
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Actualités</h1>
             <p className="text-xl">
-              Restez informé des dernières actualités de l'esport guinéen et des activités de la FEGUIESPORT.
+              Restez informé des dernières actualités de l'esport guinéen et des activités de la FEGESPORT.
             </p>
           </div>
         </div>
