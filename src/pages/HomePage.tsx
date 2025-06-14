@@ -38,7 +38,7 @@ const HomePage: React.FC = () => {
           >
             <img 
               src="https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg"
-              alt="FEGUIESPORT Logo"
+              alt="FEGESPORT Logo"
               className="w-32 h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6"
             />
           </motion.div>
