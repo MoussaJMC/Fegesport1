@@ -152,7 +152,7 @@ const AboutPage: React.FC = () => {
                 <h3 className="text-xl font-bold mb-1">Mamadou Diallo</h3>
                 <p className="text-primary-600 font-medium mb-4">Président</p>
                 <p className="text-gray-600">
-                  Entrepreneur visionnaire et passionné d'esport, Mamadou dirige la FEGUIESPORT avec l'ambition 
+                  Entrepreneur visionnaire et passionné d'esport, Mamadou dirige la FEGESPORT avec l'ambition 
                   de faire de la Guinée une référence de l'esport en Afrique.
                 </p>
               </div>
