@@ -87,9 +87,9 @@ const HomePage: React.FC = () => {
       <section className="section bg-secondary-900 text-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t('home.about.title')}</h2>
+            <h2 className="text-3xl font-bold mb-4">À PROPOS DE LA FEGESPORT</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-lg max-w-3xl mx-auto text-gray-300">{t('home.about.description')}</p>
+            <p className="text-lg max-w-3xl mx-auto text-gray-300">La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
