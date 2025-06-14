@@ -51,7 +51,7 @@ const TermsPage: React.FC = () => {
 
             <h2>5. Propriété Intellectuelle</h2>
             <p>
-              Tout le contenu présent sur le site de la FEGUIESPORT est protégé par les droits d'auteur et autres lois sur 
+              Tout le contenu présent sur le site de la FEGESPORT est protégé par les droits d'auteur et autres lois sur 
               la propriété intellectuelle. Vous ne pouvez pas utiliser ce contenu sans autorisation explicite.
             </p>
 
