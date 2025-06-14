@@ -134,7 +134,7 @@ const AboutPage: React.FC = () => {
             <h2 className="text-3xl font-bold mb-4">Notre Direction</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             <p className="text-lg max-w-3xl mx-auto">
-              La FEGUIESPORT est dirigée par une équipe de professionnels passionnés et engagés, apportant expertise 
+              La FEGESPORT est dirigée par une équipe de professionnels passionnés et engagés, apportant expertise 
               et vision au développement de l'esport guinéen.
             </p>
           </div>
