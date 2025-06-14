@@ -57,7 +57,7 @@ const TermsPage: React.FC = () => {
 
             <h2>6. Limitation de Responsabilité</h2>
             <p>
-              La FEGUIESPORT ne peut être tenue responsable des dommages directs ou indirects résultant de l'utilisation 
+              La FEGESPORT ne peut être tenue responsable des dommages directs ou indirects résultant de l'utilisation 
               ou de l'impossibilité d'utiliser nos services.
             </p>
 
