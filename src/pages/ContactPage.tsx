@@ -76,7 +76,7 @@ const ContactPage: React.FC = () => {
                       href="mailto:contact@feguiesport.org" 
                       className="text-primary-600 hover:text-primary-700"
                     >
-                      contact@feguiesport.org
+                      contact@fegesport.org
                     </a>
                   </div>
                 </motion.div>
