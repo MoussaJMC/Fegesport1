@@ -29,7 +29,7 @@ const ContactPage: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Contactez-nous</h1>
             <p className="text-xl">
               Nous sommes à votre écoute. N'hésitez pas à nous contacter pour toute question
-              concernant la FEGUIESPORT ou l'esport en Guinée.
+              concernant la FEGESPORT ou l'esport en Guinée.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-lg">Adresse</h3>
                     <p className="text-gray-600">
-                      Siège FEGUIESPORT<br />
+                      Siège FEGESPORT<br />
                       Conakry, Guinée<br />
                       BP 12345
                     </p>
