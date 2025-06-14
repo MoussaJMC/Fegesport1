@@ -89,7 +89,7 @@ const PrivacyPage: React.FC = () => {
             <h2>8. Contact</h2>
             <p>
               Pour toute question concernant notre politique de confidentialité ou pour exercer vos droits, 
-              veuillez nous contacter à l'adresse suivante : privacy@feguiesport.org
+              veuillez nous contacter à l'adresse suivante : privacy@fegesport.org
             </p>
           </div>
         </div>
