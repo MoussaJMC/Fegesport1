@@ -266,7 +266,7 @@ const AboutPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Fondation (2024)</h3>
               <p className="text-gray-600 mb-4">
-                Création de la FEGUIESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer 
+                Création de la FEGESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer 
                 et développer l'écosystème esport national.
               </p>
             </div>
