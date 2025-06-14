@@ -22,7 +22,7 @@ const NewsletterSection: React.FC = () => {
             </h2>
             <p className="text-gray-300 mb-8">
               Inscrivez-vous à notre newsletter pour recevoir les dernières actualités, 
-              événements et mises à jour de la FEGUIESPORT directement sur votre email 
+              événements et mises à jour de la FEGESPORT directement sur votre email 
               et WhatsApp.
             </p>
           </motion.div>

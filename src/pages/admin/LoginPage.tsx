@@ -277,7 +277,7 @@ const LoginPage: React.FC = () => {
             <Lock className="h-6 w-6 text-primary-600" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Administration FEGUIESPORT
+            Administration FEGESPORT
           </h2>
         </div>
 

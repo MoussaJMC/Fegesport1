@@ -158,7 +158,7 @@ const MembershipForm: React.FC = () => {
           label="Motivation"
           required
           error={errors.motivation?.message}
-          placeholder="Expliquez-nous pourquoi vous souhaitez rejoindre la FEGUIESPORT..."
+          placeholder="Expliquez-nous pourquoi vous souhaitez rejoindre la FEGESPORT..."
         />
 
         <FormCheckbox

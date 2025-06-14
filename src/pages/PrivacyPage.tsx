@@ -22,7 +22,7 @@ const PrivacyPage: React.FC = () => {
           <div className="prose prose-lg max-w-none">
             <h2>1. Collecte des Données</h2>
             <p>
-              La FEGUIESPORT collecte les données personnelles suivantes :
+              La FEGESPORT collecte les données personnelles suivantes :
             </p>
             <ul>
               <li>Nom et prénom</li>

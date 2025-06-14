@@ -33,7 +33,7 @@ const DashboardPage: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">
-                Administration FEGUIESPORT
+                Administration FEGESPORT
               </h1>
             </div>
             <div className="flex items-center">

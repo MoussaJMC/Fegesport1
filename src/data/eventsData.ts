@@ -4,7 +4,7 @@ export const upcomingEvents: EventItem[] = [
   {
     id: '1',
     title: 'Tournoi National FIFA 25',
-    description: 'Premier tournoi national de FIFA 25 organisé par la FEGUIESPORT avec 64 participants venant de toute la Guinée.',
+    description: 'Premier tournoi national de FIFA 25 organisé par la FEGESPORT avec 64 participants venant de toute la Guinée.',
     date: '2025-02-20',
     formattedDate: '20-22 Février 2025',
     time: '09:00 - 18:00',
@@ -50,11 +50,11 @@ export const upcomingEvents: EventItem[] = [
   {
     id: '2',
     title: 'Formation des Arbitres Esport',
-    description: 'Programme de formation destiné aux futurs arbitres officiels de la FEGUIESPORT pour les compétitions nationales.',
+    description: 'Programme de formation destiné aux futurs arbitres officiels de la FEGESPORT pour les compétitions nationales.',
     date: '2025-03-10',
     formattedDate: '10-12 Mars 2025',
     time: '10:00 - 16:00',
-    location: 'Siège FEGUIESPORT, Conakry',
+    location: 'Siège FEGESPORT, Conakry',
     image: 'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg',
     category: 'Formation',
     type: 'in-person',

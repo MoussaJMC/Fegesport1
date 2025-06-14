@@ -14,7 +14,7 @@ const MembershipPage: React.FC = () => {
     {
       icon: <Shield size={24} />,
       title: 'Reconnaissance Officielle',
-      description: 'Statut officiel reconnu par la FEGUIESPORT et ses partenaires internationaux'
+      description: 'Statut officiel reconnu par la FEGESPORT et ses partenaires internationaux'
     },
     {
       icon: <Users size={24} />,
@@ -24,7 +24,7 @@ const MembershipPage: React.FC = () => {
     {
       icon: <Award size={24} />,
       title: 'Compétitions Officielles',
-      description: 'Participation aux tournois et événements officiels de la FEGUIESPORT'
+      description: 'Participation aux tournois et événements officiels de la FEGESPORT'
     }
   ];
 
@@ -52,7 +52,7 @@ const MembershipPage: React.FC = () => {
         'Jusqu\'à 10 licences joueurs',
         'Organisation de tournois',
         'Support marketing',
-        'Visibilité sur le site FEGUIESPORT'
+        'Visibilité sur le site FEGESPORT'
       ]
     },
     {
@@ -80,7 +80,7 @@ const MembershipPage: React.FC = () => {
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Devenir Membre</h1>
             <p className="text-xl text-gray-300">
-              Rejoignez la FEGUIESPORT et participez au développement de l'esport guinéen. 
+              Rejoignez la FEGESPORT et participez au développement de l'esport guinéen. 
               Découvrez nos différentes formules d'adhésion adaptées à vos besoins.
             </p>
           </div>
@@ -185,7 +185,7 @@ const MembershipPage: React.FC = () => {
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4 text-white">Des Questions ?</h2>
             <p className="text-lg text-gray-300 mb-8">
-              Notre équipe est à votre disposition pour répondre à toutes vos questions concernant l'adhésion à la FEGUIESPORT.
+              Notre équipe est à votre disposition pour répondre à toutes vos questions concernant l'adhésion à la FEGESPORT.
             </p>
             <Link to="/contact" className="btn bg-primary-600 hover:bg-primary-700 text-white">
               Contactez-nous

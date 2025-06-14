@@ -73,7 +73,7 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-lg">Email</h3>
                     <a 
-                      href="mailto:contact@feguiesport.org" 
+                      href="mailto:contact@fegesport.org" 
                       className="text-primary-600 hover:text-primary-700"
                     >
                       contact@fegesport224.org
@@ -203,7 +203,7 @@ const ContactPage: React.FC = () => {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="rounded-lg"
-              title="Siège FEGUIESPORT - Conakry, Guinée"
+              title="Siège FEGESPORT - Conakry, Guinée"
             ></iframe>
           </div>
         </div>

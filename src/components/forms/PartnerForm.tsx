@@ -147,7 +147,7 @@ const PartnerForm: React.FC = () => {
           label="Proposition de partenariat"
           required
           error={errors.proposal?.message}
-          placeholder="Décrivez votre vision du partenariat et ce que vous souhaitez apporter à la FEGUIESPORT..."
+          placeholder="Décrivez votre vision du partenariat et ce que vous souhaitez apporter à la FEGESPORT..."
         />
 
         <FormSelect
@@ -165,7 +165,7 @@ const PartnerForm: React.FC = () => {
 
         <FormCheckbox
           name="acceptTerms"
-          label="J'accepte les conditions de partenariat de la FEGUIESPORT"
+          label="J'accepte les conditions de partenariat de la FEGESPORT"
           required
           error={errors.acceptTerms?.message}
         />

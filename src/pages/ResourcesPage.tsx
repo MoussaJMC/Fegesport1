@@ -23,7 +23,7 @@ const ResourcesPage: React.FC = () => {
         },
         {
           title: 'Règlement Intérieur',
-          description: 'Règles et procédures internes de la FEGUIESPORT',
+          description: 'Règles et procédures internes de la FEGESPORT',
           type: 'PDF',
           size: '1.8 MB',
           url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
@@ -68,7 +68,7 @@ const ResourcesPage: React.FC = () => {
       items: [
         {
           title: 'Rapport Annuel 2024',
-          description: 'Bilan des activités et résultats de la FEGUIESPORT',
+          description: 'Bilan des activités et résultats de la FEGESPORT',
           type: 'PDF',
           size: '5.1 MB',
           url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
@@ -214,7 +214,7 @@ const ResourcesPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-3">Bibliothèque Média</h3>
               <p className="text-gray-600 mb-4">
-                Photos, vidéos et assets officiels de la FEGUIESPORT
+                Photos, vidéos et assets officiels de la FEGESPORT
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
                 Accéder
@@ -231,7 +231,7 @@ const ResourcesPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-3">Charte Graphique</h3>
               <p className="text-gray-600 mb-4">
-                Logos, couleurs et éléments de marque FEGUIESPORT
+                Logos, couleurs et éléments de marque FEGESPORT
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
                 Télécharger

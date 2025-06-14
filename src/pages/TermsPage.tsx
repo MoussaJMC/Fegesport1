@@ -70,7 +70,7 @@ const TermsPage: React.FC = () => {
             <h2>8. Contact</h2>
             <p>
               Pour toute question concernant ces conditions d'utilisation, veuillez nous contacter à l'adresse suivante : 
-              contact@feguiesport.org
+              contact@fegesport.org
             </p>
           </div>
         </div>

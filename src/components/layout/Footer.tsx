@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Federation Info */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4">FEGUIESPORT</h3>
+            <h3 className="text-xl font-bold mb-4">FEGESPORT</h3>
             <p className="text-gray-300 mb-4">
               Fédération Guinéenne d'Esport
             </p>
@@ -101,8 +101,8 @@ const Footer: React.FC = () => {
               <p className="mb-2">BP 12345</p>
               <div className="flex items-center mb-2">
                 <Mail size={16} className="mr-2" />
-                <a href="mailto:contact@feguiesport.org" className="hover:text-white transition-colors">
-                  contact@feguiesport.org
+                <a href="mailto:contact@fegesport.org" className="hover:text-white transition-colors">
+                  contact@fegesport.org
                 </a>
               </div>
             </address>
