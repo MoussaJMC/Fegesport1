@@ -30,7 +30,7 @@ const AboutPage: React.FC = () => {
               <h2 className="text-3xl font-bold mb-4">Notre Mission</h2>
               <div className="w-20 h-1 bg-primary-600 mb-6"></div>
               <p className="text-lg text-gray-700 mb-4">
-                La FEGUIESPORT a pour mission de développer et promouvoir l'esport en Guinée en créant un environnement 
+                La FEGESPORT a pour mission de développer et promouvoir l'esport en Guinée en créant un environnement 
                 structuré, inclusif et professionnel pour tous les acteurs de l'écosystème.
               </p>
               <p className="text-lg text-gray-700">
@@ -122,7 +122,7 @@ const AboutPage: React.FC = () => {
               <p className="text-gray-600">
                 Nous embrassons l'innovation et cherchons constamment à améliorer et à faire évoluer l'écosystème esport guinéen.
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
