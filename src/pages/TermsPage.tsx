@@ -28,7 +28,7 @@ const TermsPage: React.FC = () => {
 
             <h2>2. Description des Services</h2>
             <p>
-              La FEGUIESPORT fournit une plateforme en ligne permettant aux utilisateurs d'accéder à des informations sur l'esport 
+              La FEGESPORT fournit une plateforme en ligne permettant aux utilisateurs d'accéder à des informations sur l'esport 
               en Guinée, de s'inscrire à des événements, et de participer à la communauté esport guinéenne.
             </p>
 
