@@ -67,7 +67,7 @@ const CommunityPage: React.FC = () => {
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Notre Communauté</h1>
             <p className="text-xl">
-              Découvrez les membres actifs de la FEGUIESPORT : joueurs, clubs et partenaires 
+              Découvrez les membres actifs de la FEGESPORT : joueurs, clubs et partenaires 
               qui font vivre l'esport guinéen.
             </p>
           </div>
