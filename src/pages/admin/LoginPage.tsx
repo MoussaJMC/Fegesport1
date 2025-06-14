@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
-import { Lock, AlertCircle, RefreshCw, Wifi, WifiOff, ExternalLink, Server, Database } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { Lock, AlertCircle, RefreshCw, Wifi, WifiOff, ExternalLink, Server, Database, CheckCircle, XCircle } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -14,31 +15,165 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+interface ConnectionTest {
+  name: string;
+  status: 'pending' | 'success' | 'error';
+  message: string;
+  details?: any;
+}
+
 const LoginPage: React.FC = () => {
   const { login, checkServiceHealth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || '/admin';
   const [isCheckingHealth, setIsCheckingHealth] = useState(false);
+  const [connectionTests, setConnectionTests] = useState<ConnectionTest[]>([]);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, setError, clearErrors } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
-  const handleHealthCheck = async () => {
+  // Run connection tests on component mount
+  useEffect(() => {
+    runConnectionTests();
+  }, []);
+
+  const runConnectionTests = async () => {
     setIsCheckingHealth(true);
+    const tests: ConnectionTest[] = [
+      { name: 'Configuration Supabase', status: 'pending', message: 'Vérification...' },
+      { name: 'Connexion Base de Données', status: 'pending', message: 'Vérification...' },
+      { name: 'Service Auth', status: 'pending', message: 'Vérification...' },
+      { name: 'Fonction is_admin()', status: 'pending', message: 'Vérification...' },
+    ];
+
+    setConnectionTests([...tests]);
+
+    // Test 1: Configuration
     try {
-      const isHealthy = await checkServiceHealth();
-      if (isHealthy) {
-        toast.success('✅ Service Supabase accessible et fonctionnel');
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        tests[0] = {
+          name: 'Configuration Supabase',
+          status: 'error',
+          message: 'Variables d\'environnement manquantes',
+          details: { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey }
+        };
       } else {
-        toast.error('❌ Service Supabase inaccessible ou en panne');
+        tests[0] = {
+          name: 'Configuration Supabase',
+          status: 'success',
+          message: 'Configuration OK',
+          details: { url: supabaseUrl.substring(0, 30) + '...', keyLength: supabaseKey.length }
+        };
       }
+      setConnectionTests([...tests]);
     } catch (error) {
-      toast.error('⚠️ Impossible de vérifier l\'état du service');
-    } finally {
-      setIsCheckingHealth(false);
+      tests[0] = {
+        name: 'Configuration Supabase',
+        status: 'error',
+        message: 'Erreur de configuration',
+        details: error
+      };
+      setConnectionTests([...tests]);
     }
+
+    // Test 2: Database Connection
+    try {
+      const { data, error } = await supabase.from('profiles').select('count').limit(1);
+      if (error) {
+        tests[1] = {
+          name: 'Connexion Base de Données',
+          status: 'error',
+          message: `Erreur DB: ${error.message}`,
+          details: error
+        };
+      } else {
+        tests[1] = {
+          name: 'Connexion Base de Données',
+          status: 'success',
+          message: 'Connexion établie',
+          details: data
+        };
+      }
+      setConnectionTests([...tests]);
+    } catch (error: any) {
+      tests[1] = {
+        name: 'Connexion Base de Données',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setConnectionTests([...tests]);
+    }
+
+    // Test 3: Auth Service
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        tests[2] = {
+          name: 'Service Auth',
+          status: 'error',
+          message: `Erreur Auth: ${error.message}`,
+          details: error
+        };
+      } else {
+        tests[2] = {
+          name: 'Service Auth',
+          status: 'success',
+          message: 'Service Auth accessible',
+          details: { hasSession: !!data.session }
+        };
+      }
+      setConnectionTests([...tests]);
+    } catch (error: any) {
+      tests[2] = {
+        name: 'Service Auth',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setConnectionTests([...tests]);
+    }
+
+    // Test 4: is_admin function
+    try {
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) {
+        tests[3] = {
+          name: 'Fonction is_admin()',
+          status: 'error',
+          message: `Fonction non disponible: ${error.message}`,
+          details: error
+        };
+      } else {
+        tests[3] = {
+          name: 'Fonction is_admin()',
+          status: 'success',
+          message: `Fonction accessible (retourne: ${data})`,
+          details: { result: data }
+        };
+      }
+      setConnectionTests([...tests]);
+    } catch (error: any) {
+      tests[3] = {
+        name: 'Fonction is_admin()',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setConnectionTests([...tests]);
+    }
+
+    setIsCheckingHealth(false);
+  };
+
+  const handleHealthCheck = async () => {
+    await runConnectionTests();
   };
 
   const onSubmit = async (data: LoginFormData) => {
@@ -121,6 +256,19 @@ const LoginPage: React.FC = () => {
     return 'text-red-700';
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'success':
+        return <CheckCircle className="text-green-500" size={16} />;
+      case 'error':
+        return <XCircle className="text-red-500" size={16} />;
+      case 'pending':
+        return <RefreshCw className="text-gray-400 animate-spin" size={16} />;
+      default:
+        return <AlertCircle className="text-gray-400" size={16} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -131,6 +279,62 @@ const LoginPage: React.FC = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Administration FEGUIESPORT
           </h2>
+        </div>
+
+        {/* Connection Status */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-900">État de la Connexion</h3>
+            <button
+              onClick={() => setShowDiagnostics(!showDiagnostics)}
+              className="text-xs text-primary-600 hover:text-primary-700"
+            >
+              {showDiagnostics ? 'Masquer' : 'Détails'}
+            </button>
+          </div>
+          
+          <div className="space-y-2">
+            {connectionTests.slice(0, showDiagnostics ? connectionTests.length : 2).map((test, index) => (
+              <div key={index} className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">{test.name}</span>
+                <div className="flex items-center space-x-2">
+                  {getStatusIcon(test.status)}
+                  <span className={`text-xs ${
+                    test.status === 'success' ? 'text-green-600' : 
+                    test.status === 'error' ? 'text-red-600' : 'text-gray-500'
+                  }`}>
+                    {test.status === 'success' ? 'OK' : 
+                     test.status === 'error' ? 'Erreur' : 'Test...'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {showDiagnostics && (
+            <div className="mt-4 space-y-2">
+              {connectionTests.map((test, index) => (
+                <details key={index} className="text-xs">
+                  <summary className="cursor-pointer text-gray-600 hover:text-gray-800">
+                    {test.name}: {test.message}
+                  </summary>
+                  {test.details && (
+                    <pre className="mt-1 p-2 bg-gray-50 rounded text-xs overflow-auto">
+                      {JSON.stringify(test.details, null, 2)}
+                    </pre>
+                  )}
+                </details>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={handleHealthCheck}
+            disabled={isCheckingHealth}
+            className="mt-3 w-full text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded transition-colors disabled:opacity-50"
+          >
+            {isCheckingHealth ? 'Test en cours...' : 'Retester la connexion'}
+          </button>
         </div>
         
         {errors.root && (
