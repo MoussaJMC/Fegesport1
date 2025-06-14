@@ -22,7 +22,7 @@ const TermsPage: React.FC = () => {
           <div className="prose prose-lg max-w-none">
             <h2>1. Acceptation des Conditions</h2>
             <p>
-              En accédant et en utilisant le site web de la FEGUIESPORT, vous acceptez d'être lié par ces conditions d'utilisation. 
+              En accédant et en utilisant le site web de la FEGESPORT, vous acceptez d'être lié par ces conditions d'utilisation. 
               Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre site.
             </p>
 
