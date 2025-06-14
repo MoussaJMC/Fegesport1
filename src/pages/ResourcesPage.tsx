@@ -15,7 +15,7 @@ const ResourcesPage: React.FC = () => {
       category: 'Documents Officiels',
       items: [
         {
-          title: 'Statuts de la FEGUIESPORT',
+          title: 'Statuts de la FEGESPORT',
           description: 'Document officiel détaillant la structure et le fonctionnement de la fédération',
           type: 'PDF',
           size: '2.1 MB',
