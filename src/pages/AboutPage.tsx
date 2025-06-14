@@ -14,7 +14,7 @@ const AboutPage: React.FC = () => {
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">À Propos de la FEGUIESPORT</h1>
             <p className="text-xl">
-              La Fédération Guinéenne d'Esport (FEGUIESPORT) est l'organisation nationale officielle 
+              La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle 
               pour l'esport en Guinée, dédiée à la promotion, la structuration et la représentation
               de l'esport guinéen au niveau national et international.
             </p>
