@@ -180,28 +180,6 @@ const DiagnosticPage: React.FC = () => {
       });
     }
 
-    // 9. Check RLS Policies
-    try {
-      const { data, error } = await supabase
-        .from('pg_policies')
-        .select('tablename, policyname, permissive, roles, cmd')
-        .eq('schemaname', 'public');
-      
-      results.push({
-        name: 'Politiques RLS',
-        status: error ? 'error' : (data && data.length > 0 ? 'success' : 'warning'),
-        message: error ? `Erreur: ${error.message}` : `${data?.length || 0} politiques trouvées`,
-        details: { policies: data, error }
-      });
-    } catch (error: any) {
-      results.push({
-        name: 'Politiques RLS',
-        status: 'warning',
-        message: 'Impossible de vérifier les politiques RLS',
-        details: error
-      });
-    }
-
     setDiagnostics(results);
     setLoading(false);
   };
