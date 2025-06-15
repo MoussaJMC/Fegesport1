@@ -30,9 +30,7 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        sitemap: resolve(__dirname, 'public/sitemap.xml'),
-        robots: resolve(__dirname, 'public/robots.txt')
+        main: resolve(__dirname, 'index.html')
       },
       output: {
         manualChunks: {
