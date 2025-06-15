@@ -10,20 +10,20 @@ const memberSchema = z.object({
   first_name: z.string().min(1, 'Le prénom est requis'),
   last_name: z.string().min(1, 'Le nom est requis'),
   email: z.string().email('Email invalide'),
-  phone: z.string().min(8, 'Numéro de téléphone invalide'),
-  birth_date: z.string().min(1, 'La date de naissance est requise'),
-  address: z.string().min(1, 'L\'adresse est requise'),
-  city: z.string().min(1, 'La ville est requise'),
+  phone: z.string().min(8, 'Numéro de téléphone invalide').optional().or(z.literal('')),
+  birth_date: z.string().min(1, 'La date de naissance est requise').optional().or(z.literal('')),
+  address: z.string().min(1, 'L\'adresse est requise').optional().or(z.literal('')),
+  city: z.string().min(1, 'La ville est requise').optional().or(z.literal('')),
   member_type: z.enum(['player', 'club', 'partner']),
   status: z.enum(['pending', 'active', 'suspended', 'expired']).default('pending'),
-  membership_start: z.string().min(1, 'La date de début est requise'),
-  membership_end: z.string().min(1, 'La date de fin est requise'),
+  membership_start: z.string().min(1, 'La date de début est requise').optional().or(z.literal('')),
+  membership_end: z.string().min(1, 'La date de fin est requise').optional().or(z.literal('')),
 });
 
 type MemberFormData = z.infer<typeof memberSchema>;
 
 interface MemberFormProps {
-  initialData?: MemberFormData;
+  initialData?: Partial<MemberFormData>;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -31,27 +31,51 @@ interface MemberFormProps {
 const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<MemberFormData>({
     resolver: zodResolver(memberSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      first_name: initialData?.first_name || '',
+      last_name: initialData?.last_name || '',
+      email: initialData?.email || '',
+      phone: initialData?.phone || '',
+      birth_date: initialData?.birth_date || '',
+      address: initialData?.address || '',
+      city: initialData?.city || '',
+      member_type: initialData?.member_type || 'player',
+      status: initialData?.status || 'pending',
+      membership_start: initialData?.membership_start || '',
+      membership_end: initialData?.membership_end || '',
+    },
   });
 
   const onSubmit = async (data: MemberFormData) => {
     try {
+      // Clean up empty fields
+      const cleanData = {
+        ...data,
+        phone: data.phone || null,
+        birth_date: data.birth_date || null,
+        address: data.address || null,
+        city: data.city || null,
+        membership_start: data.membership_start || null,
+        membership_end: data.membership_end || null,
+      };
+
       if (initialData?.id) {
         const { error } = await supabase
           .from('members')
-          .update(data)
+          .update(cleanData)
           .eq('id', initialData.id);
         if (error) throw error;
         toast.success('Membre mis à jour avec succès');
       } else {
         const { error } = await supabase
           .from('members')
-          .insert([data]);
+          .insert([cleanData]);
         if (error) throw error;
         toast.success('Membre créé avec succès');
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving member:', error);
       toast.error('Une erreur est survenue');
     }
   };
@@ -216,7 +240,7 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
           disabled={isSubmitting}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          {isSubmitting ? 'Enregistrement...' : initialData ? 'Mettre à jour' : 'Créer'}
+          {isSubmitting ? 'Enregistrement...' : initialData?.id ? 'Mettre à jour' : 'Créer'}
         </button>
       </div>
     </form>

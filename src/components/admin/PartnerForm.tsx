@@ -8,22 +8,22 @@ import { supabase } from '../../lib/supabase';
 const partnerSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, 'Le nom est requis'),
-  logo_url: z.string().url('URL invalide').optional(),
-  website: z.string().url('URL invalide').optional(),
+  logo_url: z.string().url('URL invalide').optional().or(z.literal('')),
+  website: z.string().url('URL invalide').optional().or(z.literal('')),
   description: z.string().min(1, 'La description est requise'),
   partnership_type: z.enum(['sponsor', 'technical', 'media', 'institutional']),
-  contact_name: z.string().min(1, 'Le nom du contact est requis'),
-  contact_email: z.string().email('Email invalide'),
-  contact_phone: z.string().min(8, 'Numéro de téléphone invalide'),
-  partnership_start: z.string().min(1, 'La date de début est requise'),
-  partnership_end: z.string().min(1, 'La date de fin est requise'),
+  contact_name: z.string().min(1, 'Le nom du contact est requis').optional().or(z.literal('')),
+  contact_email: z.string().email('Email invalide').optional().or(z.literal('')),
+  contact_phone: z.string().min(8, 'Numéro de téléphone invalide').optional().or(z.literal('')),
+  partnership_start: z.string().min(1, 'La date de début est requise').optional().or(z.literal('')),
+  partnership_end: z.string().min(1, 'La date de fin est requise').optional().or(z.literal('')),
   status: z.enum(['active', 'inactive']).default('active'),
 });
 
 type PartnerFormData = z.infer<typeof partnerSchema>;
 
 interface PartnerFormProps {
-  initialData?: PartnerFormData;
+  initialData?: Partial<PartnerFormData>;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -31,27 +31,52 @@ interface PartnerFormProps {
 const PartnerForm: React.FC<PartnerFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<PartnerFormData>({
     resolver: zodResolver(partnerSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      name: initialData?.name || '',
+      logo_url: initialData?.logo_url || '',
+      website: initialData?.website || '',
+      description: initialData?.description || '',
+      partnership_type: initialData?.partnership_type || 'sponsor',
+      contact_name: initialData?.contact_name || '',
+      contact_email: initialData?.contact_email || '',
+      contact_phone: initialData?.contact_phone || '',
+      partnership_start: initialData?.partnership_start || '',
+      partnership_end: initialData?.partnership_end || '',
+      status: initialData?.status || 'active',
+    },
   });
 
   const onSubmit = async (data: PartnerFormData) => {
     try {
+      // Clean up empty fields
+      const cleanData = {
+        ...data,
+        logo_url: data.logo_url || null,
+        website: data.website || null,
+        contact_name: data.contact_name || null,
+        contact_email: data.contact_email || null,
+        contact_phone: data.contact_phone || null,
+        partnership_start: data.partnership_start || null,
+        partnership_end: data.partnership_end || null,
+      };
+
       if (initialData?.id) {
         const { error } = await supabase
           .from('partners')
-          .update(data)
+          .update(cleanData)
           .eq('id', initialData.id);
         if (error) throw error;
         toast.success('Partenaire mis à jour avec succès');
       } else {
         const { error } = await supabase
           .from('partners')
-          .insert([data]);
+          .insert([cleanData]);
         if (error) throw error;
         toast.success('Partenaire créé avec succès');
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving partner:', error);
       toast.error('Une erreur est survenue');
     }
   };
@@ -213,7 +238,7 @@ const PartnerForm: React.FC<PartnerFormProps> = ({ initialData, onSuccess, onCan
           disabled={isSubmitting}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          {isSubmitting ? 'Enregistrement...' : initialData ? 'Mettre à jour' : 'Créer'}
+          {isSubmitting ? 'Enregistrement...' : initialData?.id ? 'Mettre à jour' : 'Créer'}
         </button>
       </div>
     </form>

@@ -12,7 +12,7 @@ const eventSchema = z.object({
   date: z.string().min(1, 'La date est requise'),
   time: z.string().optional(),
   location: z.string().min(1, 'Le lieu est requis'),
-  image_url: z.string().url('URL invalide').optional(),
+  image_url: z.string().url('URL invalide').optional().or(z.literal('')),
   category: z.string().min(1, 'La catégorie est requise'),
   type: z.enum(['online', 'in-person', 'hybrid']),
   max_participants: z.number().min(1, 'Le nombre maximum de participants est requis'),
@@ -23,7 +23,7 @@ const eventSchema = z.object({
 type EventFormData = z.infer<typeof eventSchema>;
 
 interface EventFormProps {
-  initialData?: EventFormData;
+  initialData?: Partial<EventFormData>;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -31,27 +31,46 @@ interface EventFormProps {
 const EventForm: React.FC<EventFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      date: initialData?.date || '',
+      time: initialData?.time || '',
+      location: initialData?.location || '',
+      image_url: initialData?.image_url || '',
+      category: initialData?.category || '',
+      type: initialData?.type || 'in-person',
+      max_participants: initialData?.max_participants || 50,
+      price: initialData?.price || 0,
+      status: initialData?.status || 'upcoming',
+    },
   });
 
   const onSubmit = async (data: EventFormData) => {
     try {
+      // Clean up empty image_url
+      const cleanData = {
+        ...data,
+        image_url: data.image_url || null
+      };
+
       if (initialData?.id) {
         const { error } = await supabase
           .from('events')
-          .update(data)
+          .update(cleanData)
           .eq('id', initialData.id);
         if (error) throw error;
         toast.success('Événement mis à jour avec succès');
       } else {
         const { error } = await supabase
           .from('events')
-          .insert([data]);
+          .insert([cleanData]);
         if (error) throw error;
         toast.success('Événement créé avec succès');
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving event:', error);
       toast.error('Une erreur est survenue');
     }
   };
@@ -221,7 +240,7 @@ const EventForm: React.FC<EventFormProps> = ({ initialData, onSuccess, onCancel 
           disabled={isSubmitting}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          {isSubmitting ? 'Enregistrement...' : initialData ? 'Mettre à jour' : 'Créer'}
+          {isSubmitting ? 'Enregistrement...' : initialData?.id ? 'Mettre à jour' : 'Créer'}
         </button>
       </div>
     </form>

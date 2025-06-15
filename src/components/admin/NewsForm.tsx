@@ -11,14 +11,14 @@ const newsSchema = z.object({
   excerpt: z.string().min(1, 'Le résumé est requis'),
   content: z.string().min(1, 'Le contenu est requis'),
   category: z.string().min(1, 'La catégorie est requise'),
-  image_url: z.string().url('URL invalide').optional(),
+  image_url: z.string().url('URL invalide').optional().or(z.literal('')),
   published: z.boolean().default(false),
 });
 
 type NewsFormData = z.infer<typeof newsSchema>;
 
 interface NewsFormProps {
-  initialData?: NewsFormData;
+  initialData?: Partial<NewsFormData>;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -26,27 +26,41 @@ interface NewsFormProps {
 const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      title: initialData?.title || '',
+      excerpt: initialData?.excerpt || '',
+      content: initialData?.content || '',
+      category: initialData?.category || '',
+      image_url: initialData?.image_url || '',
+      published: initialData?.published || false,
+    },
   });
 
   const onSubmit = async (data: NewsFormData) => {
     try {
+      // Clean up empty image_url
+      const cleanData = {
+        ...data,
+        image_url: data.image_url || null
+      };
+
       if (initialData?.id) {
         const { error } = await supabase
           .from('news')
-          .update(data)
+          .update(cleanData)
           .eq('id', initialData.id);
         if (error) throw error;
         toast.success('Actualité mise à jour avec succès');
       } else {
         const { error } = await supabase
           .from('news')
-          .insert([data]);
+          .insert([cleanData]);
         if (error) throw error;
         toast.success('Actualité créée avec succès');
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving news:', error);
       toast.error('Une erreur est survenue');
     }
   };
@@ -141,7 +155,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           disabled={isSubmitting}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          {isSubmitting ? 'Enregistrement...' : initialData ? 'Mettre à jour' : 'Créer'}
+          {isSubmitting ? 'Enregistrement...' : initialData?.id ? 'Mettre à jour' : 'Créer'}
         </button>
       </div>
     </form>
