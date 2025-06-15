@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Mail, Eye, Archive, Trash2, Search, Filter, Reply, MarkEmailRead } from 'lucide-react';
+import { Mail, Eye, Archive, Trash2, Search, Filter, Reply, MailSearch as MarkEmailRead } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
