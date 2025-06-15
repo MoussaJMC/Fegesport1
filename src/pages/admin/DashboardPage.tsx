@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, TrendingUp, Eye, Plus } from 'lucide-react';
+import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -51,7 +51,12 @@ const DashboardPage: React.FC = () => {
       ]);
 
       // Fetch recent activity (latest entries from different tables)
-      const recentActivity = [];
+      const recentActivity: Array<{
+        id: string;
+        type: string;
+        description: string;
+        timestamp: string;
+      }> = [];
       
       // Recent members
       const { data: recentMembers } = await supabase
