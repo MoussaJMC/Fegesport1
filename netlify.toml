@@ -1,5 +1,5 @@
 [build]
-  command = "bolt build"
+  command = "npm run build"
   publish = "dist"
 
 [build.environment]
@@ -46,7 +46,7 @@
 
 # Primary domain
 [context.production]
-  command = "bolt build"
+  command = "npm run build"
   publish = "dist"
 
 [context.production.environment]
@@ -57,7 +57,7 @@
 
 # Preview deployments
 [context.deploy-preview]
-  command = "bolt build"
+  command = "npm run build"
   publish = "dist"
 
 [context.deploy-preview.environment]
@@ -67,7 +67,7 @@
 
 # Branch deployments
 [context.branch-deploy]
-  command = "bolt build"
+  command = "npm run build"
   publish = "dist"
 
 [context.branch-deploy.environment]
