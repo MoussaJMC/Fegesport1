@@ -5,6 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
   NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 
@@ -51,6 +52,7 @@
 
 [context.production.environment]
   NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
   SITE_URL = "https://fegesport224.org"
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
@@ -62,6 +64,7 @@
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 
@@ -72,5 +75,6 @@
 
 [context.branch-deploy.environment]
   NODE_ENV = "production"
+  NPM_FLAGS = "--include=dev"
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
