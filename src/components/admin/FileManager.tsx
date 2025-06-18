@@ -7,6 +7,7 @@ import {
   Shield, Layout, User, Archive, X, Copy, ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FileUploadModal from './FileUploadModal';
 
 interface FileCategory {
   id: string;
@@ -140,6 +141,11 @@ const FileManager: React.FC = () => {
         ? prev.filter(id => id !== fileId)
         : [...prev, fileId]
     );
+  };
+
+  const handleUploadSuccess = () => {
+    fetchFiles();
+    setShowUploadModal(false);
   };
 
   if (loading) {
@@ -592,6 +598,14 @@ const FileManager: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Upload Modal */}
+      <FileUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSuccess={handleUploadSuccess}
+        categories={categories}
+      />
     </div>
   );
 };
