@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell, Activity 
+  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,6 +36,7 @@ const AdminLayout: React.FC = () => {
     { icon: Users, label: 'Membres', path: '/admin/members' },
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
+    { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
   ];
 
   const handleSignOut = async () => {
