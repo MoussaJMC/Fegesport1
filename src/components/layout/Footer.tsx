@@ -2,11 +2,33 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Facebook, Twitter, Instagram, Youtube, Mail } from 'lucide-react';
+import { useSiteSettings } from '../../hooks/useSiteSettings';
 
 const Footer: React.FC = () => {
   const { t } = useTranslation();
+  const { getSetting } = useSiteSettings();
   
   const currentYear = new Date().getFullYear();
+  
+  // Get contact info from database
+  const contactInfo = getSetting('contact_info', {
+    address: "Conakry, Guinée",
+    postal_code: "BP 12345",
+    email: "contact@fegesport224.org",
+    phone: "+224 625878764",
+    social_media: {
+      facebook: "https://facebook.com/fegesport",
+      twitter: "https://twitter.com/fegesport",
+      instagram: "https://instagram.com/fegesport",
+      youtube: "https://youtube.com/fegesport"
+    }
+  });
+
+  // Get navigation settings for footer links
+  const navigationSettings = getSetting('main_navigation', {
+    brand_text: "FEGESPORT",
+    items: []
+  });
   
   return (
     <footer className="bg-gray-900 text-white">
@@ -14,23 +36,31 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Federation Info */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4">FEGESPORT</h3>
+            <h3 className="text-xl font-bold mb-4">{navigationSettings.brand_text || "FEGESPORT"}</h3>
             <p className="text-gray-300 mb-4">
               Fédération Guinéenne d'Esport
             </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                <Instagram size={20} />
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                <Youtube size={20} />
-              </a>
+              {contactInfo.social_media?.facebook && (
+                <a href={contactInfo.social_media.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                  <Facebook size={20} />
+                </a>
+              )}
+              {contactInfo.social_media?.twitter && (
+                <a href={contactInfo.social_media.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                  <Twitter size={20} />
+                </a>
+              )}
+              {contactInfo.social_media?.instagram && (
+                <a href={contactInfo.social_media.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                  <Instagram size={20} />
+                </a>
+              )}
+              {contactInfo.social_media?.youtube && (
+                <a href={contactInfo.social_media.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                  <Youtube size={20} />
+                </a>
+              )}
             </div>
           </div>
           
@@ -38,26 +68,13 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="text-lg font-semibold mb-4">Navigation</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.home')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.about')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/news" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.news')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/membership" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.membership')}
-                </Link>
-              </li>
+              {navigationSettings.items?.slice(0, 4).map((item: any) => (
+                <li key={item.path}>
+                  <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           
@@ -65,21 +82,13 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="text-lg font-semibold mb-4">Ressources</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/resources" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.resources')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/partners" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.partners')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
-                  {t('navigation.contact')}
-                </Link>
-              </li>
+              {navigationSettings.items?.slice(4).map((item: any) => (
+                <li key={item.path}>
+                  <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link to="/privacy" className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.privacy')}
@@ -97,14 +106,21 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <address className="not-italic text-gray-300">
-              <p className="mb-2">Conakry, Guinée</p>
-              <p className="mb-2">BP 12345</p>
-              <div className="flex items-center mb-2">
-                <Mail size={16} className="mr-2" />
-                <a href="mailto:contact@fegesport.org" className="hover:text-white transition-colors">
-                  contact@fegesport.org
-                </a>
-              </div>
+              <p className="mb-2">{contactInfo.address}</p>
+              {contactInfo.postal_code && (
+                <p className="mb-2">{contactInfo.postal_code}</p>
+              )}
+              {contactInfo.email && (
+                <div className="flex items-center mb-2">
+                  <Mail size={16} className="mr-2" />
+                  <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">
+                    {contactInfo.email}
+                  </a>
+                </div>
+              )}
+              {contactInfo.phone && (
+                <p className="mb-2">{contactInfo.phone}</p>
+              )}
             </address>
           </div>
         </div>

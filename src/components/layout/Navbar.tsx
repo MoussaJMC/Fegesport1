@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Menu, X, Globe, ChevronDown, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSiteSettings } from '../../hooks/useSiteSettings';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +14,32 @@ const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { getSetting, loading: settingsLoading } = useSiteSettings();
+
+  // Get settings from database
+  const logoSettings = getSetting('site_logo', {
+    main_logo: "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg",
+    alt_text: "FEGESPORT Logo",
+    width: 48,
+    height: 48,
+    link: "/"
+  });
+
+  const navigationSettings = getSetting('main_navigation', {
+    brand_text: "FEGESPORT",
+    items: [
+      { label: "Accueil", path: "/", order: 1 },
+      { label: "À propos", path: "/about", order: 2 },
+      { label: "Actualités", path: "/news", order: 3 },
+      { label: "Adhésion", path: "/membership", order: 4, submenu: [
+        { label: "Adhésion", path: "/membership" },
+        { label: "Communauté", path: "/membership/community" }
+      ]},
+      { label: "Ressources", path: "/resources", order: 5 },
+      { label: "Partenaires", path: "/partners", order: 6 },
+      { label: "Contact", path: "/contact", order: 7 }
+    ]
+  });
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -40,25 +67,44 @@ const Navbar: React.FC = () => {
     setMembershipMenuOpen(false);
   }, [location]);
 
-  const navItems = [
-    { name: t('navigation.home'), path: '/' },
-    { name: t('navigation.about'), path: '/about' },
-    { name: t('navigation.news'), path: '/news' },
-    {
-      name: t('navigation.membership'),
-      path: '/membership',
-      submenu: [
-        { name: 'Adhésion', path: '/membership' },
-        { name: 'Communauté', path: '/membership/community' },
-      ]
-    },
-    { name: t('navigation.resources'), path: '/resources' },
-    { name: t('navigation.partners'), path: '/partners' },
-    { name: t('navigation.contact'), path: '/contact' },
-  ];
+  // Build navigation items from database settings
+  const navItems = React.useMemo(() => {
+    const items = [...(navigationSettings.items || [])];
+    
+    // Sort by order
+    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+    
+    // Add admin link if authenticated
+    if (isAuthenticated) {
+      items.push({ 
+        label: 'Administration', 
+        path: '/admin', 
+        order: 999 
+      });
+    }
+    
+    return items;
+  }, [navigationSettings.items, isAuthenticated]);
 
-  if (isAuthenticated) {
-    navItems.push({ name: 'Administration', path: '/admin' });
+  // Show loading state or fallback if settings are loading
+  if (settingsLoading) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-secondary-900 shadow-md py-2">
+        <nav className="container-custom">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <div className="h-12 w-12 bg-gray-300 rounded animate-pulse"></div>
+              <div className="h-6 w-32 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+            <div className="hidden md:flex space-x-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </header>
+    );
   }
 
   return (
@@ -72,14 +118,24 @@ const Navbar: React.FC = () => {
       <nav className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg"
-              alt="FEGESPORT Logo"
-              className="h-12 w-12 rounded"
-            />
+          <Link to={logoSettings.link || "/"} className="flex items-center space-x-2">
+            {logoSettings.main_logo && (
+              <img 
+                src={logoSettings.main_logo}
+                alt={logoSettings.alt_text || "Logo"}
+                className="rounded"
+                style={{ 
+                  width: logoSettings.width || 48, 
+                  height: logoSettings.height || 48 
+                }}
+                onError={(e) => {
+                  // Fallback to default logo if image fails to load
+                  e.currentTarget.src = "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg";
+                }}
+              />
+            )}
             <span className={`text-2xl font-bold ${scrolled ? 'text-primary-500' : 'text-white'}`}>
-              FEGESPORT
+              {navigationSettings.brand_text || "FEGESPORT"}
             </span>
           </Link>
 
@@ -101,7 +157,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.name}
+                      {item.label}
                       <ChevronDown size={14} className="ml-1" />
                     </button>
                   ) : (
@@ -117,7 +173,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.name}
+                      {item.label}
                     </Link>
                   )}
                   {item.submenu && membershipMenuOpen && (
@@ -133,7 +189,7 @@ const Navbar: React.FC = () => {
                           to={subItem.path}
                           className="block px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
                         >
-                          {subItem.name}
+                          {subItem.label}
                         </Link>
                       ))}
                     </motion.div>
@@ -227,7 +283,7 @@ const Navbar: React.FC = () => {
                           }
                         `}
                       >
-                        {item.name}
+                        {item.label}
                         <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {membershipMenuOpen && (
@@ -244,7 +300,7 @@ const Navbar: React.FC = () => {
                                 }
                               `}
                             >
-                              {subItem.name}
+                              {subItem.label}
                             </Link>
                           ))}
                         </div>
@@ -261,7 +317,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.name}
+                      {item.label}
                     </Link>
                   )}
                 </div>
