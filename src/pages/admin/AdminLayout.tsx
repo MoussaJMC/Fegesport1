@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen 
+  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -178,6 +178,7 @@ const AdminLayout: React.FC = () => {
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/admin' },
     { icon: Activity, label: 'Diagnostic', path: '/admin/diagnostic' },
+    { icon: Globe, label: 'Pages', path: '/admin/pages' },
     { icon: Newspaper, label: 'Actualités', path: '/admin/news' },
     { icon: Calendar, label: 'Événements', path: '/admin/events' },
     { icon: Users, label: 'Membres', path: '/admin/members' },
