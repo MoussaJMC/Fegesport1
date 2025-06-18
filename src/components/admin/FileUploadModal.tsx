@@ -89,7 +89,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         return;
       }
 
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         resolve({ width: img.width, height: img.height });
       };
