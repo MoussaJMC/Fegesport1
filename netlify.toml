@@ -9,38 +9,7 @@
   VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 
-# Admin route redirects (case-insensitive)
-[[redirects]]
-  from = "/admin/Login"
-  to = "/admin/login"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/Admin/*"
-  to = "/admin/:splat"
-  status = 301
-  force = true
-
-# Main SPA redirect - handles all routes including /news/, /about/, etc.
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
-  conditions = {Path = "!/sitemap.xml"}
-
-[[headers]]
-  for = "/*"
-    [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-
-# Domain configuration
+# Domain configuration - redirect www to non-www
 [[redirects]]
   from = "https://www.fegesport224.org/*"
   to = "https://fegesport224.org/:splat"
@@ -58,6 +27,59 @@
   to = "https://fegesport224.org/:splat"
   status = 301
   force = true
+
+# Admin route redirects (case-insensitive)
+[[redirects]]
+  from = "/admin/Login"
+  to = "/admin/login"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/Admin/*"
+  to = "/admin/:splat"
+  status = 301
+  force = true
+
+# SPA fallback - this MUST be the last redirect rule
+# It handles all routes that don't match static files
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/*"
+    [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+    [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "*.jpg"
+    [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.png"
+    [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.svg"
+    [headers.values]
+    Cache-Control = "public, max-age=86400"
 
 # Primary domain
 [context.production]
