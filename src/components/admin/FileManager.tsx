@@ -148,6 +148,10 @@ const FileManager: React.FC = () => {
     setShowUploadModal(false);
   };
 
+  const hasActiveFilters = searchTerm || selectedCategory;
+  const hasFiles = files.length > 0;
+  const hasFilteredFiles = filteredFiles.length > 0;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -259,220 +263,227 @@ const FileManager: React.FC = () => {
 
       {/* Files Grid/List */}
       <div className="bg-white rounded-lg shadow">
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
-            {filteredFiles.map((file, index) => (
-              <motion.div
-                key={file.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`relative group border-2 rounded-lg p-3 cursor-pointer transition-all ${
-                  selectedFiles.includes(file.id) 
-                    ? 'border-primary-500 bg-primary-50' 
-                    : 'border-gray-200 hover:border-primary-300'
-                }`}
-                onClick={() => toggleFileSelection(file.id)}
-              >
-                <div className="aspect-square mb-2 bg-gray-100 rounded-lg overflow-hidden">
-                  {file.file_type.startsWith('image/') ? (
-                    <img 
-                      src={file.file_url} 
-                      alt={file.alt_text || file.filename}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      {React.createElement(getIconComponent(file.category?.icon || 'FileText'), {
-                        size: 32,
-                        className: 'text-gray-400'
-                      })}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="text-xs">
-                  <div className="font-medium truncate" title={file.title || file.filename}>
-                    {file.title || file.filename}
-                  </div>
-                  <div className="text-gray-500">{formatFileSize(file.file_size || 0)}</div>
-                </div>
-
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="flex gap-1">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewFile(file);
-                      }}
-                      className="p-1 bg-white rounded shadow hover:bg-gray-50"
-                    >
-                      <Eye size={14} />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(file.file_url);
-                      }}
-                      className="p-1 bg-white rounded shadow hover:bg-gray-50"
-                    >
-                      <Copy size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                {file.is_featured && (
-                  <div className="absolute top-2 left-2">
-                    <div className="bg-yellow-500 text-white text-xs px-2 py-1 rounded">
-                      Vedette
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedFiles(filteredFiles.map(f => f.id));
-                        } else {
-                          setSelectedFiles([]);
-                        }
-                      }}
-                      checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
-                    />
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fichier
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Catégorie
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Taille
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredFiles.map((file) => (
-                  <tr key={file.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <input
-                        type="checkbox"
-                        checked={selectedFiles.includes(file.id)}
-                        onChange={() => toggleFileSelection(file.id)}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0 mr-3">
-                          {file.file_type.startsWith('image/') ? (
-                            <img 
-                              src={file.file_url} 
-                              alt={file.alt_text || file.filename}
-                              className="h-10 w-10 rounded object-cover"
-                            />
-                          ) : (
-                            <div className="h-10 w-10 bg-gray-100 rounded flex items-center justify-center">
-                              {React.createElement(getIconComponent(file.category?.icon || 'FileText'), {
-                                size: 20,
-                                className: 'text-gray-400'
-                              })}
-                            </div>
-                          )}
+        {hasFilteredFiles ? (
+          <>
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
+                {filteredFiles.map((file, index) => (
+                  <motion.div
+                    key={file.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className={`relative group border-2 rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedFiles.includes(file.id) 
+                        ? 'border-primary-500 bg-primary-50' 
+                        : 'border-gray-200 hover:border-primary-300'
+                    }`}
+                    onClick={() => toggleFileSelection(file.id)}
+                  >
+                    <div className="aspect-square mb-2 bg-gray-100 rounded-lg overflow-hidden">
+                      {file.file_type.startsWith('image/') ? (
+                        <img 
+                          src={file.file_url} 
+                          alt={file.alt_text || file.filename}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {React.createElement(getIconComponent(file.category?.icon || 'FileText'), {
+                            size: 32,
+                            className: 'text-gray-400'
+                          })}
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {file.title || file.filename}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {file.original_filename}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {file.category && (
-                        <span 
-                          className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                          style={{ 
-                            backgroundColor: file.category.color + '20',
-                            color: file.category.color 
-                          }}
-                        >
-                          {file.category.name}
-                        </span>
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatFileSize(file.file_size || 0)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(file.created_at).toLocaleDateString('fr-FR')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button 
-                          onClick={() => setPreviewFile(file)}
-                          className="text-primary-600 hover:text-primary-900"
-                          title="Aperçu"
+                    </div>
+                    
+                    <div className="text-xs">
+                      <div className="font-medium truncate" title={file.title || file.filename}>
+                        {file.title || file.filename}
+                      </div>
+                      <div className="text-gray-500">{formatFileSize(file.file_size || 0)}</div>
+                    </div>
+
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewFile(file);
+                          }}
+                          className="p-1 bg-white rounded shadow hover:bg-gray-50"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye size={14} />
                         </button>
-                        <button 
-                          onClick={() => copyToClipboard(file.file_url)}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Copier l'URL"
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(file.file_url);
+                          }}
+                          className="p-1 bg-white rounded shadow hover:bg-gray-50"
                         >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => window.open(file.file_url, '_blank')}
-                          className="text-green-600 hover:text-green-900"
-                          title="Ouvrir"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => deleteFile(file.id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Supprimer"
-                        >
-                          <Trash2 className="w-4 h-4" />
+                          <Copy size={14} />
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    </div>
 
-        {filteredFiles.length === 0 && (
+                    {file.is_featured && (
+                      <div className="absolute top-2 left-2">
+                        <div className="bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                          Vedette
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <input
+                          type="checkbox"
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFiles(filteredFiles.map(f => f.id));
+                            } else {
+                              setSelectedFiles([]);
+                            }
+                          }}
+                          checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
+                        />
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Fichier
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Catégorie
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Taille
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredFiles.map((file) => (
+                      <tr key={file.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={selectedFiles.includes(file.id)}
+                            onChange={() => toggleFileSelection(file.id)}
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="h-10 w-10 flex-shrink-0 mr-3">
+                              {file.file_type.startsWith('image/') ? (
+                                <img 
+                                  src={file.file_url} 
+                                  alt={file.alt_text || file.filename}
+                                  className="h-10 w-10 rounded object-cover"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 bg-gray-100 rounded flex items-center justify-center">
+                                  {React.createElement(getIconComponent(file.category?.icon || 'FileText'), {
+                                    size: 20,
+                                    className: 'text-gray-400'
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {file.title || file.filename}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {file.original_filename}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {file.category && (
+                            <span 
+                              className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                              style={{ 
+                                backgroundColor: file.category.color + '20',
+                                color: file.category.color 
+                              }}
+                            >
+                              {file.category.name}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {formatFileSize(file.file_size || 0)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(file.created_at).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2">
+                            <button 
+                              onClick={() => setPreviewFile(file)}
+                              className="text-primary-600 hover:text-primary-900"
+                              title="Aperçu"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => copyToClipboard(file.file_url)}
+                              className="text-blue-600 hover:text-blue-900"
+                              title="Copier l'URL"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => window.open(file.file_url, '_blank')}
+                              className="text-green-600 hover:text-green-900"
+                              title="Ouvrir"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => deleteFile(file.id)}
+                              className="text-red-600 hover:text-red-900"
+                              title="Supprimer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        ) : (
           <div className="text-center py-12">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun fichier</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              {!hasFiles ? 'Aucun fichier' : 'Aucun résultat'}
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || selectedCategory 
-                ? 'Aucun fichier ne correspond à vos critères de recherche.'
-                : 'Commencez par télécharger votre premier fichier.'
-              }
+              {!hasFiles ? (
+                'Commencez par télécharger votre premier fichier.'
+              ) : hasActiveFilters ? (
+                'Aucun fichier ne correspond à vos critères de recherche.'
+              ) : (
+                'Aucun fichier disponible.'
+              )}
             </p>
-            {!searchTerm && !selectedCategory && (
+            {!hasFiles && (
               <div className="mt-6">
                 <button
                   onClick={() => setShowUploadModal(true)}
