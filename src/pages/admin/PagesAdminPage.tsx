@@ -55,16 +55,29 @@ const PagesAdminPage = () => {
   const [filterStatus, setFilterStatus] = useState('');
 
   // Form states
-  const [pageForm, setPageForm] = useState({
+  const [pageForm, setPageForm] = useState<{
+    slug: string;
+    title: string;
+    meta_description: string;
+    status: Page['status'];
+  }>({
     slug: '',
     title: '',
     meta_description: '',
-    status: 'draft' as const
+    status: 'draft'
   });
 
-  const [sectionForm, setSectionForm] = useState({
+  const [sectionForm, setSectionForm] = useState<{
+    section_key: string;
+    section_type: PageSection['section_type'];
+    title: string;
+    content: string;
+    image_url: string;
+    settings: any;
+    is_active: boolean;
+  }>({
     section_key: '',
-    section_type: 'text' as const,
+    section_type: 'text',
     title: '',
     content: '',
     image_url: '',
@@ -891,7 +904,7 @@ const PagesAdminPage = () => {
                     </label>
                     <select
                       value={pageForm.status}
-                      onChange={(e) => setPageForm({ ...pageForm, status: e.target.value as any })}
+                      onChange={(e) => setPageForm({ ...pageForm, status: e.target.value as Page['status'] })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value="draft">Brouillon</option>
@@ -971,7 +984,7 @@ const PagesAdminPage = () => {
                       </label>
                       <select
                         value={sectionForm.section_type}
-                        onChange={(e) => setSectionForm({ ...sectionForm, section_type: e.target.value as any })}
+                        onChange={(e) => setSectionForm({ ...sectionForm, section_type: e.target.value as PageSection['section_type'] })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                       >
                         <option value="hero">Hero</option>

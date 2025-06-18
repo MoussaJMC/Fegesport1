@@ -6,6 +6,18 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 
+interface SubNavItem {
+  label: string;
+  path: string;
+}
+
+interface NavItem {
+  label: string;
+  path: string;
+  order: number;
+  submenu?: SubNavItem[];
+}
+
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -38,7 +50,7 @@ const Navbar: React.FC = () => {
       { label: "Ressources", path: "/resources", order: 5 },
       { label: "Partenaires", path: "/partners", order: 6 },
       { label: "Contact", path: "/contact", order: 7 }
-    ]
+    ] as NavItem[]
   });
 
   const changeLanguage = (lng: string) => {
@@ -183,7 +195,7 @@ const Navbar: React.FC = () => {
                       exit={{ opacity: 0, y: -10 }}
                       className="absolute left-0 mt-2 w-48 bg-secondary-800 rounded-md shadow-lg py-1 z-50"
                     >
-                      {item.submenu.map((subItem) => (
+                      {item.submenu.map((subItem: SubNavItem) => (
                         <Link
                           key={subItem.path}
                           to={subItem.path}
@@ -288,7 +300,7 @@ const Navbar: React.FC = () => {
                       </button>
                       {membershipMenuOpen && (
                         <div className="pl-4 space-y-1">
-                          {item.submenu.map((subItem) => (
+                          {item.submenu.map((subItem: SubNavItem) => (
                             <Link
                               key={subItem.path}
                               to={subItem.path}
