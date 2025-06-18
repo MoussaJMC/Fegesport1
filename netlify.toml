@@ -22,14 +22,7 @@
   status = 301
   force = true
 
-# Ensure admin routes are handled by React Router
-[[redirects]]
-  from = "/admin/*"
-  to = "/index.html"
-  status = 200
-  force = false
-
-# Main SPA redirect - must be last
+# Main SPA redirect - handles all routes including /news/, /about/, etc.
 [[redirects]]
   from = "/*"
   to = "/index.html"
