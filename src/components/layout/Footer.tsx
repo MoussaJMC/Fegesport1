@@ -30,6 +30,21 @@ const Footer: React.FC = () => {
     items: []
   });
   
+  // Get translated label for navigation items
+  const getTranslatedLabel = (label: string): string => {
+    // Convert label to lowercase and remove accents for matching with translation keys
+    const key = label.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, '');
+    
+    // Check if we have a translation for this key
+    const translationKey = `navigation.${key}`;
+    const hasTranslation = i18n.exists(translationKey);
+    
+    return hasTranslation ? t(translationKey) : label;
+  };
+  
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container-custom py-12">
@@ -38,7 +53,7 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-4">{navigationSettings.brand_text || "FEGESPORT"}</h3>
             <p className="text-gray-300 mb-4">
-              Fédération Guinéenne d'Esport
+              {i18n.language === 'fr' ? 'Fédération Guinéenne d\'Esport' : 'Guinean Esports Federation'}
             </p>
             <div className="flex space-x-4">
               {contactInfo.social_media?.facebook && (
@@ -71,9 +86,7 @@ const Footer: React.FC = () => {
               {navigationSettings.items?.slice(0, 4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {i18n.language === 'en' 
-                      ? t(`navigation.${item.label.toLowerCase()}`) 
-                      : item.label}
+                    {getTranslatedLabel(item.label)}
                   </Link>
                 </li>
               ))}
@@ -87,9 +100,7 @@ const Footer: React.FC = () => {
               {navigationSettings.items?.slice(4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {i18n.language === 'en' 
-                      ? t(`navigation.${item.label.toLowerCase()}`) 
-                      : item.label}
+                    {getTranslatedLabel(item.label)}
                   </Link>
                 </li>
               ))}

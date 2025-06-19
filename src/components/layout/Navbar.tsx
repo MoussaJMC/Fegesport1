@@ -98,6 +98,21 @@ const Navbar: React.FC = () => {
     return items;
   }, [navigationSettings.items, isAuthenticated]);
 
+  // Get translated label for navigation items
+  const getTranslatedLabel = (label: string): string => {
+    // Convert label to lowercase and remove accents for matching with translation keys
+    const key = label.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, '');
+    
+    // Check if we have a translation for this key
+    const translationKey = `navigation.${key}`;
+    const hasTranslation = i18n.exists(translationKey);
+    
+    return hasTranslation ? t(translationKey) : label;
+  };
+
   // Show loading state or fallback if settings are loading
   if (settingsLoading) {
     return (
@@ -118,21 +133,6 @@ const Navbar: React.FC = () => {
       </header>
     );
   }
-
-  // Get translated label for navigation items
-  const getTranslatedLabel = (label: string): string => {
-    // Convert label to lowercase and remove accents for matching with translation keys
-    const key = label.toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, '');
-    
-    // Check if we have a translation for this key
-    const translationKey = `navigation.${key}`;
-    const hasTranslation = i18n.exists(translationKey);
-    
-    return hasTranslation ? t(translationKey) : label;
-  };
 
   return (
     <header
@@ -353,7 +353,7 @@ const Navbar: React.FC = () => {
               {/* Mobile Language Selector */}
               <div className="pt-2 pb-1">
                 <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Language
+                  {i18n.language === 'fr' ? 'Langue' : 'Language'}
                 </p>
                 <button
                   onClick={() => changeLanguage('fr')}

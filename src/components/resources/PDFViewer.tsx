@@ -104,14 +104,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, onClose }) => {
               className="btn bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft size={20} className="mr-1" />
-              Précédent
+              {i18n.language === 'fr' ? 'Précédent' : 'Previous'}
             </button>
             <button
               onClick={nextPage}
               disabled={pageNumber >= numPages}
               className="btn bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Suivant
+              {i18n.language === 'fr' ? 'Suivant' : 'Next'}
               <ChevronRight size={20} className="ml-1" />
             </button>
           </div>
