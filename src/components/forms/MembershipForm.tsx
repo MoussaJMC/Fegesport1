@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { FormField, FormTextarea, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
 import PayPalButton from '../payment/PayPalButton';
+import { useTranslation } from 'react-i18next';
 
 const membershipSchema = z.object({
   type: z.string().min(1, 'Veuillez sélectionner un type d\'adhésion'),
@@ -27,6 +28,7 @@ const membershipSchema = z.object({
 type MembershipFormData = z.infer<typeof membershipSchema>;
 
 const MembershipForm: React.FC = () => {
+  const { t } = useTranslation();
   const [showPayment, setShowPayment] = useState(false);
   const [formData, setFormData] = useState<MembershipFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,7 +125,7 @@ const MembershipForm: React.FC = () => {
         }
 
         console.log('Member status updated to active');
-        toast.success('Votre adhésion a été finalisée avec succès !');
+        toast.success(t('membership.form.success'));
         methods.reset();
         setShowPayment(false);
         setFormData(null);
@@ -246,7 +248,7 @@ const MembershipForm: React.FC = () => {
 
         {!showPayment ? (
           <FormSubmitButton isLoading={isSubmitting} className="w-full">
-            {isSubmitting ? 'Enregistrement en cours...' : 'Continuer vers le paiement'}
+            {isSubmitting ? 'Enregistrement en cours...' : t('membership.form.continue')}
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">

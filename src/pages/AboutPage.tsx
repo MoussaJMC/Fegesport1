@@ -12,11 +12,9 @@ const AboutPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">À Propos de la FEGESPORT</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
             <p className="text-xl">
-              La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle 
-              pour l'esport en Guinée, dédiée à la promotion, la structuration et la représentation
-              de l'esport guinéen au niveau national et international.
+              {t('about.subtitle')}
             </p>
           </div>
         </div>
@@ -27,28 +25,17 @@ const AboutPage: React.FC = () => {
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-3xl font-bold mb-4">Notre Mission</h2>
+              <h2 className="text-3xl font-bold mb-4">{t('about.mission.title')}</h2>
               <div className="w-20 h-1 bg-primary-600 mb-6"></div>
               <p className="text-lg text-gray-700 mb-4">
-                La FEGESPORT a pour mission de développer et promouvoir l'esport en Guinée en créant un environnement 
-                structuré, inclusif et professionnel pour tous les acteurs de l'écosystème.
-              </p>
-              <p className="text-lg text-gray-700">
-                Nous travaillons à l'élaboration de cadres réglementaires, à l'organisation de compétitions officielles, 
-                et à la représentation des intérêts de la communauté esport guinéenne auprès des instances nationales et
-                internationales.
+                {t('about.mission.description')}
               </p>
             </div>
             <div>
-              <h2 className="text-3xl font-bold mb-4">Notre Vision</h2>
+              <h2 className="text-3xl font-bold mb-4">{t('about.vision.title')}</h2>
               <div className="w-20 h-1 bg-primary-600 mb-6"></div>
               <p className="text-lg text-gray-700 mb-4">
-                Notre vision est de positionner la Guinée comme un acteur majeur de l'esport en Afrique, en construisant
-                un écosystème esport durable, équitable et innovant qui crée des opportunités pour tous.
-              </p>
-              <p className="text-lg text-gray-700">
-                Nous aspirons à une reconnaissance complète de l'esport comme discipline sportive légitime et à 
-                l'établissement de standards professionnels pour tous les aspects du secteur.
+                {t('about.vision.description')}
               </p>
             </div>
           </div>
@@ -59,11 +46,10 @@ const AboutPage: React.FC = () => {
       <section className="section bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Nos Valeurs</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('about.values.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             <p className="text-lg max-w-3xl mx-auto">
-              Nos actions sont guidées par un ensemble de valeurs fondamentales qui reflètent notre engagement 
-              envers l'excellence, l'intégrité et l'inclusivité dans l'esport.
+              {t('about.values.description')}
             </p>
           </div>
 
@@ -76,9 +62,9 @@ const AboutPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <Award className="text-primary-600" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Excellence</h3>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.excellence')}</h3>
               <p className="text-gray-600">
-                Nous promouvons et poursuivons l'excellence dans tous les aspects de notre travail et de nos compétitions.
+                {t('about.values.excellence_desc')}
               </p>
             </motion.div>
 
@@ -90,9 +76,9 @@ const AboutPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <Shield className="text-primary-600" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Intégrité</h3>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.integrity')}</h3>
               <p className="text-gray-600">
-                Nous agissons avec honnêteté, transparence et responsabilité dans toutes nos activités et décisions.
+                {t('about.values.integrity_desc')}
               </p>
             </motion.div>
 
@@ -104,9 +90,9 @@ const AboutPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <Users className="text-primary-600" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Inclusivité</h3>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.inclusivity')}</h3>
               <p className="text-gray-600">
-                Nous valorisons la diversité et nous nous engageons à créer un environnement esport inclusif et accessible à tous.
+                {t('about.values.inclusivity_desc')}
               </p>
             </motion.div>
 
@@ -118,9 +104,9 @@ const AboutPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                 <Globe className="text-primary-600" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Innovation</h3>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.innovation')}</h3>
               <p className="text-gray-600">
-                Nous embrassons l'innovation et cherchons constamment à améliorer et à faire évoluer l'écosystème esport guinéen.
+                {t('about.values.innovation_desc')}
               </p>
             </motion.div>
           </div>

@@ -9,16 +9,16 @@ const PartnersPage: React.FC = () => {
 
   const partners = [
     {
-      category: 'Partenaires Institutionnels',
+      category: t('partners.title'),
       items: [
         {
           name: 'Ministère de la Jeunesse et des Sports',
-          logo: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg',
           description: 'Soutien officiel du gouvernement guinéen pour le développement de l\'esport'
         },
         {
           name: 'Comité National Olympique',
-          logo: 'https://images.pexels.com/photos/2381463/pexels-photo-2381463.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/2381463/pexels-photo-2381463.jpeg',
           description: 'Partenaire pour la reconnaissance de l\'esport comme discipline sportive'
         }
       ]
@@ -28,12 +28,12 @@ const PartnersPage: React.FC = () => {
       items: [
         {
           name: 'Gaming Academy',
-          logo: 'https://images.pexels.com/photos/7915487/pexels-photo-7915487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/7915487/pexels-photo-7915487.jpeg',
           description: 'Formation et développement des talents esport'
         },
         {
           name: 'ESL Gaming Africa',
-          logo: 'https://images.pexels.com/photos/7862608/pexels-photo-7862608.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/7862608/pexels-photo-7862608.jpeg',
           description: 'Organisation de tournois et événements internationaux'
         }
       ]
@@ -43,12 +43,12 @@ const PartnersPage: React.FC = () => {
       items: [
         {
           name: 'TotalEnergies Guinée',
-          logo: 'https://images.pexels.com/photos/2381465/pexels-photo-2381465.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/2381465/pexels-photo-2381465.jpeg',
           description: 'Sponsor principal des championnats nationaux'
         },
         {
           name: 'Orange Guinée',
-          logo: 'https://images.pexels.com/photos/2381466/pexels-photo-2381466.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+          logo: 'https://images.pexels.com/photos/2381466/pexels-photo-2381466.jpeg',
           description: 'Partenaire connectivité pour les compétitions en ligne'
         }
       ]
@@ -58,18 +58,18 @@ const PartnersPage: React.FC = () => {
   const benefits = [
     {
       icon: <Trophy size={24} />,
-      title: 'Visibilité Premium',
-      description: 'Présence sur tous nos supports de communication et événements'
+      title: t('partners.benefits.visibility'),
+      description: t('partners.benefits.visibility_desc')
     },
     {
       icon: <Users size={24} />,
-      title: 'Réseau Exclusif',
-      description: 'Accès à notre réseau de partenaires et acteurs de l\'esport'
+      title: t('partners.benefits.network'),
+      description: t('partners.benefits.network_desc')
     },
     {
       icon: <Globe size={24} />,
-      title: 'Rayonnement International',
-      description: 'Exposition lors des compétitions internationales'
+      title: t('partners.benefits.international'),
+      description: t('partners.benefits.international_desc')
     }
   ];
 
@@ -79,10 +79,9 @@ const PartnersPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Nos Partenaires</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('partners.title')}</h1>
             <p className="text-xl">
-              Découvrez les organisations qui nous accompagnent dans le développement 
-              de l'esport en Guinée.
+              {t('partners.subtitle')}
             </p>
           </div>
         </div>
@@ -125,7 +124,7 @@ const PartnersPage: React.FC = () => {
       <section className="section bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Devenir Partenaire</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('partners.become')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             <p className="text-lg max-w-2xl mx-auto">
               Rejoignez-nous dans notre mission de développer l'esport en Guinée et 
@@ -152,7 +151,7 @@ const PartnersPage: React.FC = () => {
 
           <div className="text-center">
             <Link to="/contact" className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8">
-              Contactez-nous
+              {t('contact.title')}
             </Link>
           </div>
         </div>
@@ -162,7 +161,7 @@ const PartnersPage: React.FC = () => {
       <section className="section bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Processus de Partenariat</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('partners.process.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 
@@ -171,9 +170,9 @@ const PartnersPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 1
               </div>
-              <h3 className="text-xl font-bold mb-2">Premier Contact</h3>
+              <h3 className="text-xl font-bold mb-2">{t('partners.process.contact')}</h3>
               <p className="text-gray-600">
-                Échangeons sur vos objectifs et explorons les possibilités de collaboration.
+                {t('partners.process.contact_desc')}
               </p>
             </div>
 
@@ -181,9 +180,9 @@ const PartnersPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 2
               </div>
-              <h3 className="text-xl font-bold mb-2">Proposition Sur Mesure</h3>
+              <h3 className="text-xl font-bold mb-2">{t('partners.process.proposal')}</h3>
               <p className="text-gray-600">
-                Nous élaborons une proposition adaptée à vos besoins et objectifs.
+                {t('partners.process.proposal_desc')}
               </p>
             </div>
 
@@ -191,9 +190,9 @@ const PartnersPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 3
               </div>
-              <h3 className="text-xl font-bold mb-2">Finalisation</h3>
+              <h3 className="text-xl font-bold mb-2">{t('partners.process.finalization')}</h3>
               <p className="text-gray-600">
-                Nous définissons ensemble les modalités du partenariat.
+                {t('partners.process.finalization_desc')}
               </p>
             </div>
 
@@ -201,9 +200,9 @@ const PartnersPage: React.FC = () => {
               <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 4
               </div>
-              <h3 className="text-xl font-bold mb-2">Activation</h3>
+              <h3 className="text-xl font-bold mb-2">{t('partners.process.activation')}</h3>
               <p className="text-gray-600">
-                Mise en œuvre du partenariat et début des activations.
+                {t('partners.process.activation_desc')}
               </p>
             </div>
           </div>

@@ -13,9 +13,9 @@ const NewsPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Actualités</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('news.title')}</h1>
             <p className="text-xl">
-              Restez informé des dernières actualités de l'esport guinéen et des activités de la FEGESPORT.
+              {t('news.subtitle')}
             </p>
           </div>
         </div>

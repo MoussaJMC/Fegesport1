@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { FormField, FormTextarea, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
+import { useTranslation } from 'react-i18next';
 
 const partnerSchema = z.object({
   type: z.string().min(1, 'Veuillez sélectionner un type de partenariat'),
@@ -27,6 +28,7 @@ const partnerSchema = z.object({
 type PartnerFormData = z.infer<typeof partnerSchema>;
 
 const PartnerForm: React.FC = () => {
+  const { t } = useTranslation();
   const methods = useForm<PartnerFormData>({
     resolver: zodResolver(partnerSchema),
   });
@@ -41,7 +43,7 @@ const PartnerForm: React.FC = () => {
       toast.success('Votre demande de partenariat a été envoyée avec succès !');
       methods.reset();
     } catch (error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     }
   };
 

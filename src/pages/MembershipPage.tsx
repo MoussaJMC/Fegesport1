@@ -13,27 +13,27 @@ const MembershipPage: React.FC = () => {
   const membershipBenefits = [
     {
       icon: <Shield size={24} />,
-      title: 'Reconnaissance Officielle',
-      description: 'Statut officiel reconnu par la FEGESPORT et ses partenaires internationaux'
+      title: t('membership.why_join.recognition'),
+      description: t('membership.why_join.recognition_desc')
     },
     {
       icon: <Users size={24} />,
-      title: 'Réseau Professionnel',
-      description: 'Accès à un réseau d\'acteurs de l\'esport guinéen et international'
+      title: t('membership.why_join.network'),
+      description: t('membership.why_join.network_desc')
     },
     {
       icon: <Award size={24} />,
-      title: 'Compétitions Officielles',
-      description: 'Participation aux tournois et événements officiels de la FEGESPORT'
+      title: t('membership.why_join.competitions'),
+      description: t('membership.why_join.competitions_desc')
     }
   ];
 
   const membershipTypes = [
     {
       id: 'player',
-      title: 'Joueur Individuel',
-      price: '15,000',
-      period: 'par an',
+      title: t('membership.types.player'),
+      price: t('membership.types.player_price'),
+      period: t('membership.types.player_period'),
       features: [
         'Licence officielle de joueur',
         'Participation aux tournois officiels',
@@ -44,9 +44,9 @@ const MembershipPage: React.FC = () => {
     },
     {
       id: 'club',
-      title: 'Club Esport',
-      price: '150,000',
-      period: 'par an',
+      title: t('membership.types.club'),
+      price: t('membership.types.club_price'),
+      period: t('membership.types.club_period'),
       features: [
         'Statut de club officiel',
         'Jusqu\'à 10 licences joueurs',
@@ -57,9 +57,9 @@ const MembershipPage: React.FC = () => {
     },
     {
       id: 'partner',
-      title: 'Partenaire',
-      price: 'Sur mesure',
-      period: '',
+      title: t('membership.types.partner'),
+      price: t('membership.types.partner_price'),
+      period: t('membership.types.partner_period'),
       features: [
         'Statut de partenaire officiel',
         'Logo sur le site et événements',
@@ -78,10 +78,9 @@ const MembershipPage: React.FC = () => {
       <section className="bg-secondary-900 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Devenir Membre</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('membership.title')}</h1>
             <p className="text-xl text-gray-300">
-              Rejoignez la FEGESPORT et participez au développement de l'esport guinéen. 
-              Découvrez nos différentes formules d'adhésion adaptées à vos besoins.
+              {t('membership.subtitle')}
             </p>
           </div>
         </div>
@@ -91,7 +90,7 @@ const MembershipPage: React.FC = () => {
       <section className="section bg-secondary-800">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-white">Pourquoi Nous Rejoindre ?</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">{t('membership.why_join.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 
@@ -118,7 +117,7 @@ const MembershipPage: React.FC = () => {
       <section className="section bg-secondary-900">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-white">Types d'Adhésion</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">{t('membership.types.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 
@@ -155,7 +154,7 @@ const MembershipPage: React.FC = () => {
                   }`}
                   onClick={() => setSelectedPlan(type.id)}
                 >
-                  Sélectionner
+                  {t('membership.types.select')}
                 </button>
               </motion.div>
             ))}
@@ -168,7 +167,7 @@ const MembershipPage: React.FC = () => {
         <section className="section bg-secondary-800">
           <div className="container-custom max-w-3xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-white">Formulaire d'Adhésion</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">{t('membership.form.title')}</h2>
               <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             </div>
 
@@ -183,12 +182,12 @@ const MembershipPage: React.FC = () => {
       <section className="section bg-secondary-900">
         <div className="container-custom">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4 text-white">Des Questions ?</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">{t('membership.questions.title')}</h2>
             <p className="text-lg text-gray-300 mb-8">
-              Notre équipe est à votre disposition pour répondre à toutes vos questions concernant l'adhésion à la FEGESPORT.
+              {t('membership.questions.description')}
             </p>
             <Link to="/contact" className="btn bg-primary-600 hover:bg-primary-700 text-white">
-              Contactez-nous
+              {t('membership.questions.contact')}
             </Link>
           </div>
         </div>

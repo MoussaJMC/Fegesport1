@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { FormField, FormTextarea, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
+import { useTranslation } from 'react-i18next';
 
 const tournamentSchema = z.object({
   tournament: z.string().min(1, 'Veuillez sélectionner un tournoi'),
@@ -24,6 +25,7 @@ const tournamentSchema = z.object({
 type TournamentFormData = z.infer<typeof tournamentSchema>;
 
 const TournamentForm: React.FC = () => {
+  const { t } = useTranslation();
   const methods = useForm<TournamentFormData>({
     resolver: zodResolver(tournamentSchema),
   });
@@ -38,7 +40,7 @@ const TournamentForm: React.FC = () => {
       toast.success('Votre inscription au tournoi a été enregistrée avec succès !');
       methods.reset();
     } catch (error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     }
   };
 

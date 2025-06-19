@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { FormField, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
 import PayPalButton from '../payment/PayPalButton';
 import { EventPrice } from '../../types/events';
+import { useTranslation } from 'react-i18next';
 
 const registrationSchema = z.object({
   firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
@@ -34,6 +35,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
   prices,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [showPayment, setShowPayment] = React.useState(false);
   const [selectedPrice, setSelectedPrice] = React.useState<EventPrice | null>(null);
   const [formData, setFormData] = React.useState<RegistrationFormData | null>(null);
@@ -57,7 +59,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
       setFormData(data);
       setShowPayment(true);
     } catch (error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     }
   };
 
@@ -67,7 +69,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
       console.log('Payment successful', details);
       console.log('Form data', formData);
       
-      toast.success('Votre inscription a été finalisée avec succès !');
+      toast.success(t('membership.form.success'));
       methods.reset();
       setShowPayment(false);
       onSuccess();
@@ -190,7 +192,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
 
         {!showPayment ? (
           <FormSubmitButton isLoading={isSubmitting} className="w-full">
-            Continuer vers le paiement
+            {t('membership.form.continue')}
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">

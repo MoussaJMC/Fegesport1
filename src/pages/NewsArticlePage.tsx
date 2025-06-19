@@ -3,8 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, Tag, User } from 'lucide-react';
 import { latestNews } from '../data/newsData';
+import { useTranslation } from 'react-i18next';
 
 const NewsArticlePage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const article = latestNews.find(news => news.id === id);
 
@@ -12,14 +14,14 @@ const NewsArticlePage: React.FC = () => {
     return (
       <div className="pt-20 min-h-screen bg-secondary-900">
         <div className="container-custom py-20 text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Article non trouvé</h1>
-          <p className="text-gray-300 mb-8">L'article que vous recherchez n'existe pas.</p>
+          <h1 className="text-3xl font-bold text-white mb-4">{t('common.notFound')}</h1>
+          <p className="text-gray-300 mb-8">{t('common.notFoundMessage')}</p>
           <Link 
             to="/news" 
             className="inline-flex items-center text-primary-500 hover:text-primary-400"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Retour aux actualités
+            {t('common.backHome')}
           </Link>
         </div>
       </div>
@@ -105,7 +107,7 @@ const NewsArticlePage: React.FC = () => {
             className="inline-flex items-center text-primary-500 hover:text-primary-400"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Retour aux actualités
+            {t('common.backHome')}
           </Link>
           
           <div className="flex gap-4">

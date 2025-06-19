@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, MapPin, Clock, Users, AlertTriangle } from 'lucide-react';
 import { upcomingEvents } from '../data/eventsData';
 import EventRegistrationForm from '../components/events/EventRegistrationForm';
+import { useTranslation } from 'react-i18next';
 
 const EventPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const event = upcomingEvents.find(event => event.id === id);
   const [showRegistration, setShowRegistration] = React.useState(false);
@@ -14,14 +16,14 @@ const EventPage: React.FC = () => {
     return (
       <div className="pt-20 min-h-screen bg-secondary-900">
         <div className="container-custom py-20 text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Événement non trouvé</h1>
-          <p className="text-gray-300 mb-8">L'événement que vous recherchez n'existe pas.</p>
+          <h1 className="text-3xl font-bold text-white mb-4">{t('common.notFound')}</h1>
+          <p className="text-gray-300 mb-8">{t('common.notFoundMessage')}</p>
           <Link 
             to="/" 
             className="inline-flex items-center text-primary-500 hover:text-primary-400"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Retour à l'accueil
+            {t('common.backHome')}
           </Link>
         </div>
       </div>
@@ -69,7 +71,7 @@ const EventPage: React.FC = () => {
             <div className="flex items-center text-gray-300">
               <Calendar size={20} className="mr-2 text-primary-500" />
               <div>
-                <div className="font-semibold">Date</div>
+                <div className="font-semibold">{t('events.date')}</div>
                 <div>{event.formattedDate}</div>
               </div>
             </div>
@@ -78,7 +80,7 @@ const EventPage: React.FC = () => {
               <div className="flex items-center text-gray-300">
                 <Clock size={20} className="mr-2 text-primary-500" />
                 <div>
-                  <div className="font-semibold">Horaire</div>
+                  <div className="font-semibold">{t('events.time')}</div>
                   <div>{event.time}</div>
                 </div>
               </div>
@@ -88,7 +90,7 @@ const EventPage: React.FC = () => {
               <div className="flex items-center text-gray-300">
                 <MapPin size={20} className="mr-2 text-primary-500" />
                 <div>
-                  <div className="font-semibold">Lieu</div>
+                  <div className="font-semibold">{t('events.location')}</div>
                   <div>{event.location}</div>
                 </div>
               </div>
@@ -98,7 +100,7 @@ const EventPage: React.FC = () => {
               <div className="flex items-center text-gray-300">
                 <Users size={20} className="mr-2 text-primary-500" />
                 <div>
-                  <div className="font-semibold">Participants</div>
+                  <div className="font-semibold">{t('events.participants')}</div>
                   <div>
                     {event.currentParticipants || 0} / {event.maxParticipants}
                   </div>
@@ -115,7 +117,7 @@ const EventPage: React.FC = () => {
           {/* Rules */}
           {event.rules && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">Règlement</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">{t('events.rules')}</h2>
               <div className="bg-secondary-700 rounded-lg p-6">
                 <div className="flex items-start mb-4">
                   <AlertTriangle size={24} className="text-primary-500 mr-2 flex-shrink-0 mt-1" />
@@ -144,7 +146,7 @@ const EventPage: React.FC = () => {
                     : 'bg-primary-600 hover:bg-primary-700'
                 } text-white text-lg px-8 py-3`}
               >
-                {isFull ? 'Complet' : 'S\'inscrire'}
+                {isFull ? t('events.full') : t('events.register')}
               </button>
             </div>
           )}
@@ -158,7 +160,7 @@ const EventPage: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="bg-secondary-800 rounded-lg shadow-xl p-8 mb-12"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Inscription</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('events.register')}</h2>
             <EventRegistrationForm
               eventId={event.id}
               prices={event.prices}
@@ -174,7 +176,7 @@ const EventPage: React.FC = () => {
             className="inline-flex items-center text-primary-500 hover:text-primary-400"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Retour à l'accueil
+            {t('common.backHome')}
           </Link>
         </div>
       </div>

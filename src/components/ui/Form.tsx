@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 interface FormFieldProps {
   name: string;
@@ -139,6 +140,8 @@ export const FormSubmitButton: React.FC<{
   isLoading?: boolean;
   className?: string;
 }> = ({ children, isLoading = false, className = '' }) => {
+  const { t } = useTranslation();
+  
   return (
     <button
       type="submit"
@@ -148,7 +151,7 @@ export const FormSubmitButton: React.FC<{
       {isLoading ? (
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-          Chargement...
+          {t('common.loading')}
         </div>
       ) : (
         children

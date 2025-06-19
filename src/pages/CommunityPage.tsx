@@ -2,9 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Trophy, Star, Building } from 'lucide-react';
 import { useCommunityStats } from '../hooks/useCommunityStats';
+import { useTranslation } from 'react-i18next';
 
 const CommunityPage: React.FC = () => {
   const { stats, isLoading } = useCommunityStats();
+  const { t } = useTranslation();
 
   const members = {
     players: [
@@ -65,10 +67,9 @@ const CommunityPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Notre Communauté</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('community.title')}</h1>
             <p className="text-xl">
-              Découvrez les membres actifs de la FEGESPORT : joueurs, clubs et partenaires 
-              qui font vivre l'esport guinéen.
+              {t('community.subtitle')}
             </p>
           </div>
         </div>
@@ -92,7 +93,7 @@ const CommunityPage: React.FC = () => {
                   `${stats?.players || 0}+`
                 )}
               </div>
-              <div className="text-gray-400">Joueurs Inscrits</div>
+              <div className="text-gray-400">{t('community.stats.players')}</div>
             </motion.div>
 
             <motion.div
@@ -109,7 +110,7 @@ const CommunityPage: React.FC = () => {
                   stats?.clubs || 0
                 )}
               </div>
-              <div className="text-gray-400">Clubs Officiels</div>
+              <div className="text-gray-400">{t('community.stats.clubs')}</div>
             </motion.div>
 
             <motion.div
@@ -126,7 +127,7 @@ const CommunityPage: React.FC = () => {
                   stats?.partners || 0
                 )}
               </div>
-              <div className="text-gray-400">Partenaires</div>
+              <div className="text-gray-400">{t('community.stats.partners')}</div>
             </motion.div>
           </div>
         </div>
@@ -136,7 +137,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-800">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">Joueurs Pro</h2>
+            <h2 className="text-3xl font-bold text-white">{t('community.sections.players')}</h2>
             <Trophy className="text-primary-500" size={32} />
           </div>
 
@@ -181,7 +182,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-900">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">Clubs</h2>
+            <h2 className="text-3xl font-bold text-white">{t('community.sections.clubs')}</h2>
             <Building className="text-primary-500" size={32} />
           </div>
 
@@ -225,7 +226,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-800">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">Partenaires</h2>
+            <h2 className="text-3xl font-bold text-white">{t('community.sections.partners')}</h2>
             <Star className="text-primary-500" size={32} />
           </div>
 

@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
 
 interface ContactFormData {
   name: string;
@@ -11,13 +15,40 @@ interface ContactFormData {
   message: string;
 }
 
+const contactSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  email: z.string().email('Email invalide'),
+  subject: z.string().min(3, 'Le sujet doit contenir au moins 3 caractères'),
+  message: z.string().min(10, 'Le message doit contenir au moins 10 caractères'),
+});
+
 const ContactPage: React.FC = () => {
   const { t } = useTranslation();
-  const { register, handleSubmit, formState: { errors } } = useForm<ContactFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  });
 
-  const onSubmit = (data: ContactFormData) => {
-    console.log(data);
-    // Handle form submission
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      // Insert message into contact_messages table
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([{
+          name: data.name,
+          email: data.email,
+          subject: data.subject,
+          message: data.message,
+          status: 'unread'
+        }]);
+
+      if (error) throw error;
+      
+      toast.success('Message envoyé avec succès!');
+      reset();
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast.error('Une erreur est survenue. Veuillez réessayer.');
+    }
   };
 
   return (
@@ -26,10 +57,9 @@ const ContactPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Contactez-nous</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('contact.title')}</h1>
             <p className="text-xl">
-              Nous sommes à votre écoute. N'hésitez pas à nous contacter pour toute question
-              concernant la FEGESPORT ou l'esport en Guinée.
+              {t('contact.subtitle')}
             </p>
           </div>
         </div>
@@ -40,7 +70,7 @@ const ContactPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Information */}
             <div>
-              <h2 className="text-2xl font-bold mb-6">Informations de Contact</h2>
+              <h2 className="text-2xl font-bold mb-6">{t('contact.info.title')}</h2>
               <div className="space-y-6">
                 <motion.div 
                   className="flex items-start space-x-4"
@@ -52,7 +82,7 @@ const ContactPage: React.FC = () => {
                     <MapPin className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Adresse</h3>
+                    <h3 className="font-semibold text-lg">{t('contact.info.address')}</h3>
                     <p className="text-gray-600">
                       Siège FEGESPORT<br />
                       Conakry, Guinée<br />
@@ -71,7 +101,7 @@ const ContactPage: React.FC = () => {
                     <Mail className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Email</h3>
+                    <h3 className="font-semibold text-lg">{t('contact.info.email')}</h3>
                     <a 
                       href="mailto:contact@fegesport.org" 
                       className="text-primary-600 hover:text-primary-700"
@@ -91,34 +121,34 @@ const ContactPage: React.FC = () => {
                     <Phone className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Téléphone</h3>
+                    <h3 className="font-semibold text-lg">{t('contact.info.phone')}</h3>
                     <p className="text-gray-600">+224 625878764</p>
                   </div>
                 </motion.div>
               </div>
 
               <div className="mt-12">
-                <h2 className="text-2xl font-bold mb-6">Horaires d'Ouverture</h2>
+                <h2 className="text-2xl font-bold mb-6">{t('contact.hours.title')}</h2>
                 <div className="space-y-2 text-gray-600">
-                  <p>Lundi - Vendredi: 8h30 - 17h00</p>
-                  <p>Samedi: 9h00 - 13h00</p>
-                  <p>Dimanche: Fermé</p>
+                  <p>{t('contact.hours.weekdays')}</p>
+                  <p>{t('contact.hours.saturday')}</p>
+                  <p>{t('contact.hours.sunday')}</p>
                 </div>
               </div>
             </div>
 
             {/* Contact Form */}
             <div>
-              <h2 className="text-2xl font-bold mb-6">Envoyez-nous un Message</h2>
+              <h2 className="text-2xl font-bold mb-6">{t('contact.form.title')}</h2>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Nom complet
+                    {t('contact.form.name')}
                   </label>
                   <input
                     type="text"
                     id="name"
-                    {...register("name", { required: "Le nom est requis" })}
+                    {...register("name")}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   />
                   {errors.name && (
@@ -128,18 +158,12 @@ const ContactPage: React.FC = () => {
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
+                    {t('contact.form.email')}
                   </label>
                   <input
                     type="email"
                     id="email"
-                    {...register("email", { 
-                      required: "L'email est requis",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Adresse email invalide"
-                      }
-                    })}
+                    {...register("email")}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   />
                   {errors.email && (
@@ -149,12 +173,12 @@ const ContactPage: React.FC = () => {
 
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                    Sujet
+                    {t('contact.form.subject')}
                   </label>
                   <input
                     type="text"
                     id="subject"
-                    {...register("subject", { required: "Le sujet est requis" })}
+                    {...register("subject")}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   />
                   {errors.subject && (
@@ -164,12 +188,12 @@ const ContactPage: React.FC = () => {
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                    Message
+                    {t('contact.form.message')}
                   </label>
                   <textarea
                     id="message"
                     rows={6}
-                    {...register("message", { required: "Le message est requis" })}
+                    {...register("message")}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                   ></textarea>
                   {errors.message && (
@@ -182,7 +206,7 @@ const ContactPage: React.FC = () => {
                   className="btn btn-primary w-full flex items-center justify-center"
                 >
                   <Send className="w-5 h-5 mr-2" />
-                  Envoyer le message
+                  {t('contact.form.send')}
                 </button>
               </form>
             </div>
