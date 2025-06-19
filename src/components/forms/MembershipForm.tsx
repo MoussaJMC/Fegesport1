@@ -3,6 +3,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { supabase } from '../../lib/supabase';
 import { FormField, FormTextarea, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
 import PayPalButton from '../payment/PayPalButton';
 
@@ -28,32 +29,107 @@ type MembershipFormData = z.infer<typeof membershipSchema>;
 const MembershipForm: React.FC = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [formData, setFormData] = useState<MembershipFormData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<MembershipFormData>({
     resolver: zodResolver(membershipSchema),
   });
 
-  const { handleSubmit, formState: { errors, isSubmitting } } = methods;
+  const { handleSubmit, formState: { errors } } = methods;
 
   const onSubmit = async (data: MembershipFormData) => {
     try {
+      setIsSubmitting(true);
+      
+      // First, let's test the database connection
+      console.log('Testing database connection...');
+      const { data: testData, error: testError } = await supabase
+        .from('members')
+        .select('count')
+        .limit(1);
+      
+      if (testError) {
+        console.error('Database connection test failed:', testError);
+        toast.error('Erreur de connexion à la base de données');
+        return;
+      }
+      
+      console.log('Database connection successful');
+      
+      // Prepare member data for database insertion
+      const memberData = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        birth_date: data.birthDate,
+        address: data.address,
+        city: data.city,
+        member_type: data.type as 'player' | 'club' | 'partner',
+        status: 'pending' as const,
+        membership_start: new Date().toISOString().split('T')[0], // Today's date
+        membership_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // One year from now
+      };
+
+      console.log('Attempting to insert member data:', memberData);
+
+      // Insert member data into database
+      const { data: insertedMember, error: insertError } = await supabase
+        .from('members')
+        .insert([memberData])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Database insertion error:', insertError);
+        toast.error(`Erreur lors de l'inscription: ${insertError.message}`);
+        return;
+      }
+
+      console.log('Member successfully inserted:', insertedMember);
+      
+      // Store form data for payment processing
       setFormData(data);
+      
+      // Show success message
+      toast.success('Données d\'inscription enregistrées avec succès!');
+      
+      // Proceed to payment
       setShowPayment(true);
-    } catch (error) {
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      
+    } catch (error: any) {
+      console.error('Unexpected error during member inscription:', error);
+      toast.error('Une erreur inattendue est survenue. Veuillez réessayer.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handlePaymentSuccess = async (details: any) => {
     try {
-      // Here you would typically send both the form data and payment details to your backend
-      console.log('Payment successful', details);
-      console.log('Form data', formData);
+      console.log('Payment successful:', details);
       
-      toast.success('Votre adhésion a été finalisée avec succès !');
-      methods.reset();
-      setShowPayment(false);
-    } catch (error) {
+      if (formData) {
+        // Update member status to active after successful payment
+        const { error: updateError } = await supabase
+          .from('members')
+          .update({ status: 'active' })
+          .eq('email', formData.email);
+
+        if (updateError) {
+          console.error('Error updating member status:', updateError);
+          toast.error('Erreur lors de la mise à jour du statut');
+          return;
+        }
+
+        console.log('Member status updated to active');
+        toast.success('Votre adhésion a été finalisée avec succès !');
+        methods.reset();
+        setShowPayment(false);
+        setFormData(null);
+      }
+    } catch (error: any) {
+      console.error('Error in payment success handler:', error);
       toast.error('Une erreur est survenue lors de la finalisation de l\'adhésion.');
     }
   };
@@ -170,10 +246,17 @@ const MembershipForm: React.FC = () => {
 
         {!showPayment ? (
           <FormSubmitButton isLoading={isSubmitting} className="w-full">
-            Continuer vers le paiement
+            {isSubmitting ? 'Enregistrement en cours...' : 'Continuer vers le paiement'}
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-green-800 mb-2">✅ Inscription enregistrée</h3>
+              <p className="text-green-700">
+                Vos données d'inscription ont été enregistrées avec succès dans notre base de données. 
+                Procédez maintenant au paiement pour finaliser votre adhésion.
+              </p>
+            </div>
             <h3 className="text-lg font-semibold text-white">Paiement</h3>
             <PayPalButton
               amount="15000"

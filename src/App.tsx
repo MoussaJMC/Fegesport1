@@ -24,6 +24,7 @@ import AdminLayout from './pages/admin/AdminLayout';
 import LoginPage from './pages/admin/LoginPage';
 import DashboardPage from './pages/admin/DashboardPage';
 import DiagnosticPage from './pages/admin/DiagnosticPage';
+import TestDatabasePage from './pages/admin/TestDatabasePage';
 import PagesAdminPage from './pages/admin/PagesAdminPage';
 import NewsAdminPage from './pages/admin/NewsAdminPage';
 import EventsAdminPage from './pages/admin/EventsAdminPage';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="diagnostic" element={<DiagnosticPage />} />
+            <Route path="test-database" element={<TestDatabasePage />} />
             <Route path="pages" element={<PagesAdminPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
