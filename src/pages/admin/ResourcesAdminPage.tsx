@@ -67,12 +67,21 @@ const ResourcesAdminPage: React.FC = () => {
         return;
       }
       
-      // If the table exists, fetch real data
-      const { data, error } = await supabase
+      // Try to get the Documents category ID
+      const documentsCategoryId = await getCategoryId('Documents');
+      
+      // Build the query - only filter by category_id if we have a valid ID
+      let query = supabase
         .from('static_files')
         .select('*')
-        .eq('category_id', (await getCategoryId('Documents')) || '')
         .order('created_at', { ascending: false });
+      
+      // Only add category filter if we have a valid category ID
+      if (documentsCategoryId) {
+        query = query.eq('category_id', documentsCategoryId);
+      }
+      
+      const { data, error } = await query;
 
       if (error) throw error;
       
@@ -107,14 +116,19 @@ const ResourcesAdminPage: React.FC = () => {
         .from('file_categories')
         .select('id')
         .eq('name', categoryName)
-        .single();
+        .limit(1);
       
       if (error) {
         console.error('Error fetching category ID:', error);
         return null;
       }
       
-      return data?.id || null;
+      // Check if we have data and it's not empty
+      if (data && data.length > 0) {
+        return data[0].id;
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error in getCategoryId:', error);
       return null;
@@ -241,39 +255,50 @@ const ResourcesAdminPage: React.FC = () => {
       const isRealData = resources.length > 0 && resources[0].id !== '1';
       
       if (isRealData) {
-        // Get category ID
-        const categoryId = await getCategoryId(formData.category) || 
-                          await getCategoryId('Documents');
+        // Get category ID - if not found, proceed without category
+        const categoryId = await getCategoryId(formData.category);
         
         if (editingResource) {
           // Update existing resource
+          const updateData: any = {
+            title: formData.title,
+            description: formData.description,
+            file_url: formData.file_url,
+            file_type: formData.file_type,
+            is_public: formData.is_public
+          };
+          
+          // Only add category_id if we have a valid one
+          if (categoryId) {
+            updateData.category_id = categoryId;
+          }
+          
           const { error } = await supabase
             .from('static_files')
-            .update({
-              title: formData.title,
-              description: formData.description,
-              file_url: formData.file_url,
-              file_type: formData.file_type,
-              category_id: categoryId,
-              is_public: formData.is_public
-            })
+            .update(updateData)
             .eq('id', editingResource.id);
 
           if (error) throw error;
         } else {
           // Create new resource
+          const insertData: any = {
+            filename: formData.title,
+            original_filename: formData.title,
+            title: formData.title,
+            description: formData.description,
+            file_url: formData.file_url,
+            file_type: formData.file_type,
+            is_public: formData.is_public
+          };
+          
+          // Only add category_id if we have a valid one
+          if (categoryId) {
+            insertData.category_id = categoryId;
+          }
+          
           const { error } = await supabase
             .from('static_files')
-            .insert([{
-              filename: formData.title,
-              original_filename: formData.title,
-              title: formData.title,
-              description: formData.description,
-              file_url: formData.file_url,
-              file_type: formData.file_type,
-              category_id: categoryId,
-              is_public: formData.is_public
-            }]);
+            .insert([insertData]);
 
           if (error) throw error;
         }
