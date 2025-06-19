@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EventItem } from '../../types/events';
+import { useTranslation } from 'react-i18next';
 
 interface EventCardProps {
   event: EventItem;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const { t } = useTranslation();
+  
   return (
     <motion.div 
       className="card flex overflow-hidden"
@@ -60,7 +63,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           to={`/events/${event.id}`} 
           className="text-primary-600 hover:text-primary-700 font-medium text-sm"
         >
-          Voir les détails
+          {t('events.details')}
         </Link>
       </div>
     </motion.div>

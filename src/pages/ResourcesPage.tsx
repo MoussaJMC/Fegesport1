@@ -12,7 +12,7 @@ const ResourcesPage: React.FC = () => {
   // Updated resources with CORS-enabled PDF URL
   const resources = [
     {
-      category: 'Documents Officiels',
+      category: t('resources.categories.official'),
       items: [
         {
           title: 'Statuts de la FEGESPORT',
@@ -38,7 +38,7 @@ const ResourcesPage: React.FC = () => {
       ]
     },
     {
-      category: 'Guides Pratiques',
+      category: t('resources.categories.guides'),
       items: [
         {
           title: 'Guide des Compétitions',
@@ -64,7 +64,7 @@ const ResourcesPage: React.FC = () => {
       ]
     },
     {
-      category: 'Études et Rapports',
+      category: t('resources.categories.reports'),
       items: [
         {
           title: 'Rapport Annuel 2024',
@@ -104,7 +104,7 @@ const ResourcesPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      toast.error('Erreur lors du téléchargement du PDF');
+      toast.error(t('common.error'));
     }
   };
 
@@ -118,10 +118,9 @@ const ResourcesPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Centre de Ressources</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('resources.title')}</h1>
             <p className="text-xl">
-              Accédez à notre bibliothèque de documents, guides et ressources pour le développement 
-              de l'esport en Guinée.
+              {t('resources.subtitle')}
             </p>
           </div>
         </div>
@@ -131,7 +130,12 @@ const ResourcesPage: React.FC = () => {
       <section className="bg-white border-b">
         <div className="container-custom py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {['Documents Officiels', 'Guides Pratiques', 'Études et Rapports', 'Formulaires'].map((link, index) => (
+            {[
+              t('resources.categories.official'), 
+              t('resources.categories.guides'), 
+              t('resources.categories.reports'), 
+              t('resources.categories.forms')
+            ].map((link, index) => (
               <button
                 key={index}
                 className="px-6 py-3 text-center rounded-lg hover:bg-primary-50 text-primary-600 font-medium transition-colors"
@@ -173,14 +177,14 @@ const ResourcesPage: React.FC = () => {
                                 className="text-primary-600 hover:text-primary-700 flex items-center"
                               >
                                 <Eye size={16} className="mr-1" />
-                                Consulter
+                                {t('resources.actions.view')}
                               </button>
                               <button 
                                 onClick={() => handleDownloadPDF(item.url, item.title)}
                                 className="text-primary-600 hover:text-primary-700 flex items-center"
                               >
                                 <Download size={16} className="mr-1" />
-                                Télécharger
+                                {t('resources.actions.download')}
                               </button>
                             </div>
                           </div>
@@ -199,7 +203,7 @@ const ResourcesPage: React.FC = () => {
       <section className="section bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Autres Ressources</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('resources.other.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 
@@ -212,12 +216,12 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Book className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Bibliothèque Média</h3>
+              <h3 className="text-xl font-bold mb-3">{t('resources.other.media')}</h3>
               <p className="text-gray-600 mb-4">
-                Photos, vidéos et assets officiels de la FEGESPORT
+                {t('resources.other.media_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
-                Accéder
+                {t('resources.other.access')}
               </button>
             </motion.div>
 
@@ -229,12 +233,12 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Shield className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Charte Graphique</h3>
+              <h3 className="text-xl font-bold mb-3">{t('resources.other.branding')}</h3>
               <p className="text-gray-600 mb-4">
-                Logos, couleurs et éléments de marque FEGESPORT
+                {t('resources.other.branding_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
-                Télécharger
+                {t('resources.other.download')}
               </button>
             </motion.div>
 
@@ -246,12 +250,12 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <FileText className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Formulaires</h3>
+              <h3 className="text-xl font-bold mb-3">{t('resources.other.forms')}</h3>
               <p className="text-gray-600 mb-4">
-                Documents administratifs et formulaires officiels
+                {t('resources.other.forms_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
-                Voir tout
+                {t('resources.other.viewAll')}
               </button>
             </motion.div>
           </div>

@@ -2,8 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import NewsletterForm from './NewsletterForm';
+import { useTranslation } from 'react-i18next';
 
 const NewsletterSection: React.FC = () => {
+  const { t } = useTranslation();
+  
   return (
     <section className="bg-secondary-800 py-16">
       <div className="container-custom">
@@ -18,12 +21,10 @@ const NewsletterSection: React.FC = () => {
               <Bell className="text-primary-500" size={28} />
             </div>
             <h2 className="text-3xl font-bold text-white mb-4">
-              Restez Informé
+              {t('newsletter.title')}
             </h2>
             <p className="text-gray-300 mb-8">
-              Inscrivez-vous à notre newsletter pour recevoir les dernières actualités, 
-              événements et mises à jour de la FEGESPORT directement sur votre email 
-              et WhatsApp.
+              {t('newsletter.description')}
             </p>
           </motion.div>
 

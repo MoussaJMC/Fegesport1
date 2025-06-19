@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -14,6 +15,7 @@ interface PDFViewerProps {
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ url, onClose }) => {
+  const { t } = useTranslation();
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -27,9 +29,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, onClose }) => {
 
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
-    setError('Impossible de charger le PDF. Veuillez réessayer plus tard.');
+    setError(t('common.error'));
     setLoading(false);
-    toast.error('Erreur lors du chargement du PDF');
+    toast.error(t('common.error'));
   };
 
   const changePage = (offset: number) => {
@@ -49,7 +51,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, onClose }) => {
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         <div className="p-4 border-b flex justify-between items-center">
           <div className="text-lg font-semibold">
-            {loading ? 'Chargement...' : `Page ${pageNumber} sur ${numPages}`}
+            {loading ? t('common.loading') : `Page ${pageNumber} sur ${numPages}`}
           </div>
           <button
             onClick={onClose}
@@ -67,7 +69,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, onClose }) => {
                 onClick={onClose}
                 className="mt-4 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
               >
-                Fermer
+                {t('common.backHome')}
               </button>
             </div>
           ) : (

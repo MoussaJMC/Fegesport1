@@ -119,6 +119,21 @@ const Navbar: React.FC = () => {
     );
   }
 
+  // Get translated label for navigation items
+  const getTranslatedLabel = (label: string): string => {
+    // Convert label to lowercase and remove accents for matching with translation keys
+    const key = label.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, '');
+    
+    // Check if we have a translation for this key
+    const translationKey = `navigation.${key}`;
+    const hasTranslation = i18n.exists(translationKey);
+    
+    return hasTranslation ? t(translationKey) : label;
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -169,7 +184,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {getTranslatedLabel(item.label)}
                       <ChevronDown size={14} className="ml-1" />
                     </button>
                   ) : (
@@ -185,7 +200,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {getTranslatedLabel(item.label)}
                     </Link>
                   )}
                   {item.submenu && membershipMenuOpen && (
@@ -201,7 +216,7 @@ const Navbar: React.FC = () => {
                           to={subItem.path}
                           className="block px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
                         >
-                          {subItem.label}
+                          {getTranslatedLabel(subItem.label)}
                         </Link>
                       ))}
                     </motion.div>
@@ -295,7 +310,7 @@ const Navbar: React.FC = () => {
                           }
                         `}
                       >
-                        {item.label}
+                        {getTranslatedLabel(item.label)}
                         <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {membershipMenuOpen && (
@@ -312,7 +327,7 @@ const Navbar: React.FC = () => {
                                 }
                               `}
                             >
-                              {subItem.label}
+                              {getTranslatedLabel(subItem.label)}
                             </Link>
                           ))}
                         </div>
@@ -329,7 +344,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {getTranslatedLabel(item.label)}
                     </Link>
                   )}
                 </div>

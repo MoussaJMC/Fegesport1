@@ -6,7 +6,8 @@
     "membership": "Membership",
     "resources": "Resources",
     "partners": "Partners",
-    "contact": "Contact"
+    "contact": "Contact",
+    "community": "Community"
   },
   "home": {
     "hero": {
@@ -15,8 +16,8 @@
       "cta": "Join us"
     },
     "about": {
-      "title": "ABOUT FEGUIESPORT",
-      "description": "The Guinean Esports Federation (FEGUIESPORT) is the official national organization for esports in Guinea. Our mission is to promote, structure, and represent Guinean esports at the national and international level."
+      "title": "ABOUT FEGESPORT",
+      "description": "The Guinean Esports Federation (FEGESPORT) is the official national organization for esports in Guinea. Our mission is to promote, structure, and represent Guinean esports at the national and international level."
     },
     "news": {
       "title": "LATEST NEWS",
@@ -30,11 +31,203 @@
       "title": "JOIN THE COMMUNITY",
       "description": "Whether you're a player, a club, or a potential partner, find out how to be part of the Guinean esports movement.",
       "cta": "Become a member"
+    },
+    "stats": {
+      "title": "OUR NUMBERS",
+      "players": "Registered Players",
+      "clubs": "Official Clubs",
+      "partners": "Partners"
+    }
+  },
+  "about": {
+    "title": "About FEGESPORT",
+    "subtitle": "The Guinean Esports Federation (FEGESPORT) is the official national organization for esports in Guinea.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "FEGESPORT's mission is to develop and promote esports in Guinea by creating a structured, inclusive, and professional environment for all stakeholders in the ecosystem."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "description": "Our vision is to position Guinea as a major player in esports in Africa, building a sustainable, equitable, and innovative esports ecosystem that creates opportunities for all."
+    },
+    "values": {
+      "title": "Our Values",
+      "description": "Our actions are guided by a set of core values that reflect our commitment to excellence, integrity, and inclusivity in esports.",
+      "excellence": "Excellence",
+      "excellence_desc": "We promote and pursue excellence in all aspects of our work and competitions.",
+      "integrity": "Integrity",
+      "integrity_desc": "We act with honesty, transparency, and responsibility in all our activities and decisions.",
+      "inclusivity": "Inclusivity",
+      "inclusivity_desc": "We value diversity and are committed to creating an inclusive and accessible esports environment for all.",
+      "innovation": "Innovation",
+      "innovation_desc": "We embrace innovation and constantly seek to improve and evolve the Guinean esports ecosystem."
+    }
+  },
+  "membership": {
+    "title": "Become a Member",
+    "subtitle": "Join FEGESPORT and participate in the development of Guinean esports. Discover our different membership options tailored to your needs.",
+    "why_join": {
+      "title": "Why Join Us?",
+      "recognition": "Official Recognition",
+      "recognition_desc": "Official status recognized by FEGESPORT and its international partners",
+      "network": "Professional Network",
+      "network_desc": "Access to a network of Guinean and international esports stakeholders",
+      "competitions": "Official Competitions",
+      "competitions_desc": "Participation in official FEGESPORT tournaments and events"
+    },
+    "types": {
+      "title": "Membership Types",
+      "player": "Individual Player",
+      "player_price": "15,000",
+      "player_period": "per year",
+      "club": "Esports Club",
+      "club_price": "150,000",
+      "club_period": "per year",
+      "partner": "Partner",
+      "partner_price": "Custom",
+      "partner_period": "",
+      "select": "Select"
+    },
+    "form": {
+      "title": "Membership Form",
+      "continue": "Continue to payment",
+      "success": "Your membership has been successfully finalized!"
+    },
+    "questions": {
+      "title": "Questions?",
+      "description": "Our team is available to answer all your questions about FEGESPORT membership.",
+      "contact": "Contact us"
+    }
+  },
+  "news": {
+    "title": "News",
+    "subtitle": "Stay informed about the latest news in Guinean esports and FEGESPORT activities.",
+    "readMore": "Read more"
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Discover upcoming esports events organized by FEGESPORT.",
+    "register": "Register",
+    "full": "Full",
+    "details": "View details",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "participants": "Participants",
+    "rules": "Rules"
+  },
+  "partners": {
+    "title": "Our Partners",
+    "subtitle": "Discover the organizations that support us in developing esports in Guinea.",
+    "become": "Become a Partner",
+    "benefits": {
+      "title": "Partnership Benefits",
+      "visibility": "Premium Visibility",
+      "visibility_desc": "Presence on all our communication materials and events",
+      "network": "Exclusive Network",
+      "network_desc": "Access to our network of partners and esports stakeholders",
+      "international": "International Exposure",
+      "international_desc": "Exposure during international competitions"
+    },
+    "process": {
+      "title": "Partnership Process",
+      "contact": "Initial Contact",
+      "contact_desc": "Let's discuss your goals and explore collaboration possibilities.",
+      "proposal": "Custom Proposal",
+      "proposal_desc": "We develop a proposal tailored to your needs and objectives.",
+      "finalization": "Finalization",
+      "finalization_desc": "We define the partnership terms together.",
+      "activation": "Activation",
+      "activation_desc": "Implementation of the partnership and start of activations."
+    }
+  },
+  "resources": {
+    "title": "Resource Center",
+    "subtitle": "Access our library of documents, guides, and resources for the development of esports in Guinea.",
+    "categories": {
+      "official": "Official Documents",
+      "guides": "Practical Guides",
+      "reports": "Studies and Reports",
+      "forms": "Forms"
+    },
+    "actions": {
+      "view": "View",
+      "download": "Download"
+    },
+    "other": {
+      "title": "Other Resources",
+      "media": "Media Library",
+      "media_desc": "Official FEGESPORT photos, videos, and assets",
+      "branding": "Branding Guidelines",
+      "branding_desc": "FEGESPORT logos, colors, and brand elements",
+      "forms": "Forms",
+      "forms_desc": "Administrative documents and official forms",
+      "access": "Access",
+      "download": "Download",
+      "viewAll": "View all"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to listen. Don't hesitate to contact us with any questions about FEGESPORT or esports in Guinea.",
+    "info": {
+      "title": "Contact Information",
+      "address": "Address",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "form": {
+      "title": "Send Us a Message",
+      "name": "Full name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send message"
+    },
+    "hours": {
+      "title": "Opening Hours",
+      "weekdays": "Monday - Friday: 8:30 AM - 5:00 PM",
+      "saturday": "Saturday: 9:00 AM - 1:00 PM",
+      "sunday": "Sunday: Closed"
+    }
+  },
+  "community": {
+    "title": "Our Community",
+    "subtitle": "Discover the active members of FEGESPORT: players, clubs, and partners who bring Guinean esports to life.",
+    "stats": {
+      "players": "Registered Players",
+      "clubs": "Official Clubs",
+      "partners": "Partners"
+    },
+    "sections": {
+      "players": "Pro Players",
+      "clubs": "Clubs",
+      "partners": "Partners"
     }
   },
   "footer": {
-    "rights": "© 2025 FEGUIESPORT. All rights reserved.",
+    "rights": "© 2025 FEGESPORT. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use"
+  },
+  "newsletter": {
+    "title": "Stay Informed",
+    "description": "Subscribe to our newsletter to receive the latest news, events, and updates from FEGESPORT directly to your email and WhatsApp.",
+    "email": "Email",
+    "whatsapp": "WhatsApp Number",
+    "accept": "I agree to receive notifications by email and WhatsApp",
+    "subscribe": "Subscribe to the newsletter",
+    "success": "Successfully subscribed to the newsletter!"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "readMore": "Read more",
+    "viewAll": "View all",
+    "backHome": "Back to home",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "notFound": "Page not found",
+    "notFoundMessage": "The page you are looking for does not exist or has been moved."
   }
 }

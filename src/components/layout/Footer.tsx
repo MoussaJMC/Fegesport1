@@ -5,7 +5,7 @@ import { Facebook, Twitter, Instagram, Youtube, Mail } from 'lucide-react';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 
 const Footer: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { getSetting } = useSiteSettings();
   
   const currentYear = new Date().getFullYear();
@@ -66,12 +66,14 @@ const Footer: React.FC = () => {
           
           {/* Quick Links */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Navigation</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('navigation.home')}</h3>
             <ul className="space-y-2">
               {navigationSettings.items?.slice(0, 4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {item.label}
+                    {i18n.language === 'en' 
+                      ? t(`navigation.${item.label.toLowerCase()}`) 
+                      : item.label}
                   </Link>
                 </li>
               ))}
@@ -80,12 +82,14 @@ const Footer: React.FC = () => {
           
           {/* Resources */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Ressources</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('navigation.resources')}</h3>
             <ul className="space-y-2">
               {navigationSettings.items?.slice(4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {item.label}
+                    {i18n.language === 'en' 
+                      ? t(`navigation.${item.label.toLowerCase()}`) 
+                      : item.label}
                   </Link>
                 </li>
               ))}
@@ -104,7 +108,7 @@ const Footer: React.FC = () => {
           
           {/* Contact */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Contact</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('navigation.contact')}</h3>
             <address className="not-italic text-gray-300">
               <p className="mb-2">{contactInfo.address}</p>
               {contactInfo.postal_code && (

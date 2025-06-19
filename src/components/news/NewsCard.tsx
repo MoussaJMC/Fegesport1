@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NewsItem } from '../../types/news';
+import { useTranslation } from 'react-i18next';
 
 interface NewsCardProps {
   news: NewsItem;
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
+  const { t } = useTranslation();
+  
   return (
     <motion.article 
       className="card h-full flex flex-col"
@@ -46,7 +49,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
           to={`/news/${news.id}`} 
           className="text-primary-600 hover:text-primary-700 font-medium text-sm"
         >
-          Lire la suite
+          {t('news.readMore')}
         </Link>
       </div>
     </motion.article>

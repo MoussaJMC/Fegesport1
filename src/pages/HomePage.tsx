@@ -16,7 +16,7 @@ import { upcomingEvents } from '../data/eventsData';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 
 const HomePage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { getSetting } = useSiteSettings();
   const [news, setNews] = useState(latestNews);
   const [events, setEvents] = useState(upcomingEvents);
@@ -150,7 +150,11 @@ const HomePage: React.FC = () => {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { 
+      day: 'numeric', 
+      month: i18n.language === 'fr' ? 'long' : 'short', 
+      year: 'numeric' 
+    });
   };
 
   // Find specific sections by key
@@ -220,7 +224,7 @@ const HomePage: React.FC = () => {
               to="/about" 
               className="btn bg-secondary-800 hover:bg-secondary-700 text-white text-lg px-8 py-4 rounded-full"
             >
-              En savoir plus
+              {t('common.learnMore')}
             </Link>
           </motion.div>
         </div>
@@ -233,10 +237,10 @@ const HomePage: React.FC = () => {
       <section className="section bg-secondary-900 text-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{aboutSection?.title || "À PROPOS DE LA FEGESPORT"}</h2>
+            <h2 className="text-3xl font-bold mb-4">{aboutSection?.title || t('home.about.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             <p className="text-lg max-w-3xl mx-auto text-gray-300">
-              {aboutSection?.content || "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."}
+              {aboutSection?.content || t('home.about.description')}
             </p>
           </div>
 
@@ -249,8 +253,8 @@ const HomePage: React.FC = () => {
               <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Trophy className="text-primary-500" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Excellence</h3>
-              <p className="text-gray-400">Promouvoir l'excellence et les standards professionnels dans toutes les compétitions d'esport.</p>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.excellence')}</h3>
+              <p className="text-gray-400">{t('about.values.excellence_desc')}</p>
             </motion.div>
 
             <motion.div 
@@ -261,8 +265,8 @@ const HomePage: React.FC = () => {
               <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Users className="text-primary-500" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Communauté</h3>
-              <p className="text-gray-400">Bâtir une communauté esport inclusive, diverse et respectueuse en Guinée.</p>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.inclusivity')}</h3>
+              <p className="text-gray-400">{t('about.values.inclusivity_desc')}</p>
             </motion.div>
 
             <motion.div 
@@ -273,14 +277,14 @@ const HomePage: React.FC = () => {
               <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Calendar className="text-primary-500" size={28} />
               </div>
-              <h3 className="text-xl font-bold mb-3">Développement</h3>
-              <p className="text-gray-400">Investir dans le développement de l'écosystème esport guinéen à tous les niveaux.</p>
+              <h3 className="text-xl font-bold mb-3">{t('about.values.innovation')}</h3>
+              <p className="text-gray-400">{t('about.values.innovation_desc')}</p>
             </motion.div>
           </div>
 
           <div className="text-center mt-10">
             <Link to="/about" className="inline-flex items-center text-primary-500 hover:text-primary-400 font-medium">
-              En savoir plus <ArrowRight size={16} className="ml-2" />
+              {t('common.learnMore')} <ArrowRight size={16} className="ml-2" />
             </Link>
           </div>
         </div>
@@ -327,7 +331,7 @@ const HomePage: React.FC = () => {
         <section className="section bg-secondary-800">
           <div className="container-custom">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-white">{statsSection.title || "Nos Chiffres"}</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">{statsSection.title || t('home.stats.title')}</h2>
               <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
               {statsSection.content && (
                 <p className="text-lg max-w-3xl mx-auto text-gray-300">{statsSection.content}</p>
@@ -344,7 +348,7 @@ const HomePage: React.FC = () => {
                   className="bg-secondary-700 p-6 rounded-lg text-center"
                 >
                   <div className="text-4xl font-bold text-primary-500 mb-2">{stat.value}</div>
-                  <div className="text-lg text-white">{stat.label}</div>
+                  <div className="text-lg text-white">{stat.label || t(`home.stats.${stat.icon}`)}</div>
                 </motion.div>
               ))}
             </div>

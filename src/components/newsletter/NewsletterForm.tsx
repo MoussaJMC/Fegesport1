@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Mail, Send, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const newsletterSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -18,6 +19,7 @@ const newsletterSchema = z.object({
 type NewsletterFormData = z.infer<typeof newsletterSchema>;
 
 const NewsletterForm: React.FC = () => {
+  const { t } = useTranslation();
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<NewsletterFormData>({
     resolver: zodResolver(newsletterSchema),
   });
@@ -36,11 +38,11 @@ const NewsletterForm: React.FC = () => {
       // Simulating API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success('Inscription réussie à la newsletter !');
+      toast.success(t('newsletter.success'));
       reset();
     } catch (error) {
       console.error('Newsletter subscription error:', error);
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     }
   };
 
@@ -48,7 +50,7 @@ const NewsletterForm: React.FC = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-          Email
+          {t('newsletter.email')}
         </label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -67,7 +69,7 @@ const NewsletterForm: React.FC = () => {
 
       <div>
         <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-300 mb-1">
-          Numéro WhatsApp
+          {t('newsletter.whatsapp')}
         </label>
         <div className="relative">
           <MessageSquare className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -92,7 +94,7 @@ const NewsletterForm: React.FC = () => {
             className="w-4 h-4 text-primary-500 border-secondary-600 rounded focus:ring-primary-500 bg-secondary-800"
           />
           <span className="text-sm text-gray-300">
-            J'accepte de recevoir les notifications par email et WhatsApp
+            {t('newsletter.accept')}
           </span>
         </label>
         {errors.acceptNotifications && (
@@ -108,12 +110,12 @@ const NewsletterForm: React.FC = () => {
         {isSubmitting ? (
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-            Inscription en cours...
+            {t('common.loading')}
           </div>
         ) : (
           <>
             <Send size={20} className="mr-2" />
-            S'inscrire à la newsletter
+            {t('newsletter.subscribe')}
           </>
         )}
       </button>
