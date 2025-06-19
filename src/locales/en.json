@@ -4,12 +4,9 @@
     "about": "About",
     "news": "News",
     "membership": "Membership",
-    "community": "Community",
     "resources": "Resources",
     "partners": "Partners",
-    "contact": "Contact",
-    "admin": "Admin",
-    "language": "Language"
+    "contact": "Contact"
   },
   "home": {
     "hero": {
@@ -18,8 +15,8 @@
       "cta": "Join us"
     },
     "about": {
-      "title": "ABOUT FEGESPORT",
-      "description": "The Guinean Esports Federation (FEGESPORT) is the official national organization for esports in Guinea. Our mission is to promote, structure, and represent Guinean esports at the national and international level."
+      "title": "ABOUT FEGUIESPORT",
+      "description": "The Guinean Esports Federation (FEGUIESPORT) is the official national organization for esports in Guinea. Our mission is to promote, structure, and represent Guinean esports at the national and international level."
     },
     "news": {
       "title": "LATEST NEWS",
@@ -36,78 +33,8 @@
     }
   },
   "footer": {
-    "federation": "Guinean Esports Federation",
-    "navigation": "Navigation",
-    "resources": "Resources",
-    "contact": "Contact",
-    "rights": "© 2025 FEGESPORT. All rights reserved.",
+    "rights": "© 2025 FEGUIESPORT. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use"
-  },
-  "about": {
-    "mission": "Our Mission",
-    "vision": "Our Vision",
-    "values": "Our Values",
-    "leadership": "Our Leadership",
-    "history": "Our History"
-  },
-  "membership": {
-    "title": "Become a Member",
-    "subtitle": "Join FEGESPORT and participate in the development of Guinean esports.",
-    "benefits": "Why Join Us?",
-    "types": "Membership Types",
-    "form": "Membership Form",
-    "questions": "Questions?"
-  },
-  "contact": {
-    "title": "Contact Us",
-    "subtitle": "We're here to help. Don't hesitate to reach out with any questions about FEGESPORT or esports in Guinea.",
-    "info": "Contact Information",
-    "form": "Send us a Message",
-    "hours": "Opening Hours"
-  },
-  "resources": {
-    "title": "Resource Center",
-    "subtitle": "Access our library of documents, guides, and resources for esports development in Guinea.",
-    "categories": "Categories",
-    "download": "Download",
-    "view": "View"
-  },
-  "partners": {
-    "title": "Our Partners",
-    "subtitle": "Discover the organizations supporting us in developing esports in Guinea.",
-    "become": "Become a Partner",
-    "benefits": "Partnership Benefits",
-    "process": "Partnership Process"
-  },
-  "news": {
-    "title": "News",
-    "subtitle": "Stay informed about the latest news in Guinean esports and FEGESPORT activities.",
-    "readMore": "Read more",
-    "categories": "Categories",
-    "recentPosts": "Recent Posts"
-  },
-  "events": {
-    "title": "Events",
-    "subtitle": "Discover upcoming esports events in Guinea.",
-    "register": "Register",
-    "details": "Event Details",
-    "location": "Location",
-    "date": "Date",
-    "time": "Time",
-    "participants": "Participants"
-  },
-  "common": {
-    "readMore": "Read more",
-    "viewAll": "View all",
-    "learnMore": "Learn more",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "loading": "Loading...",
-    "noResults": "No results found",
-    "search": "Search"
   }
 }

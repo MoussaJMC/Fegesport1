@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-4">{navigationSettings.brand_text || "FEGESPORT"}</h3>
             <p className="text-gray-300 mb-4">
-              {t('footer.federation')}
+              Fédération Guinéenne d'Esport
             </p>
             <div className="flex space-x-4">
               {contactInfo.social_media?.facebook && (
@@ -66,12 +66,12 @@ const Footer: React.FC = () => {
           
           {/* Quick Links */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('footer.navigation')}</h3>
+            <h3 className="text-lg font-semibold mb-4">Navigation</h3>
             <ul className="space-y-2">
               {navigationSettings.items?.slice(0, 4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {t(`navigation.${item.label.toLowerCase()}`) || item.label}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -80,12 +80,12 @@ const Footer: React.FC = () => {
           
           {/* Resources */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('footer.resources')}</h3>
+            <h3 className="text-lg font-semibold mb-4">Ressources</h3>
             <ul className="space-y-2">
               {navigationSettings.items?.slice(4).map((item: any) => (
                 <li key={item.path}>
                   <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
-                    {t(`navigation.${item.label.toLowerCase()}`) || item.label}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -104,7 +104,7 @@ const Footer: React.FC = () => {
           
           {/* Contact */}
           <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('footer.contact')}</h3>
+            <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <address className="not-italic text-gray-300">
               <p className="mb-2">{contactInfo.address}</p>
               {contactInfo.postal_code && (
