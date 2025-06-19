@@ -32,6 +32,7 @@ import MembersAdminPage from './pages/admin/MembersAdminPage';
 import PartnersAdminPage from './pages/admin/PartnersAdminPage';
 import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 import FilesAdminPage from './pages/admin/FilesAdminPage';
+import ResourcesAdminPage from './pages/admin/ResourcesAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -60,6 +61,7 @@ function App() {
             <Route path="partners" element={<PartnersAdminPage />} />
             <Route path="messages" element={<MessagesAdminPage />} />
             <Route path="files" element={<FilesAdminPage />} />
+            <Route path="resources" element={<ResourcesAdminPage />} />
           </Route>
 
           {/* Public routes */}

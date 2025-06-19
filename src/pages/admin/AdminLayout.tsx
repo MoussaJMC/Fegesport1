@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database
+  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -186,6 +186,7 @@ const AdminLayout: React.FC = () => {
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
+    { icon: Book, label: 'Ressources', path: '/admin/resources' },
   ];
 
   const handleSignOut = async () => {

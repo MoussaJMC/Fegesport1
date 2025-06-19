@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Eye, Search, Filter, Globe, Save, X, ArrowUp, ArrowDown, Image, Type, Layout, BarChart3, Star, Users, MessageSquare, Menu as MenuIcon, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageEditor from '../../components/admin/PageEditor';
 
 interface Page {
   id: string;
@@ -53,6 +54,7 @@ const PagesAdminPage = () => {
   const [activeTab, setActiveTab] = useState<'pages' | 'settings'>('pages');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [showPageEditor, setShowPageEditor] = useState(false);
 
   // Form states
   const [pageForm, setPageForm] = useState<{
@@ -554,117 +556,105 @@ const PagesAdminPage = () => {
                 <div className="p-4 border-b flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-semibold">{selectedPage.title}</h2>
-                    <p className="text-sm text-gray-500">Sections de contenu</p>
+                    <p className="text-sm text-gray-500">/{selectedPage.slug}</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSectionForm({
-                        section_key: '',
-                        section_type: 'text',
-                        title: '',
-                        content: '',
-                        image_url: '',
-                        settings: {},
-                        is_active: true
-                      });
-                      setEditingSection(null);
-                      setShowSectionForm(true);
-                    }}
-                    className="btn bg-primary-600 hover:bg-primary-700 text-white text-sm"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Ajouter Section
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        window.open(`/${selectedPage.slug}`, '_blank');
+                      }}
+                      className="btn bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Voir
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowPageEditor(true);
+                      }}
+                      className="btn bg-primary-600 hover:bg-primary-700 text-white text-sm"
+                    >
+                      <Edit className="w-4 h-4 mr-1" />
+                      Éditer
+                    </button>
+                  </div>
                 </div>
 
-                <div className="p-4 space-y-4">
-                  {sections.map((section, index) => (
-                    <motion.div
-                      key={section.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className={`border rounded-lg p-4 ${section.is_active ? 'border-gray-200' : 'border-gray-100 bg-gray-50'}`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex items-center space-x-2">
-                            {getSectionIcon(section.section_type)}
-                            <span className="font-medium">{section.title || section.section_key}</span>
-                          </div>
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                            {section.section_type}
-                          </span>
-                          {!section.is_active && (
-                            <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                              Inactif
+                <div className="p-4">
+                  {showPageEditor ? (
+                    <PageEditor 
+                      page={selectedPage} 
+                      onSave={() => {
+                        setShowPageEditor(false);
+                        fetchPages();
+                        if (selectedPage) {
+                          fetchSections(selectedPage.id);
+                        }
+                      }}
+                      onCancel={() => setShowPageEditor(false)}
+                    />
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="font-medium mb-2">Informations</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium">Statut:</span> 
+                            <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getStatusColor(selectedPage.status)}`}>
+                              {selectedPage.status}
                             </span>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={() => handleMoveSectionUp(section)}
-                            disabled={index === 0}
-                            className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                          >
-                            <ArrowUp className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleMoveSectionDown(section)}
-                            disabled={index === sections.length - 1}
-                            className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                          >
-                            <ArrowDown className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSectionForm({
-                                section_key: section.section_key,
-                                section_type: section.section_type,
-                                title: section.title || '',
-                                content: section.content || '',
-                                image_url: section.image_url || '',
-                                settings: section.settings || {},
-                                is_active: section.is_active
-                              });
-                              setEditingSection(section);
-                              setShowSectionForm(true);
-                            }}
-                            className="p-1 text-blue-600 hover:text-blue-800"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSection(section.id)}
-                            className="p-1 text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          </div>
+                          <div>
+                            <span className="font-medium">Dernière mise à jour:</span> {new Date(selectedPage.updated_at).toLocaleDateString()}
+                          </div>
+                          <div className="col-span-2">
+                            <span className="font-medium">Meta Description:</span> {selectedPage.meta_description || 'Non définie'}
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="text-sm text-gray-600">
-                        {section.content && (
-                          <p className="line-clamp-2">{section.content}</p>
-                        )}
-                        {section.image_url && (
-                          <div className="mt-2">
-                            <img 
-                              src={section.image_url} 
-                              alt={section.title}
-                              className="h-20 w-32 object-cover rounded"
-                            />
+
+                      <div>
+                        <h3 className="font-medium mb-2">Sections ({sections.length})</h3>
+                        {sections.length > 0 ? (
+                          <div className="space-y-2">
+                            {sections.map((section) => (
+                              <div 
+                                key={section.id}
+                                className={`p-3 border rounded-lg ${!section.is_active ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-300'}`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center">
+                                    {getSectionIcon(section.section_type)}
+                                    <span className="ml-2 font-medium">{section.title || section.section_key}</span>
+                                    {!section.is_active && (
+                                      <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">
+                                        Inactif
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                                    {section.section_type}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-4 bg-gray-50 rounded-lg">
+                            <p className="text-gray-500">Aucune section pour cette page</p>
                           </div>
                         )}
                       </div>
-                    </motion.div>
-                  ))}
 
-                  {sections.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <Layout className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <p>Aucune section pour cette page</p>
-                      <p className="text-sm">Ajoutez votre première section pour commencer</p>
+                      <div className="flex justify-center pt-4">
+                        <button
+                          onClick={() => setShowPageEditor(true)}
+                          className="btn bg-primary-600 hover:bg-primary-700 text-white"
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Éditer cette page
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -758,6 +748,16 @@ const PagesAdminPage = () => {
                   </div>
                 </div>
               )}
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={handleSaveSettings}
+                  className="btn bg-primary-600 hover:bg-primary-700 text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </button>
+              </div>
             </div>
           </div>
 
@@ -827,6 +827,16 @@ const PagesAdminPage = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={handleSaveSettings}
+                  className="btn bg-primary-600 hover:bg-primary-700 text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </button>
               </div>
             </div>
           </div>
