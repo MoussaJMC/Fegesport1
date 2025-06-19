@@ -70,7 +70,7 @@ const ResourcesAdminPage: React.FC = () => {
       // Try to get the Documents category ID
       const documentsCategoryId = await getCategoryId('Documents');
       
-      // Build the query - only filter by category_id if we have a valid ID
+      // Build the query
       let query = supabase
         .from('static_files')
         .select('*')
