@@ -5,6 +5,7 @@ import { Menu, X, Globe, ChevronDown, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface SubNavItem {
   label: string;
@@ -23,10 +24,11 @@ const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [membershipMenuOpen, setMembershipMenuOpen] = useState(false);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { getSetting, loading: settingsLoading } = useSiteSettings();
+  const { currentLanguage, changeLanguage } = useLanguage();
 
   // Get settings from database
   const logoSettings = getSetting('site_logo', {
@@ -53,8 +55,8 @@ const Navbar: React.FC = () => {
     ] as NavItem[]
   });
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const handleChangeLanguage = (lng: string) => {
+    changeLanguage(lng);
     setLangMenuOpen(false);
   };
 
@@ -89,14 +91,14 @@ const Navbar: React.FC = () => {
     // Add admin link if authenticated
     if (isAuthenticated) {
       items.push({ 
-        label: 'Administration', 
+        label: t('navigation.admin'), 
         path: '/admin', 
         order: 999 
       });
     }
     
     return items;
-  }, [navigationSettings.items, isAuthenticated]);
+  }, [navigationSettings.items, isAuthenticated, t]);
 
   // Show loading state or fallback if settings are loading
   if (settingsLoading) {
@@ -169,7 +171,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {t(`navigation.${item.label.toLowerCase()}`) || item.label}
                       <ChevronDown size={14} className="ml-1" />
                     </button>
                   ) : (
@@ -185,7 +187,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {t(`navigation.${item.label.toLowerCase()}`) || item.label}
                     </Link>
                   )}
                   {item.submenu && membershipMenuOpen && (
@@ -201,7 +203,7 @@ const Navbar: React.FC = () => {
                           to={subItem.path}
                           className="block px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
                         >
-                          {subItem.label}
+                          {t(`navigation.${subItem.label.toLowerCase()}`) || subItem.label}
                         </Link>
                       ))}
                     </motion.div>
@@ -219,7 +221,7 @@ const Navbar: React.FC = () => {
                 }`}
               >
                 <Globe size={18} className="mr-1" />
-                <span className="uppercase mr-1">{i18n.language}</span>
+                <span className="uppercase mr-1">{currentLanguage}</span>
                 <ChevronDown size={14} />
               </button>
 
@@ -231,13 +233,13 @@ const Navbar: React.FC = () => {
                   className="absolute right-0 mt-2 w-40 bg-secondary-800 rounded-md shadow-lg py-1 z-50"
                 >
                   <button
-                    onClick={() => changeLanguage('fr')}
+                    onClick={() => handleChangeLanguage('fr')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
                   >
                     Français
                   </button>
                   <button
-                    onClick={() => changeLanguage('en')}
+                    onClick={() => handleChangeLanguage('en')}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
                   >
                     English
@@ -295,7 +297,7 @@ const Navbar: React.FC = () => {
                           }
                         `}
                       >
-                        {item.label}
+                        {t(`navigation.${item.label.toLowerCase()}`) || item.label}
                         <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {membershipMenuOpen && (
@@ -312,7 +314,7 @@ const Navbar: React.FC = () => {
                                 }
                               `}
                             >
-                              {subItem.label}
+                              {t(`navigation.${subItem.label.toLowerCase()}`) || subItem.label}
                             </Link>
                           ))}
                         </div>
@@ -329,7 +331,7 @@ const Navbar: React.FC = () => {
                         }
                       `}
                     >
-                      {item.label}
+                      {t(`navigation.${item.label.toLowerCase()}`) || item.label}
                     </Link>
                   )}
                 </div>
@@ -338,12 +340,12 @@ const Navbar: React.FC = () => {
               {/* Mobile Language Selector */}
               <div className="pt-2 pb-1">
                 <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Language
+                  {t('navigation.language')}
                 </p>
                 <button
-                  onClick={() => changeLanguage('fr')}
+                  onClick={() => handleChangeLanguage('fr')}
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    i18n.language === 'fr' 
+                    currentLanguage === 'fr' 
                       ? 'bg-secondary-800 text-primary-500' 
                       : 'text-gray-300 hover:bg-secondary-800'
                   }`}
@@ -351,9 +353,9 @@ const Navbar: React.FC = () => {
                   Français
                 </button>
                 <button
-                  onClick={() => changeLanguage('en')}
+                  onClick={() => handleChangeLanguage('en')}
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    i18n.language === 'en' 
+                    currentLanguage === 'en' 
                       ? 'bg-secondary-800 text-primary-500' 
                       : 'text-gray-300 hover:bg-secondary-800'
                   }`}

@@ -4,9 +4,12 @@
     "about": "À propos",
     "news": "Actualités",
     "membership": "Adhésion",
+    "community": "Communauté",
     "resources": "Ressources",
     "partners": "Partenaires",
-    "contact": "Contact"
+    "contact": "Contact",
+    "admin": "Administration",
+    "language": "Langue"
   },
   "home": {
     "hero": {
@@ -15,8 +18,8 @@
       "cta": "Rejoignez-nous"
     },
     "about": {
-      "title": "À PROPOS DE LA FEGUIESPORT",
-      "description": "La Fédération Guinéenne d'Esport (FEGUIESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."
+      "title": "À PROPOS DE LA FEGESPORT",
+      "description": "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."
     },
     "news": {
       "title": "ACTUALITÉS RÉCENTES",
@@ -33,8 +36,78 @@
     }
   },
   "footer": {
-    "rights": "© 2025 FEGUIESPORT. Tous droits réservés.",
+    "federation": "Fédération Guinéenne d'Esport",
+    "navigation": "Navigation",
+    "resources": "Ressources",
+    "contact": "Contact",
+    "rights": "© 2025 FEGESPORT. Tous droits réservés.",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation"
+  },
+  "about": {
+    "mission": "Notre Mission",
+    "vision": "Notre Vision",
+    "values": "Nos Valeurs",
+    "leadership": "Notre Direction",
+    "history": "Notre Histoire"
+  },
+  "membership": {
+    "title": "Devenir Membre",
+    "subtitle": "Rejoignez la FEGESPORT et participez au développement de l'esport guinéen.",
+    "benefits": "Pourquoi Nous Rejoindre ?",
+    "types": "Types d'Adhésion",
+    "form": "Formulaire d'Adhésion",
+    "questions": "Des Questions ?"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes à votre écoute. N'hésitez pas à nous contacter pour toute question concernant la FEGESPORT ou l'esport en Guinée.",
+    "info": "Informations de Contact",
+    "form": "Envoyez-nous un Message",
+    "hours": "Horaires d'Ouverture"
+  },
+  "resources": {
+    "title": "Centre de Ressources",
+    "subtitle": "Accédez à notre bibliothèque de documents, guides et ressources pour le développement de l'esport en Guinée.",
+    "categories": "Catégories",
+    "download": "Télécharger",
+    "view": "Consulter"
+  },
+  "partners": {
+    "title": "Nos Partenaires",
+    "subtitle": "Découvrez les organisations qui nous accompagnent dans le développement de l'esport en Guinée.",
+    "become": "Devenir Partenaire",
+    "benefits": "Avantages du Partenariat",
+    "process": "Processus de Partenariat"
+  },
+  "news": {
+    "title": "Actualités",
+    "subtitle": "Restez informé des dernières actualités de l'esport guinéen et des activités de la FEGESPORT.",
+    "readMore": "Lire la suite",
+    "categories": "Catégories",
+    "recentPosts": "Publications Récentes"
+  },
+  "events": {
+    "title": "Événements",
+    "subtitle": "Découvrez les événements esport à venir en Guinée.",
+    "register": "S'inscrire",
+    "details": "Détails de l'événement",
+    "location": "Lieu",
+    "date": "Date",
+    "time": "Heure",
+    "participants": "Participants"
+  },
+  "common": {
+    "readMore": "Lire la suite",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "submit": "Envoyer",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "Chargement...",
+    "noResults": "Aucun résultat trouvé",
+    "search": "Rechercher"
   }
 }
