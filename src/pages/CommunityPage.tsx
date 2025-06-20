@@ -1,12 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Trophy, Star, Building } from 'lucide-react';
-import { useCommunityStats } from '../hooks/useCommunityStats';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../lib/supabase';
+
+interface CommunityStats {
+  players: number;
+  clubs: number;
+  partners: number;
+}
 
 const CommunityPage: React.FC = () => {
-  const { stats, isLoading } = useCommunityStats();
   const { t } = useTranslation();
+  const [stats, setStats] = useState<CommunityStats>({
+    players: 200,
+    clubs: 15,
+    partners: 8
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      
+      // Try to get members count
+      const { count: playersCount, error: playersError } = await supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('member_type', 'player');
+      
+      // Try to get clubs count
+      const { count: clubsCount, error: clubsError } = await supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('member_type', 'club');
+      
+      // Try to get partners count
+      const { count: partnersCount, error: partnersError } = await supabase
+        .from('partners')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      
+      // Update stats with real data if available
+      setStats({
+        players: playersCount || 200,
+        clubs: clubsCount || 15,
+        partners: partnersCount || 8
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      // Keep default stats on error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const members = {
     players: [
@@ -87,10 +138,10 @@ const CommunityPage: React.FC = () => {
             >
               <Users className="w-12 h-12 text-primary-500 mx-auto mb-4" />
               <div className="text-4xl font-bold text-white mb-2">
-                {isLoading ? (
+                {loading ? (
                   <div className="animate-pulse h-10 w-20 bg-secondary-700 rounded mx-auto" />
                 ) : (
-                  `${stats?.players || 0}+`
+                  `${stats.players}+`
                 )}
               </div>
               <div className="text-gray-400">{t('community.stats.players')}</div>
@@ -104,10 +155,10 @@ const CommunityPage: React.FC = () => {
             >
               <Building className="w-12 h-12 text-primary-500 mx-auto mb-4" />
               <div className="text-4xl font-bold text-white mb-2">
-                {isLoading ? (
+                {loading ? (
                   <div className="animate-pulse h-10 w-20 bg-secondary-700 rounded mx-auto" />
                 ) : (
-                  stats?.clubs || 0
+                  stats.clubs
                 )}
               </div>
               <div className="text-gray-400">{t('community.stats.clubs')}</div>
@@ -121,10 +172,10 @@ const CommunityPage: React.FC = () => {
             >
               <Star className="w-12 h-12 text-primary-500 mx-auto mb-4" />
               <div className="text-4xl font-bold text-white mb-2">
-                {isLoading ? (
+                {loading ? (
                   <div className="animate-pulse h-10 w-20 bg-secondary-700 rounded mx-auto" />
                 ) : (
-                  stats?.partners || 0
+                  stats.partners
                 )}
               </div>
               <div className="text-gray-400">{t('community.stats.partners')}</div>

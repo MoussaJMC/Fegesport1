@@ -22,6 +22,11 @@ const HomePage: React.FC = () => {
   const [events, setEvents] = useState(upcomingEvents);
   const [pageSections, setPageSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    players: 200,
+    clubs: 15,
+    partners: 8
+  });
 
   // Get settings from database
   const logoSettings = getSetting('site_logo', {
@@ -36,6 +41,7 @@ const HomePage: React.FC = () => {
     fetchPageData();
     fetchLatestNews();
     fetchUpcomingEvents();
+    fetchStats();
   }, []);
 
   const fetchPageData = async () => {
@@ -148,6 +154,38 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      // Try to get members count
+      const { count: playersCount, error: playersError } = await supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('member_type', 'player');
+      
+      // Try to get clubs count
+      const { count: clubsCount, error: clubsError } = await supabase
+        .from('members')
+        .select('*', { count: 'exact', head: true })
+        .eq('member_type', 'club');
+      
+      // Try to get partners count
+      const { count: partnersCount, error: partnersError } = await supabase
+        .from('partners')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      
+      // Update stats with real data if available
+      setStats({
+        players: playersCount || 200,
+        clubs: clubsCount || 15,
+        partners: partnersCount || 8
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      // Keep default stats on error
+    }
+  };
+
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { 
@@ -242,9 +280,7 @@ const HomePage: React.FC = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">{t('home.about.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-lg max-w-3xl mx-auto text-gray-300">
-              {t('home.about.description')}
-            </p>
+            <p className="text-lg max-w-3xl mx-auto text-gray-300">{t('home.about.description')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
@@ -330,34 +366,46 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      {statsSection && (
-        <section className="section bg-secondary-800">
-          <div className="container-custom">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4 text-white">{t('home.stats.title')}</h2>
-              <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-              {statsSection.content && (
-                <p className="text-lg max-w-3xl mx-auto text-gray-300">{statsSection.content}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {statsSection.settings?.stats?.map((stat: any, index: number) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-secondary-700 p-6 rounded-lg text-center"
-                >
-                  <div className="text-4xl font-bold text-primary-500 mb-2">{stat.value}</div>
-                  <div className="text-lg text-white">{t(`home.stats.${stat.icon}`) || stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
+      <section className="section bg-secondary-800">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4 text-white">{t('home.stats.title')}</h2>
+            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
-        </section>
-      )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-secondary-700 p-6 rounded-lg text-center"
+            >
+              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.players}+</div>
+              <div className="text-lg text-white">{t('home.stats.players')}</div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-secondary-700 p-6 rounded-lg text-center"
+            >
+              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.clubs}</div>
+              <div className="text-lg text-white">{t('home.stats.clubs')}</div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-secondary-700 p-6 rounded-lg text-center"
+            >
+              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.partners}</div>
+              <div className="text-lg text-white">{t('home.stats.partners')}</div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Newsletter Section */}
       <NewsletterSection />
@@ -375,10 +423,8 @@ const HomePage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-secondary-900 via-secondary-900/90 to-secondary-900/80"></div>
         <div className="container-custom relative z-10 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{t('home.join.title')}</h2>
-          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 text-gray-300">
-            {t('home.join.description')}
-          </p>
-          <Link to="/membership" className="btn bg-primary-600 hover:bg-primary-700 text-white text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3 rounded-full">
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 text-gray-300">{t('home.join.description')}</p>
+          <Link to="/membership" className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8 py-3 rounded-full">
             {t('home.join.cta')}
           </Link>
         </div>
