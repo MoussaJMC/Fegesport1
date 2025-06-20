@@ -348,7 +348,7 @@ const HomePage: React.FC = () => {
                   className="bg-secondary-700 p-6 rounded-lg text-center"
                 >
                   <div className="text-4xl font-bold text-primary-500 mb-2">{stat.value}</div>
-                  <div className="text-lg text-white">{stat.label || t(`home.stats.${stat.icon}`)}</div>
+                  <div className="text-lg text-white">{t(`home.stats.${stat.icon}`) || stat.label}</div>
                 </motion.div>
               ))}
             </div>
