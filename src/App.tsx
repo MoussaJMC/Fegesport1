@@ -30,6 +30,7 @@ import NewsAdminPage from './pages/admin/NewsAdminPage';
 import EventsAdminPage from './pages/admin/EventsAdminPage';
 import MembersAdminPage from './pages/admin/MembersAdminPage';
 import MembershipTypesAdminPage from './pages/admin/MembershipTypesAdminPage';
+import LeadershipAdminPage from './pages/admin/LeadershipAdminPage';
 import PartnersAdminPage from './pages/admin/PartnersAdminPage';
 import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 import FilesAdminPage from './pages/admin/FilesAdminPage';
@@ -60,6 +61,7 @@ function App() {
             <Route path="events" element={<EventsAdminPage />} />
             <Route path="members" element={<MembersAdminPage />} />
             <Route path="membership-types" element={<MembershipTypesAdminPage />} />
+            <Route path="leadership" element={<LeadershipAdminPage />} />
             <Route path="partners" element={<PartnersAdminPage />} />
             <Route path="messages" element={<MessagesAdminPage />} />
             <Route path="files" element={<FilesAdminPage />} />

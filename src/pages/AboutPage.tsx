@@ -1,10 +1,115 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Award, Shield, Users, Globe } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+interface LeadershipMember {
+  id: string;
+  name: string;
+  position: string;
+  bio: string;
+  image_url: string;
+  order: number;
+  is_active: boolean;
+}
 
 const AboutPage: React.FC = () => {
   const { t } = useTranslation();
+  const [leadershipTeam, setLeadershipTeam] = useState<LeadershipMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLeadershipTeam();
+  }, []);
+
+  const fetchLeadershipTeam = async () => {
+    try {
+      setLoading(true);
+      
+      // Try to fetch from Supabase
+      const { data, error } = await supabase
+        .from('leadership_team')
+        .select('*')
+        .eq('is_active', true)
+        .order('order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching leadership team:', error);
+        // If table doesn't exist or other error, use default data
+        setLeadershipTeam(getDefaultLeadershipTeam());
+      } else if (data && data.length > 0) {
+        setLeadershipTeam(data);
+      } else {
+        // No data found, use default data
+        setLeadershipTeam(getDefaultLeadershipTeam());
+      }
+    } catch (error) {
+      console.error('Error in fetchLeadershipTeam:', error);
+      setLeadershipTeam(getDefaultLeadershipTeam());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDefaultLeadershipTeam = (): LeadershipMember[] => {
+    return [
+      {
+        id: '1',
+        name: 'Mamadou Diallo',
+        position: 'Président',
+        bio: 'Entrepreneur visionnaire et passionné d\'esport, Mamadou dirige la FEGESPORT avec l\'ambition de faire de la Guinée une référence de l\'esport en Afrique.',
+        image_url: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg',
+        order: 1,
+        is_active: true
+      },
+      {
+        id: '2',
+        name: 'Aïssata Camara',
+        position: 'Secrétaire Générale',
+        bio: 'Forte d\'une expérience de 15 ans dans l\'administration sportive, Aïssata coordonne l\'ensemble des activités de la fédération.',
+        image_url: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
+        order: 2,
+        is_active: true
+      },
+      {
+        id: '3',
+        name: 'Ibrahima Sow',
+        position: 'Directeur Technique',
+        bio: 'Ancien joueur professionnel et expert technique, Ibrahima supervise tous les aspects compétitifs et la formation des arbitres.',
+        image_url: 'https://images.pexels.com/photos/5792641/pexels-photo-5792641.jpeg',
+        order: 3,
+        is_active: true
+      },
+      {
+        id: '4',
+        name: 'Fatoumata Barry',
+        position: 'Directrice Marketing',
+        bio: 'Spécialiste en marketing digital, Fatoumata développe la stratégie de communication et les partenariats de la FEGESPORT.',
+        image_url: 'https://images.pexels.com/photos/2381469/pexels-photo-2381469.jpeg',
+        order: 4,
+        is_active: true
+      },
+      {
+        id: '5',
+        name: 'Sékou Condé',
+        position: 'Directeur des Compétitions',
+        bio: 'Expert en organisation d\'événements esport, Sékou coordonne l\'ensemble des compétitions nationales et internationales.',
+        image_url: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
+        order: 5,
+        is_active: true
+      },
+      {
+        id: '6',
+        name: 'Mariama Touré',
+        position: 'Directrice du Développement',
+        bio: 'Chargée du développement des programmes jeunesse et de l\'expansion de l\'esport dans toutes les régions de Guinée.',
+        image_url: 'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg',
+        order: 6,
+        is_active: true
+      }
+    ];
+  };
 
   return (
     <div className="pt-20">
@@ -125,115 +230,42 @@ const AboutPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg" 
-                  alt="Président" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Mamadou Diallo</h3>
-                <p className="text-primary-600 font-medium mb-4">Président</p>
-                <p className="text-gray-600">
-                  Entrepreneur visionnaire et passionné d'esport, Mamadou dirige la FEGESPORT avec l'ambition 
-                  de faire de la Guinée une référence de l'esport en Afrique.
-                </p>
-              </div>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             </div>
-
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg" 
-                  alt="Secrétaire Générale" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Aïssata Camara</h3>
-                <p className="text-primary-600 font-medium mb-4">Secrétaire Générale</p>
-                <p className="text-gray-600">
-                  Forte d'une expérience de 15 ans dans l'administration sportive, Aïssata coordonne 
-                  l'ensemble des activités de la fédération.
-                </p>
-              </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+              {leadershipTeam.map((member, index) => (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="card overflow-hidden"
+                >
+                  <div className="h-72 bg-gray-200 relative">
+                    <img 
+                      src={member.image_url} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/300x400?text=Photo+non+disponible';
+                      }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-1">{member.name}</h3>
+                    <p className="text-primary-600 font-medium mb-4">{member.position}</p>
+                    <p className="text-gray-600">
+                      {member.bio}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/5792641/pexels-photo-5792641.jpeg" 
-                  alt="Directeur Technique" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Ibrahima Sow</h3>
-                <p className="text-primary-600 font-medium mb-4">Directeur Technique</p>
-                <p className="text-gray-600">
-                  Ancien joueur professionnel et expert technique, Ibrahima supervise tous les aspects 
-                  compétitifs et la formation des arbitres.
-                </p>
-              </div>
-            </div>
-
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/2381469/pexels-photo-2381469.jpeg" 
-                  alt="Directrice Marketing" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Fatoumata Barry</h3>
-                <p className="text-primary-600 font-medium mb-4">Directrice Marketing</p>
-                <p className="text-gray-600">
-                  Spécialiste en marketing digital, Fatoumata développe la stratégie de communication 
-                  et les partenariats de la FEGESPORT.
-                </p>
-              </div>
-            </div>
-
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" 
-                  alt="Directeur des Compétitions" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Sékou Condé</h3>
-                <p className="text-primary-600 font-medium mb-4">Directeur des Compétitions</p>
-                <p className="text-gray-600">
-                  Expert en organisation d'événements esport, Sékou coordonne l'ensemble des 
-                  compétitions nationales et internationales.
-                </p>
-              </div>
-            </div>
-
-            <div className="card overflow-hidden">
-              <div className="h-72 bg-gray-200 relative">
-                <img 
-                  src="https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg" 
-                  alt="Directrice du Développement" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-1">Mariama Touré</h3>
-                <p className="text-primary-600 font-medium mb-4">Directrice du Développement</p>
-                <p className="text-gray-600">
-                  Chargée du développement des programmes jeunesse et de l'expansion de 
-                  l'esport dans toutes les régions de Guinée.
-                </p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
