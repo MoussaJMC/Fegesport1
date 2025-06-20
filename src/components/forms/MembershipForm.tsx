@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,6 +27,16 @@ const membershipSchema = z.object({
 
 type MembershipFormData = z.infer<typeof membershipSchema>;
 
+interface MembershipType {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  period: string;
+  features: string[];
+  is_active: boolean;
+}
+
 interface MembershipFormProps {
   selectedType?: string;
 }
@@ -36,6 +46,9 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
   const [showPayment, setShowPayment] = useState(false);
   const [formData, setFormData] = useState<MembershipFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [membershipTypes, setMembershipTypes] = useState<MembershipType[]>([]);
+  const [selectedMembershipType, setSelectedMembershipType] = useState<MembershipType | null>(null);
+  const [loadingTypes, setLoadingTypes] = useState(true);
 
   const methods = useForm<MembershipFormData>({
     resolver: zodResolver(membershipSchema),
@@ -44,7 +57,106 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
     }
   });
 
-  const { handleSubmit, formState: { errors } } = methods;
+  const { handleSubmit, formState: { errors }, watch, setValue } = methods;
+  const watchedType = watch('type');
+
+  useEffect(() => {
+    fetchMembershipTypes();
+  }, []);
+
+  useEffect(() => {
+    if (selectedType && membershipTypes.length > 0) {
+      setValue('type', selectedType);
+    }
+  }, [selectedType, membershipTypes, setValue]);
+
+  useEffect(() => {
+    if (watchedType && membershipTypes.length > 0) {
+      const selected = membershipTypes.find(type => type.id === watchedType);
+      setSelectedMembershipType(selected || null);
+    } else {
+      setSelectedMembershipType(null);
+    }
+  }, [watchedType, membershipTypes]);
+
+  const fetchMembershipTypes = async () => {
+    try {
+      setLoadingTypes(true);
+      
+      // Try to fetch from Supabase
+      const { data, error } = await supabase
+        .from('membership_types')
+        .select('*')
+        .eq('is_active', true)
+        .order('price', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching membership types:', error);
+        // If table doesn't exist or other error, use default types
+        setMembershipTypes(getDefaultMembershipTypes());
+      } else if (data && data.length > 0) {
+        setMembershipTypes(data);
+      } else {
+        // No data found, use default types
+        setMembershipTypes(getDefaultMembershipTypes());
+      }
+    } catch (error) {
+      console.error('Error in fetchMembershipTypes:', error);
+      setMembershipTypes(getDefaultMembershipTypes());
+    } finally {
+      setLoadingTypes(false);
+    }
+  };
+
+  const getDefaultMembershipTypes = (): MembershipType[] => {
+    return [
+      {
+        id: 'player',
+        name: t('membership.types.player'),
+        description: 'Adhésion pour les joueurs individuels',
+        price: 15000,
+        period: t('membership.types.player_period'),
+        features: [
+          'Licence officielle de joueur',
+          'Participation aux tournois officiels',
+          'Accès aux formations',
+          'Newsletter exclusive',
+          'Badge digital officiel'
+        ],
+        is_active: true
+      },
+      {
+        id: 'club',
+        name: t('membership.types.club'),
+        description: 'Adhésion pour les clubs esport',
+        price: 150000,
+        period: t('membership.types.club_period'),
+        features: [
+          'Statut de club officiel',
+          'Jusqu\'à 10 licences joueurs',
+          'Organisation de tournois',
+          'Support marketing',
+          'Visibilité sur le site FEGESPORT'
+        ],
+        is_active: true
+      },
+      {
+        id: 'partner',
+        name: t('membership.types.partner'),
+        description: 'Adhésion pour les partenaires',
+        price: 0,
+        period: t('membership.types.partner_period'),
+        features: [
+          'Statut de partenaire officiel',
+          'Logo sur le site et événements',
+          'Accès VIP aux événements',
+          'Communication dédiée',
+          'Programme personnalisé'
+        ],
+        is_active: true
+      }
+    ];
+  };
 
   const onSubmit = async (data: MembershipFormData) => {
     try {
@@ -148,6 +260,14 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
     toast.error(t('common.error'));
   };
 
+  if (loadingTypes) {
+    return (
+      <div className="flex justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -156,11 +276,10 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           label={t('membership.types.title')}
           required
           error={errors.type?.message}
-          options={[
-            { value: 'player', label: t('membership.types.player') },
-            { value: 'club', label: t('membership.types.club') },
-            { value: 'partner', label: t('membership.types.partner') },
-          ]}
+          options={membershipTypes.map(type => ({
+            value: type.id,
+            label: type.name
+          }))}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -268,7 +387,7 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
             </div>
             <h3 className="text-lg font-semibold text-white">Paiement</h3>
             <PayPalButton
-              amount="15000"
+              amount={selectedMembershipType?.price.toString() || "15000"}
               currency="XOF"
               onSuccess={handlePaymentSuccess}
               onError={handlePaymentError}

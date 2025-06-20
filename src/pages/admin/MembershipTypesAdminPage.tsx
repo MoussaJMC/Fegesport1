@@ -485,8 +485,114 @@ const MembershipTypesAdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* Membership Types List */}
-      <div className="bg-white rounded-lg shadow">
+      {/* Membership Types Cards (Mobile-friendly) */}
+      <div className="lg:hidden space-y-4">
+        {filteredTypes.map((type, index) => (
+          <motion.div
+            key={type.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            className="bg-white rounded-lg shadow p-4"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center">
+                <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <Tag className="h-5 w-5 text-primary-600" />
+                </div>
+                <div className="ml-3">
+                  <div className="font-medium">{type.name}</div>
+                  <div className="text-sm text-gray-500">{type.description}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => toggleActiveStatus(type.id, type.is_active)}
+                className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                  type.is_active 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {type.is_active ? 'Actif' : 'Inactif'}
+              </button>
+            </div>
+            
+            <div className="flex items-center text-sm mb-3">
+              <DollarSign className="h-4 w-4 text-gray-500 mr-1" />
+              <div className="text-gray-900">
+                {type.price === 0 ? 'Sur mesure' : `${type.price.toLocaleString()} FCFA`}
+              </div>
+              <div className="text-xs text-gray-500 ml-1">
+                {type.period}
+              </div>
+            </div>
+            
+            <div className="mb-3">
+              <div className="text-sm font-medium mb-1">Avantages:</div>
+              <ul className="text-sm text-gray-500 list-disc pl-5 space-y-1">
+                {type.features.slice(0, 3).map((feature, i) => (
+                  <li key={i}>
+                    {feature}
+                  </li>
+                ))}
+                {type.features.length > 3 && (
+                  <li className="text-gray-400 text-xs">
+                    +{type.features.length - 3} autres avantages
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="flex justify-end space-x-2">
+              <button 
+                onClick={() => handleEdit(type)}
+                className="p-2 text-blue-600 hover:text-blue-900"
+                title="Modifier"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => deleteMembershipType(type.id)}
+                className="p-2 text-red-600 hover:text-red-900"
+                title="Supprimer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        ))}
+        
+        {filteredTypes.length === 0 && (
+          <div className="text-center py-12 bg-white rounded-lg shadow">
+            <Tag className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun type d'adhésion</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {searchTerm || filterActive
+                ? 'Aucun type d\'adhésion ne correspond à vos critères de recherche.'
+                : 'Commencez par créer votre premier type d\'adhésion.'
+              }
+            </p>
+            {!searchTerm && !filterActive && (
+              <div className="mt-6">
+                <button
+                  onClick={() => {
+                    resetForm();
+                    setEditingType(null);
+                    setShowForm(true);
+                  }}
+                  className="btn bg-primary-600 hover:bg-primary-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nouveau Type
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Membership Types Table (Desktop) */}
+      <div className="hidden lg:block bg-white rounded-lg shadow">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
