@@ -40,7 +40,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           <Calendar size={14} className="mr-1" />
           <time dateTime={event.date}>{event.formattedDate}</time>
         </div>
-        <h3 className="text-lg font-bold mb-2">
+        <h3 className="text-lg font-bold mb-2 line-clamp-2">
           <Link to={`/events/${event.id}`} className="hover:text-primary-600 transition-colors">
             {event.title}
           </Link>

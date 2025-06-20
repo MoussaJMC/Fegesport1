@@ -146,7 +146,7 @@ const MembershipForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <FormSelect
           name="type"
-          label="Type d'adhésion"
+          label={t('membership.types.title')}
           required
           error={errors.type?.message}
           options={[
@@ -248,7 +248,7 @@ const MembershipForm: React.FC = () => {
 
         {!showPayment ? (
           <FormSubmitButton isLoading={isSubmitting} className="w-full">
-            {isSubmitting ? t('common.loading') : t('membership.form.continue')}
+            {t('membership.form.continue')}
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">
