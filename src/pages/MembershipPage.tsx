@@ -196,7 +196,7 @@ const MembershipPage: React.FC = () => {
                   <div className="text-3xl font-bold text-primary-500 mb-1">
                     {type.price === 0 ? t('membership.types.partner_price') : 
                       `${type.price.toLocaleString()} `}
-                    <span className="text-sm font-normal text-gray-400">FCFA</span>
+                    <span className="text-sm font-normal text-gray-400">GNF</span>
                   </div>
                   <p className="text-gray-400 mb-6">{type.period}</p>
                   <ul className="space-y-3">

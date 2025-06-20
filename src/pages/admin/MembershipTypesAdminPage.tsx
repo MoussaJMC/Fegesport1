@@ -408,7 +408,7 @@ const MembershipTypesAdminPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Prix (FCFA)
+                      Prix (GNF)
                     </label>
                     <input
                       type="number"
@@ -520,7 +520,7 @@ const MembershipTypesAdminPage: React.FC = () => {
             <div className="flex items-center text-sm mb-3">
               <DollarSign className="h-4 w-4 text-gray-500 mr-1" />
               <div className="text-gray-900">
-                {type.price === 0 ? 'Sur mesure' : `${type.price.toLocaleString()} FCFA`}
+                {type.price === 0 ? 'Sur mesure' : `${type.price.toLocaleString()} GNF`}
               </div>
               <div className="text-xs text-gray-500 ml-1">
                 {type.period}
@@ -641,7 +641,7 @@ const MembershipTypesAdminPage: React.FC = () => {
                     <div className="flex items-center">
                       <DollarSign className="h-4 w-4 text-gray-500 mr-1" />
                       <div className="text-sm text-gray-900">
-                        {type.price === 0 ? 'Sur mesure' : `${type.price.toLocaleString()} FCFA`}
+                        {type.price === 0 ? 'Sur mesure' : `${type.price.toLocaleString()} GNF`}
                       </div>
                       <div className="text-xs text-gray-500 ml-1">
                         {type.period}
