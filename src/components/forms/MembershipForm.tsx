@@ -27,7 +27,11 @@ const membershipSchema = z.object({
 
 type MembershipFormData = z.infer<typeof membershipSchema>;
 
-const MembershipForm: React.FC = () => {
+interface MembershipFormProps {
+  selectedType?: string;
+}
+
+const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
   const { t } = useTranslation();
   const [showPayment, setShowPayment] = useState(false);
   const [formData, setFormData] = useState<MembershipFormData | null>(null);
@@ -35,6 +39,9 @@ const MembershipForm: React.FC = () => {
 
   const methods = useForm<MembershipFormData>({
     resolver: zodResolver(membershipSchema),
+    defaultValues: {
+      type: selectedType || ''
+    }
   });
 
   const { handleSubmit, formState: { errors } } = methods;
