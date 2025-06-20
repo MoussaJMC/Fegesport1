@@ -117,7 +117,7 @@ const AboutPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
             <p className="text-xl">
               {t('about.subtitle')}
             </p>
@@ -130,16 +130,16 @@ const AboutPage: React.FC = () => {
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-3xl font-bold mb-4">{t('about.mission.title')}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.mission.title')}</h2>
               <div className="w-20 h-1 bg-primary-600 mb-6"></div>
-              <p className="text-lg text-gray-700 mb-4">
+              <p className="text-base md:text-lg text-gray-700 mb-4">
                 {t('about.mission.description')}
               </p>
             </div>
             <div>
-              <h2 className="text-3xl font-bold mb-4">{t('about.vision.title')}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.vision.title')}</h2>
               <div className="w-20 h-1 bg-primary-600 mb-6"></div>
-              <p className="text-lg text-gray-700 mb-4">
+              <p className="text-base md:text-lg text-gray-700 mb-4">
                 {t('about.vision.description')}
               </p>
             </div>
@@ -151,14 +151,14 @@ const AboutPage: React.FC = () => {
       <section className="section bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t('about.values.title')}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.values.title')}</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-lg max-w-3xl mx-auto">
+            <p className="text-base md:text-lg max-w-3xl mx-auto">
               {t('about.values.description')}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
             <motion.div 
               className="card p-6"
               whileHover={{ y: -10 }}
@@ -222,9 +222,9 @@ const AboutPage: React.FC = () => {
       <section className="section bg-white">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Notre Direction</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre Direction</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-lg max-w-3xl mx-auto">
+            <p className="text-base md:text-lg max-w-3xl mx-auto">
               La FEGESPORT est dirigée par une équipe de professionnels passionnés et engagés, apportant expertise 
               et vision au développement de l'esport guinéen.
             </p>
@@ -235,7 +235,7 @@ const AboutPage: React.FC = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               {leadershipTeam.map((member, index) => (
                 <motion.div
                   key={member.id}
@@ -245,7 +245,7 @@ const AboutPage: React.FC = () => {
                   viewport={{ once: true }}
                   className="card overflow-hidden"
                 >
-                  <div className="h-72 bg-gray-200 relative">
+                  <div className="h-64 sm:h-72 bg-gray-200 relative">
                     <img 
                       src={member.image_url} 
                       alt={member.name} 
@@ -256,9 +256,9 @@ const AboutPage: React.FC = () => {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold mb-1">{member.name}</h3>
+                    <h3 className="text-xl font-bold mb-1 card-title">{member.name}</h3>
                     <p className="text-primary-600 font-medium mb-4">{member.position}</p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 card-description">
                       {member.bio}
                     </p>
                   </div>
@@ -273,7 +273,7 @@ const AboutPage: React.FC = () => {
       <section className="section bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Notre Histoire</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre Histoire</h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 

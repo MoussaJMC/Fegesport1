@@ -189,14 +189,17 @@ const HomePage: React.FC = () => {
             <img 
               src={logoSettings.main_logo}
               alt={logoSettings.alt_text || "FEGESPORT Logo"}
-              className="w-32 h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6"
+              className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6"
+              onError={(e) => {
+                e.currentTarget.src = "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg";
+              }}
             />
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-5xl md:text-6xl font-bold mb-4 text-white"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white"
           >
             {t('home.hero.title')}
           </motion.h1>
@@ -204,7 +207,7 @@ const HomePage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300"
+            className="text-lg sm:text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300"
           >
             {t('home.hero.subtitle')}
           </motion.p>
@@ -293,14 +296,14 @@ const HomePage: React.FC = () => {
       {/* Latest News Section */}
       <section className="section bg-secondary-800">
         <div className="container-custom">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-white">{t('home.news.title')}</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">{t('home.news.title')}</h2>
             <Link to="/news" className="text-primary-500 hover:text-primary-400 font-medium flex items-center">
               {t('home.news.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {news.slice(0, 3).map((newsItem) => (
               <NewsCard key={newsItem.id} news={newsItem} />
             ))}
@@ -311,14 +314,14 @@ const HomePage: React.FC = () => {
       {/* Upcoming Events Section */}
       <section className="section bg-secondary-900">
         <div className="container-custom">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-white">{t('home.events.title')}</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">{t('home.events.title')}</h2>
             <Link to="/events" className="text-primary-500 hover:text-primary-400 font-medium flex items-center">
               {t('home.events.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {events.slice(0, 4).map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
@@ -371,9 +374,11 @@ const HomePage: React.FC = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-secondary-900 via-secondary-900/90 to-secondary-900/80"></div>
         <div className="container-custom relative z-10 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('home.join.title')}</h2>
-          <p className="text-xl max-w-2xl mx-auto mb-8 text-gray-300">{t('home.join.description')}</p>
-          <Link to="/membership" className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8 py-3 rounded-full">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{t('home.join.title')}</h2>
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 text-gray-300">
+            {t('home.join.description')}
+          </p>
+          <Link to="/membership" className="btn bg-primary-600 hover:bg-primary-700 text-white text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3 rounded-full">
             {t('home.join.cta')}
           </Link>
         </div>

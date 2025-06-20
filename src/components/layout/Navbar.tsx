@@ -161,7 +161,7 @@ const Navbar: React.FC = () => {
                 }}
               />
             )}
-            <span className={`text-2xl font-bold ${scrolled ? 'text-primary-500' : 'text-white'}`}>
+            <span className={`text-xl md:text-2xl font-bold ${scrolled ? 'text-primary-500' : 'text-white'}`}>
               {navigationSettings.brand_text || "FEGESPORT"}
             </span>
           </Link>
@@ -281,6 +281,8 @@ const Navbar: React.FC = () => {
               className={`inline-flex items-center justify-center p-2 rounded-md transition-colors ${
                 scrolled ? 'text-gray-300 hover:text-primary-500' : 'text-white hover:text-primary-300'
               }`}
+              aria-expanded={isOpen}
+              aria-label="Toggle navigation menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -294,7 +296,7 @@ const Navbar: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-secondary-900 rounded-b-lg shadow-lg"
+              className="md:hidden bg-secondary-900 rounded-b-lg shadow-lg mobile-nav-container"
             >
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {navItems.map((item) => (

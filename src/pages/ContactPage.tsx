@@ -47,7 +47,7 @@ const ContactPage: React.FC = () => {
       reset();
     } catch (error) {
       console.error('Error submitting contact form:', error);
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     }
   };
 
@@ -57,7 +57,7 @@ const ContactPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('contact.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('contact.title')}</h1>
             <p className="text-xl">
               {t('contact.subtitle')}
             </p>
@@ -78,7 +78,7 @@ const ContactPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="bg-primary-100 p-3 rounded-full">
+                  <div className="bg-primary-100 p-3 rounded-full flex-shrink-0">
                     <MapPin className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>
@@ -97,14 +97,14 @@ const ContactPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  <div className="bg-primary-100 p-3 rounded-full">
+                  <div className="bg-primary-100 p-3 rounded-full flex-shrink-0">
                     <Mail className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">{t('contact.info.email')}</h3>
                     <a 
                       href="mailto:contact@fegesport.org" 
-                      className="text-primary-600 hover:text-primary-700"
+                      className="text-primary-600 hover:text-primary-700 break-all"
                     >
                       contact@fegesport224.org
                     </a>
@@ -117,7 +117,7 @@ const ContactPage: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <div className="bg-primary-100 p-3 rounded-full">
+                  <div className="bg-primary-100 p-3 rounded-full flex-shrink-0">
                     <Phone className="text-primary-600 w-6 h-6" />
                   </div>
                   <div>

@@ -93,11 +93,11 @@ const NewsletterForm: React.FC = () => {
       </div>
 
       <div>
-        <label className="flex items-center space-x-2">
+        <label className="flex items-start space-x-2">
           <input
             type="checkbox"
             {...register('acceptNotifications')}
-            className="w-4 h-4 text-primary-500 border-secondary-600 rounded focus:ring-primary-500 bg-secondary-800"
+            className="w-4 h-4 mt-1 text-primary-500 border-secondary-600 rounded focus:ring-primary-500 bg-secondary-800"
           />
           <span className="text-sm text-gray-300">
             {t('newsletter.accept')}

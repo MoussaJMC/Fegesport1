@@ -29,15 +29,15 @@
   }
 
   h1 {
-    @apply text-4xl md:text-5xl;
+    @apply text-3xl md:text-5xl;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl;
+    @apply text-2xl md:text-4xl;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl;
+    @apply text-xl md:text-3xl;
   }
   
   p {
@@ -83,4 +83,51 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 640px) {
+  .section {
+    @apply py-8;
+  }
+  
+  .container-custom {
+    @apply px-4;
+  }
+  
+  h1 {
+    @apply text-3xl;
+  }
+  
+  h2 {
+    @apply text-2xl;
+  }
+  
+  h3 {
+    @apply text-xl;
+  }
+  
+  .btn {
+    @apply px-4 py-2 text-sm;
+  }
+}
+
+/* Fix for mobile navigation */
+.mobile-nav-container {
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+/* Fix for long text in cards */
+.card-title, .card-description {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Improve form elements on mobile */
+@media (max-width: 640px) {
+  input, select, textarea {
+    @apply text-base;
+  }
 }

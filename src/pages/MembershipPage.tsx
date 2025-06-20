@@ -132,7 +132,7 @@ const MembershipPage: React.FC = () => {
       <section className="bg-secondary-900 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('membership.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('membership.title')}</h1>
             <p className="text-xl text-gray-300">
               {t('membership.subtitle')}
             </p>
@@ -233,7 +233,7 @@ const MembershipPage: React.FC = () => {
               <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
             </div>
 
-            <div className="bg-secondary-700 p-8 rounded-lg">
+            <div className="bg-secondary-700 p-4 sm:p-8 rounded-lg">
               <MembershipForm selectedType={selectedPlan} />
             </div>
           </div>

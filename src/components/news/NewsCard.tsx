@@ -25,6 +25,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
           src={news.image} 
           alt={news.title} 
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src = "https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg";
+          }}
         />
         {news.category && (
           <span className="absolute top-4 right-4 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -37,12 +40,12 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
           <Calendar size={14} className="mr-1" />
           <time dateTime={news.date}>{news.date}</time>
         </div>
-        <h3 className="text-xl font-bold mb-2 line-clamp-2">
+        <h3 className="text-xl font-bold mb-2 line-clamp-2 card-title">
           <Link to={`/news/${news.id}`} className="hover:text-primary-600 transition-colors">
             {news.title}
           </Link>
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">
+        <p className="text-gray-600 mb-4 line-clamp-3 flex-grow card-description">
           {news.excerpt}
         </p>
         <Link 

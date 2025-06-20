@@ -79,7 +79,7 @@ const PartnersPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('partners.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('partners.title')}</h1>
             <p className="text-xl">
               {t('partners.subtitle')}
             </p>
@@ -106,11 +106,14 @@ const PartnersPage: React.FC = () => {
                         src={partner.logo} 
                         alt={partner.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Logo+non+disponible';
+                        }}
                       />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-bold mb-2">{partner.name}</h3>
-                      <p className="text-gray-600">{partner.description}</p>
+                      <h3 className="text-xl font-bold mb-2 card-title">{partner.name}</h3>
+                      <p className="text-gray-600 card-description">{partner.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -143,8 +146,8 @@ const PartnersPage: React.FC = () => {
                 <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
                   <div className="text-primary-600">{benefit.icon}</div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
+                <h3 className="text-xl font-bold mb-3 card-title">{benefit.title}</h3>
+                <p className="text-gray-600 card-description">{benefit.description}</p>
               </motion.div>
             ))}
           </div>

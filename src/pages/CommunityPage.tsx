@@ -67,7 +67,7 @@ const CommunityPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('community.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('community.title')}</h1>
             <p className="text-xl">
               {t('community.subtitle')}
             </p>
@@ -137,7 +137,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-800">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">{t('community.sections.players')}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">{t('community.sections.players')}</h2>
             <Trophy className="text-primary-500" size={32} />
           </div>
 
@@ -155,19 +155,22 @@ const CommunityPage: React.FC = () => {
                     src={player.image}
                     alt={player.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Photo+non+disponible';
+                    }}
                   />
                   <div className="absolute top-4 right-4 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                     {player.level}
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-1">{player.name}</h3>
+                  <h3 className="text-xl font-bold text-white mb-1 card-title">{player.name}</h3>
                   <p className="text-primary-500 font-medium mb-4">{player.gamertag}</p>
                   <div className="space-y-2">
                     {player.achievements.map((achievement, i) => (
                       <div key={i} className="flex items-center text-gray-300">
-                        <Star className="text-primary-500 mr-2" size={16} />
-                        {achievement}
+                        <Star className="text-primary-500 mr-2 flex-shrink-0" size={16} />
+                        <span className="card-description">{achievement}</span>
                       </div>
                     ))}
                   </div>
@@ -182,7 +185,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-900">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">{t('community.sections.clubs')}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">{t('community.sections.clubs')}</h2>
             <Building className="text-primary-500" size={32} />
           </div>
 
@@ -200,18 +203,21 @@ const CommunityPage: React.FC = () => {
                     src={club.image}
                     alt={club.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Photo+non+disponible';
+                    }}
                   />
                   <div className="absolute top-4 right-4 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                     {club.members} membres
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">{club.name}</h3>
+                  <h3 className="text-xl font-bold text-white mb-4 card-title">{club.name}</h3>
                   <div className="space-y-2">
                     {club.achievements.map((achievement, i) => (
                       <div key={i} className="flex items-center text-gray-300">
-                        <Trophy className="text-primary-500 mr-2" size={16} />
-                        {achievement}
+                        <Trophy className="text-primary-500 mr-2 flex-shrink-0" size={16} />
+                        <span className="card-description">{achievement}</span>
                       </div>
                     ))}
                   </div>
@@ -226,7 +232,7 @@ const CommunityPage: React.FC = () => {
       <section className="section bg-secondary-800">
         <div className="container-custom">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">{t('community.sections.partners')}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">{t('community.sections.partners')}</h2>
             <Star className="text-primary-500" size={32} />
           </div>
 
@@ -244,14 +250,17 @@ const CommunityPage: React.FC = () => {
                     src={partner.image}
                     alt={partner.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Photo+non+disponible';
+                    }}
                   />
                   <div className="absolute top-4 right-4 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                     {partner.category}
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{partner.name}</h3>
-                  <p className="text-gray-300">{partner.contribution}</p>
+                  <h3 className="text-xl font-bold text-white mb-2 card-title">{partner.name}</h3>
+                  <p className="text-gray-300 card-description">{partner.contribution}</p>
                 </div>
               </motion.div>
             ))}

@@ -128,7 +128,7 @@ const Footer: React.FC = () => {
               {contactInfo.email && (
                 <div className="flex items-center mb-2">
                   <Mail size={16} className="mr-2" />
-                  <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors">
+                  <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors break-all">
                     {contactInfo.email}
                   </a>
                 </div>
@@ -141,7 +141,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0">
+          <p className="text-gray-400 text-sm mb-4 md:mb-0 text-center md:text-left">
             {t('footer.rights').replace('2025', currentYear.toString())}
           </p>
           <div className="flex space-x-4">

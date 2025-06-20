@@ -6,7 +6,7 @@ import PDFViewer from '../components/resources/PDFViewer';
 import { toast } from 'sonner';
 
 const ResourcesPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedPDF, setSelectedPDF] = useState<string | null>(null);
 
   // Updated resources with CORS-enabled PDF URL
@@ -104,6 +104,7 @@ const ResourcesPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
+      console.error('Error downloading PDF:', error);
       toast.error(t('common.error'));
     }
   };
@@ -118,7 +119,7 @@ const ResourcesPage: React.FC = () => {
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{t('resources.title')}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('resources.title')}</h1>
             <p className="text-xl">
               {t('resources.subtitle')}
             </p>
@@ -127,9 +128,9 @@ const ResourcesPage: React.FC = () => {
       </section>
 
       {/* Quick Links */}
-      <section className="bg-white border-b">
+      <section className="bg-white border-b overflow-x-auto">
         <div className="container-custom py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex flex-nowrap md:grid md:grid-cols-4 gap-4">
             {[
               t('resources.categories.official'), 
               t('resources.categories.guides'), 
@@ -138,7 +139,7 @@ const ResourcesPage: React.FC = () => {
             ].map((link, index) => (
               <button
                 key={index}
-                className="px-6 py-3 text-center rounded-lg hover:bg-primary-50 text-primary-600 font-medium transition-colors"
+                className="px-6 py-3 text-center rounded-lg hover:bg-primary-50 text-primary-600 font-medium transition-colors whitespace-nowrap flex-shrink-0"
               >
                 {link}
               </button>
@@ -154,7 +155,7 @@ const ResourcesPage: React.FC = () => {
             {resources.map((category, index) => (
               <div key={index}>
                 <h2 className="text-2xl font-bold mb-6">{category.category}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {category.items.map((item, itemIndex) => (
                     <motion.div
                       key={itemIndex}
@@ -163,25 +164,25 @@ const ResourcesPage: React.FC = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex items-start">
-                        <div className="bg-primary-100 p-3 rounded-lg">
+                        <div className="bg-primary-100 p-3 rounded-lg flex-shrink-0">
                           <FileText className="text-primary-600" size={24} />
                         </div>
                         <div className="ml-4 flex-grow">
-                          <h3 className="font-bold mb-2">{item.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4">{item.description}</p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">{item.type} • {item.size}</span>
+                          <h3 className="font-bold mb-2 card-title">{item.title}</h3>
+                          <p className="text-sm text-gray-600 mb-4 card-description">{item.description}</p>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <span className="text-sm text-gray-500 mb-2 sm:mb-0">{item.type} • {item.size}</span>
                             <div className="flex space-x-2">
                               <button 
                                 onClick={() => handleViewPDF(item.url)}
-                                className="text-primary-600 hover:text-primary-700 flex items-center"
+                                className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
                               >
                                 <Eye size={16} className="mr-1" />
                                 {t('resources.actions.view')}
                               </button>
                               <button 
                                 onClick={() => handleDownloadPDF(item.url, item.title)}
-                                className="text-primary-600 hover:text-primary-700 flex items-center"
+                                className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
                               >
                                 <Download size={16} className="mr-1" />
                                 {t('resources.actions.download')}
@@ -216,8 +217,8 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Book className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">{t('resources.other.media')}</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 card-title">{t('resources.other.media')}</h3>
+              <p className="text-gray-600 mb-4 card-description">
                 {t('resources.other.media_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
@@ -233,8 +234,8 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Shield className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">{t('resources.other.branding')}</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 card-title">{t('resources.other.branding')}</h3>
+              <p className="text-gray-600 mb-4 card-description">
                 {t('resources.other.branding_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
@@ -250,8 +251,8 @@ const ResourcesPage: React.FC = () => {
               <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <FileText className="text-primary-600" size={24} />
               </div>
-              <h3 className="text-xl font-bold mb-3">{t('resources.other.forms')}</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-xl font-bold mb-3 card-title">{t('resources.other.forms')}</h3>
+              <p className="text-gray-600 mb-4 card-description">
                 {t('resources.other.forms_desc')}
               </p>
               <button className="text-primary-600 hover:text-primary-700 font-medium">
