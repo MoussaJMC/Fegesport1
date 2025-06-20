@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book
+  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -183,6 +183,7 @@ const AdminLayout: React.FC = () => {
     { icon: Newspaper, label: 'Actualités', path: '/admin/news' },
     { icon: Calendar, label: 'Événements', path: '/admin/events' },
     { icon: Users, label: 'Membres', path: '/admin/members' },
+    { icon: Tag, label: 'Types d\'Adhésion', path: '/admin/membership-types' },
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
