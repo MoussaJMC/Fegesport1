@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Globe, ChevronDown, User } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 
@@ -288,97 +288,99 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-secondary-900 rounded-b-lg shadow-lg"
-          >
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <div key={item.path}>
-                  {item.submenu ? (
-                    <>
-                      <button
-                        onClick={() => setMembershipMenuOpen(!membershipMenuOpen)}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-secondary-900 rounded-b-lg shadow-lg"
+            >
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                {navItems.map((item) => (
+                  <div key={item.path}>
+                    {item.submenu ? (
+                      <>
+                        <button
+                          onClick={() => setMembershipMenuOpen(!membershipMenuOpen)}
+                          className={`
+                            w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center justify-between
+                            ${location.pathname.startsWith(item.path)
+                              ? 'bg-secondary-800 text-primary-500'
+                              : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
+                            }
+                          `}
+                        >
+                          {getTranslatedLabel(item.label)}
+                          <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {membershipMenuOpen && (
+                          <div className="pl-4 space-y-1">
+                            {item.submenu.map((subItem: SubNavItem) => (
+                              <Link
+                                key={subItem.path}
+                                to={subItem.path}
+                                className={`
+                                  block px-3 py-2 rounded-md text-sm font-medium
+                                  ${location.pathname === subItem.path
+                                    ? 'bg-secondary-800 text-primary-500'
+                                    : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
+                                  }
+                                `}
+                              >
+                                {getTranslatedLabel(subItem.label)}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.path}
                         className={`
-                          w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center justify-between
-                          ${location.pathname.startsWith(item.path)
+                          block px-3 py-2 rounded-md text-base font-medium
+                          ${location.pathname === item.path
                             ? 'bg-secondary-800 text-primary-500'
                             : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
                           }
                         `}
                       >
                         {getTranslatedLabel(item.label)}
-                        <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      {membershipMenuOpen && (
-                        <div className="pl-4 space-y-1">
-                          {item.submenu.map((subItem: SubNavItem) => (
-                            <Link
-                              key={subItem.path}
-                              to={subItem.path}
-                              className={`
-                                block px-3 py-2 rounded-md text-sm font-medium
-                                ${location.pathname === subItem.path
-                                  ? 'bg-secondary-800 text-primary-500'
-                                  : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                                }
-                              `}
-                            >
-                              {getTranslatedLabel(subItem.label)}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      to={item.path}
-                      className={`
-                        block px-3 py-2 rounded-md text-base font-medium
-                        ${location.pathname === item.path
-                          ? 'bg-secondary-800 text-primary-500'
-                          : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                        }
-                      `}
-                    >
-                      {getTranslatedLabel(item.label)}
-                    </Link>
-                  )}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Mobile Language Selector */}
+                <div className="pt-2 pb-1">
+                  <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    {i18n.language === 'fr' ? 'Langue' : 'Language'}
+                  </p>
+                  <button
+                    onClick={() => changeLanguage('fr')}
+                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                      i18n.language === 'fr' 
+                        ? 'bg-secondary-800 text-primary-500' 
+                        : 'text-gray-300 hover:bg-secondary-800'
+                    }`}
+                  >
+                    Français
+                  </button>
+                  <button
+                    onClick={() => changeLanguage('en')}
+                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                      i18n.language === 'en' 
+                        ? 'bg-secondary-800 text-primary-500' 
+                        : 'text-gray-300 hover:bg-secondary-800'
+                    }`}
+                  >
+                    English
+                  </button>
                 </div>
-              ))}
-              
-              {/* Mobile Language Selector */}
-              <div className="pt-2 pb-1">
-                <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  {i18n.language === 'fr' ? 'Langue' : 'Language'}
-                </p>
-                <button
-                  onClick={() => changeLanguage('fr')}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    i18n.language === 'fr' 
-                      ? 'bg-secondary-800 text-primary-500' 
-                      : 'text-gray-300 hover:bg-secondary-800'
-                  }`}
-                >
-                  Français
-                </button>
-                <button
-                  onClick={() => changeLanguage('en')}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                    i18n.language === 'en' 
-                      ? 'bg-secondary-800 text-primary-500' 
-                      : 'text-gray-300 hover:bg-secondary-800'
-                  }`}
-                >
-                  English
-                </button>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );
