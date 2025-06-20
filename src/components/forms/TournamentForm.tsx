@@ -40,6 +40,7 @@ const TournamentForm: React.FC = () => {
       toast.success('Votre inscription au tournoi a été enregistrée avec succès !');
       methods.reset();
     } catch (error) {
+      console.error('Error submitting tournament form:', error);
       toast.error(t('common.error'));
     }
   };
@@ -148,7 +149,7 @@ const TournamentForm: React.FC = () => {
         />
 
         <FormSubmitButton isLoading={isSubmitting} className="w-full">
-          S'inscrire au tournoi
+          {isSubmitting ? t('common.loading') : 'S\'inscrire au tournoi'}
         </FormSubmitButton>
       </form>
     </FormProvider>

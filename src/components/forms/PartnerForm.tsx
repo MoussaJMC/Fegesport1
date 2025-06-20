@@ -43,6 +43,7 @@ const PartnerForm: React.FC = () => {
       toast.success('Votre demande de partenariat a été envoyée avec succès !');
       methods.reset();
     } catch (error) {
+      console.error('Error submitting partner form:', error);
       toast.error(t('common.error'));
     }
   };
@@ -56,7 +57,7 @@ const PartnerForm: React.FC = () => {
           required
           error={errors.type?.message}
           options={[
-            { value: 'sponsor', label: 'Sponsor' },
+            { value: 'sponsor', label: t('partners.benefits.visibility') },
             { value: 'technical', label: 'Partenaire technique' },
             { value: 'media', label: 'Partenaire média' },
             { value: 'institutional', label: 'Partenaire institutionnel' },
@@ -173,7 +174,7 @@ const PartnerForm: React.FC = () => {
         />
 
         <FormSubmitButton isLoading={isSubmitting} className="w-full">
-          Envoyer la demande de partenariat
+          {isSubmitting ? t('common.loading') : 'Envoyer la demande de partenariat'}
         </FormSubmitButton>
       </form>
     </FormProvider>

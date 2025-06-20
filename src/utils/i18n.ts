@@ -24,7 +24,33 @@ i18n
     },
     react: {
       useSuspense: false // prevents issues with suspense
-    }
+    },
+    debug: false // set to true to see debugging info in console
   });
+
+// Add a function to help debug missing translations
+export const checkMissingTranslations = () => {
+  const frKeys = getAllKeys(translationFR);
+  const enKeys = getAllKeys(translationEN);
+  
+  console.log('Missing in EN:', frKeys.filter(key => !enKeys.includes(key)));
+  console.log('Missing in FR:', enKeys.filter(key => !frKeys.includes(key)));
+};
+
+// Helper function to get all keys from a nested object
+const getAllKeys = (obj: any, prefix = ''): string[] => {
+  let keys: string[] = [];
+  
+  for (const key in obj) {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      keys = [...keys, ...getAllKeys(obj[key], newKey)];
+    } else {
+      keys.push(newKey);
+    }
+  }
+  
+  return keys;
+};
 
 export default i18n;

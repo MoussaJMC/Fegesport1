@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Mail, Send, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../../lib/supabase';
 
 const newsletterSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -26,17 +27,22 @@ const NewsletterForm: React.FC = () => {
 
   const onSubmit = async (data: NewsletterFormData) => {
     try {
-      // TODO: Replace with actual API call to your backend service
-      // Example:
-      // const response = await fetch('/api/newsletter/subscribe', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(data),
-      // });
-      // if (!response.ok) throw new Error('Failed to subscribe');
-
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Insert into newsletter_subscriptions table
+      const { error } = await supabase
+        .from('newsletter_subscriptions')
+        .insert([{
+          email: data.email,
+          whatsapp: data.whatsapp,
+          status: 'active'
+        }]);
+        
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast.error('Cette adresse email est déjà inscrite à la newsletter');
+          return;
+        }
+        throw error;
+      }
       
       toast.success(t('newsletter.success'));
       reset();

@@ -59,6 +59,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
       setFormData(data);
       setShowPayment(true);
     } catch (error) {
+      console.error('Error submitting registration form:', error);
       toast.error(t('common.error'));
     }
   };
@@ -74,13 +75,14 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
       setShowPayment(false);
       onSuccess();
     } catch (error) {
-      toast.error('Une erreur est survenue lors de la finalisation de l\'inscription.');
+      console.error('Error in payment success handler:', error);
+      toast.error(t('common.error'));
     }
   };
 
   const handlePaymentError = (error: any) => {
     console.error('Payment error:', error);
-    toast.error('Une erreur est survenue lors du paiement. Veuillez réessayer.');
+    toast.error(t('common.error'));
   };
 
   return (

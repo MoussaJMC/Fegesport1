@@ -101,7 +101,7 @@ const MembershipForm: React.FC = () => {
       
     } catch (error: any) {
       console.error('Unexpected error during member inscription:', error);
-      toast.error('Une erreur inattendue est survenue. Veuillez réessayer.');
+      toast.error(t('common.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -132,13 +132,13 @@ const MembershipForm: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error in payment success handler:', error);
-      toast.error('Une erreur est survenue lors de la finalisation de l\'adhésion.');
+      toast.error(t('common.error'));
     }
   };
 
   const handlePaymentError = (error: any) => {
     console.error('Payment error:', error);
-    toast.error('Une erreur est survenue lors du paiement. Veuillez réessayer.');
+    toast.error(t('common.error'));
   };
 
   return (
@@ -150,9 +150,9 @@ const MembershipForm: React.FC = () => {
           required
           error={errors.type?.message}
           options={[
-            { value: 'player', label: 'Joueur' },
-            { value: 'club', label: 'Club' },
-            { value: 'partner', label: 'Partenaire' },
+            { value: 'player', label: t('membership.types.player') },
+            { value: 'club', label: t('membership.types.club') },
+            { value: 'partner', label: t('membership.types.partner') },
           ]}
         />
 
@@ -248,7 +248,7 @@ const MembershipForm: React.FC = () => {
 
         {!showPayment ? (
           <FormSubmitButton isLoading={isSubmitting} className="w-full">
-            {isSubmitting ? 'Enregistrement en cours...' : t('membership.form.continue')}
+            {isSubmitting ? t('common.loading') : t('membership.form.continue')}
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">
