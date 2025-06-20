@@ -78,5 +78,37 @@ export const upcomingEvents: EventItem[] = [
 2. Une bonne connaissance des jeux esport est requise
 3. La présence est obligatoire sur les 3 jours
 4. Un test final validera la certification`
+  },
+  {
+    id: '3',
+    title: 'Remise de PRIX aux Champions du Tournoi Annuel EDITION 9',
+    description: 'Cérémonie officielle de remise des prix aux champions du tournoi annuel de la FEGESPORT, édition 9.',
+    date: '2025-06-28',
+    formattedDate: '28 Juin 2025',
+    time: '18:00 - 21:00',
+    location: 'Hôtel Kaloum, Conakry',
+    image: 'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg',
+    category: 'Cérémonie',
+    type: 'in-person',
+    maxParticipants: 200,
+    currentParticipants: 0,
+    prices: [
+      {
+        id: 'invitation',
+        name: 'Sur Invitation',
+        amount: 0,
+        description: 'Entrée sur invitation uniquement',
+        features: [
+          'Cérémonie de remise des prix',
+          'Cocktail dînatoire',
+          'Networking avec les professionnels',
+          'Photos officielles'
+        ]
+      }
+    ],
+    rules: `1. Entrée sur invitation uniquement
+2. Tenue correcte exigée
+3. Les champions doivent confirmer leur présence 7 jours avant l'événement
+4. Les photos de l'événement pourront être utilisées à des fins promotionnelles`
   }
 ];

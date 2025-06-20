@@ -1,16 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, MapPin, Clock, Users, AlertTriangle } from 'lucide-react';
 import { upcomingEvents } from '../data/eventsData';
 import EventRegistrationForm from '../components/events/EventRegistrationForm';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '../lib/supabase';
 
 const EventPage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams();
-  const event = upcomingEvents.find(event => event.id === id);
-  const [showRegistration, setShowRegistration] = React.useState(false);
+  const [event, setEvent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [showRegistration, setShowRegistration] = useState(false);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      setLoading(true);
+      try {
+        // Try to fetch from Supabase first
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching event from Supabase:', error);
+          // Fallback to local data
+          const localEvent = upcomingEvents.find(event => event.id === id);
+          if (localEvent) {
+            setEvent(localEvent);
+          } else {
+            setEvent(null);
+          }
+        } else if (data) {
+          // Format the event data
+          setEvent({
+            ...data,
+            formattedDate: formatDate(data.date),
+            image: data.image_url || 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg',
+            prices: [
+              {
+                id: 'standard',
+                name: 'Standard',
+                amount: data.price || 25000,
+                description: 'Tarif standard',
+                features: [
+                  'Participation au tournoi',
+                  'T-shirt officiel',
+                  'Buffet inclus'
+                ]
+              }
+            ]
+          });
+        }
+      } catch (error) {
+        console.error('Error in fetchEvent:', error);
+        setEvent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="pt-20 min-h-screen bg-secondary-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   if (!event) {
     return (
@@ -126,7 +197,7 @@ const EventPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="prose prose-invert max-w-none">
-                  {event.rules.split('\n').map((rule, index) => (
+                  {event.rules.split('\n').map((rule: string, index: number) => (
                     <p key={index} className="text-gray-300">{rule}</p>
                   ))}
                 </div>
