@@ -218,7 +218,7 @@ const HomePage: React.FC = () => {
               to="/membership" 
               className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8 py-4 rounded-full"
             >
-              {heroSection?.settings?.cta_text || t('home.hero.cta')}
+              {t('home.hero.cta')}
             </Link>
             <Link 
               to="/about" 
