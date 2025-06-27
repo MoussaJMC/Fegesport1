@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus } from 'lucide-react';
+import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -32,22 +32,61 @@ const DashboardPage: React.FC = () => {
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     fetchDashboardStats();
   }, []);
 
+  const checkSupabaseConnection = async (): Promise<boolean> => {
+    try {
+      // Simple health check query
+      const { error } = await supabase.from('profiles').select('count').limit(1);
+      if (error) {
+        console.error('Supabase connection test failed:', error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Supabase connection error:', error);
+      return false;
+    }
+  };
+
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
+      setConnectionError(null);
       
-      // Fetch counts from all tables
+      // First, test the connection
+      const isConnected = await checkSupabaseConnection();
+      if (!isConnected) {
+        throw new Error('Unable to connect to Supabase. Please check your connection and CORS settings.');
+      }
+
+      // Fetch counts from all tables with timeout and error handling
+      const fetchWithTimeout = async (query: any, tableName: string) => {
+        try {
+          const result = await Promise.race([
+            query,
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout fetching ${tableName}`)), 10000)
+            )
+          ]);
+          return result;
+        } catch (error) {
+          console.error(`Error fetching ${tableName}:`, error);
+          return { count: 0, error };
+        }
+      };
+
       const [membersResult, eventsResult, partnersResult, messagesResult, newsResult] = await Promise.all([
-        supabase.from('members').select('id', { count: 'exact', head: true }),
-        supabase.from('events').select('id', { count: 'exact', head: true }),
-        supabase.from('partners').select('id', { count: 'exact', head: true }),
-        supabase.from('contact_messages').select('id', { count: 'exact', head: true }),
-        supabase.from('news').select('id', { count: 'exact', head: true })
+        fetchWithTimeout(supabase.from('members').select('id', { count: 'exact', head: true }), 'members'),
+        fetchWithTimeout(supabase.from('events').select('id', { count: 'exact', head: true }), 'events'),
+        fetchWithTimeout(supabase.from('partners').select('id', { count: 'exact', head: true }), 'partners'),
+        fetchWithTimeout(supabase.from('contact_messages').select('id', { count: 'exact', head: true }), 'messages'),
+        fetchWithTimeout(supabase.from('news').select('id', { count: 'exact', head: true }), 'news')
       ]);
 
       // Fetch recent activity (latest entries from different tables)
@@ -58,40 +97,45 @@ const DashboardPage: React.FC = () => {
         timestamp: string;
       }> = [];
       
-      // Recent members
-      const { data: recentMembers } = await supabase
-        .from('members')
-        .select('id, first_name, last_name, created_at')
-        .order('created_at', { ascending: false })
-        .limit(3);
+      try {
+        // Recent members
+        const { data: recentMembers, error: membersError } = await supabase
+          .from('members')
+          .select('id, first_name, last_name, created_at')
+          .order('created_at', { ascending: false })
+          .limit(3);
 
-      if (recentMembers) {
-        recentMembers.forEach(member => {
-          recentActivity.push({
-            id: member.id,
-            type: 'member',
-            description: `Nouveau membre: ${member.first_name} ${member.last_name}`,
-            timestamp: member.created_at
+        if (!membersError && recentMembers) {
+          recentMembers.forEach(member => {
+            recentActivity.push({
+              id: member.id,
+              type: 'member',
+              description: `Nouveau membre: ${member.first_name} ${member.last_name}`,
+              timestamp: member.created_at
+            });
           });
-        });
-      }
+        }
 
-      // Recent messages
-      const { data: recentMessages } = await supabase
-        .from('contact_messages')
-        .select('id, name, subject, created_at')
-        .order('created_at', { ascending: false })
-        .limit(2);
+        // Recent messages
+        const { data: recentMessages, error: messagesError } = await supabase
+          .from('contact_messages')
+          .select('id, name, subject, created_at')
+          .order('created_at', { ascending: false })
+          .limit(2);
 
-      if (recentMessages) {
-        recentMessages.forEach(message => {
-          recentActivity.push({
-            id: message.id,
-            type: 'message',
-            description: `Nouveau message de ${message.name}: ${message.subject}`,
-            timestamp: message.created_at
+        if (!messagesError && recentMessages) {
+          recentMessages.forEach(message => {
+            recentActivity.push({
+              id: message.id,
+              type: 'message',
+              description: `Nouveau message de ${message.name}: ${message.subject}`,
+              timestamp: message.created_at
+            });
           });
-        });
+        }
+      } catch (activityError) {
+        console.error('Error fetching recent activity:', activityError);
+        // Continue without recent activity if it fails
       }
 
       // Sort activity by timestamp
@@ -105,12 +149,33 @@ const DashboardPage: React.FC = () => {
         news: newsResult.count || 0,
         recentActivity: recentActivity.slice(0, 5)
       });
-    } catch (error) {
+
+      // Reset retry count on success
+      setRetryCount(0);
+      
+    } catch (error: any) {
       console.error('Error fetching dashboard stats:', error);
-      toast.error('Erreur lors du chargement des statistiques');
+      
+      let errorMessage = 'Erreur lors du chargement des statistiques';
+      
+      if (error.message?.includes('Failed to fetch')) {
+        errorMessage = 'Impossible de se connecter à la base de données. Vérifiez votre connexion internet et les paramètres CORS de Supabase.';
+      } else if (error.message?.includes('Timeout')) {
+        errorMessage = 'Délai d\'attente dépassé lors de la connexion à la base de données.';
+      } else if (error.message?.includes('CORS')) {
+        errorMessage = 'Erreur CORS: Ajoutez votre URL de développement aux origines CORS autorisées dans Supabase.';
+      }
+      
+      setConnectionError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    fetchDashboardStats();
   };
 
   const handleSignOut = async () => {
@@ -183,8 +248,77 @@ const DashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <p className="text-gray-600">Chargement du tableau de bord...</p>
+        {retryCount > 0 && (
+          <p className="text-sm text-gray-500">Tentative {retryCount + 1}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (connectionError) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">Vue d'ensemble de l'administration FEGESPORT</p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Déconnexion
+          </button>
+        </div>
+
+        {/* Connection Error */}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-6 w-6 text-red-600" />
+            </div>
+            <div className="ml-3 flex-1">
+              <h3 className="text-lg font-medium text-red-800">
+                Erreur de connexion
+              </h3>
+              <p className="mt-2 text-sm text-red-700">
+                {connectionError}
+              </p>
+              <div className="mt-4 space-y-2">
+                <p className="text-sm text-red-700 font-medium">
+                  Solutions possibles :
+                </p>
+                <ul className="text-sm text-red-700 list-disc list-inside space-y-1">
+                  <li>Vérifiez votre connexion internet</li>
+                  <li>Assurez-vous que votre projet Supabase est actif</li>
+                  <li>Ajoutez <code className="bg-red-100 px-1 rounded">http://localhost:5173</code> aux origines CORS dans les paramètres de votre projet Supabase</li>
+                  <li>Vérifiez que vos variables d'environnement Supabase sont correctes</li>
+                </ul>
+              </div>
+              <div className="mt-4 flex space-x-3">
+                <button
+                  onClick={handleRetry}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Réessayer
+                </button>
+                <Link
+                  to="/admin/diagnostic"
+                  className="inline-flex items-center px-3 py-2 border border-red-300 text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Diagnostic
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
