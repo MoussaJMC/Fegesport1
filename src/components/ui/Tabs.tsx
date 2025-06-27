@@ -1,5 +1,13 @@
 import * as React from 'react';
 
+// Create context
+interface TabsContextType {
+  activeValue: string;
+  onValueChange: (value: string) => void;
+}
+
+const TabsContext = React.createContext<TabsContextType | null>(null);
+
 interface TabsProps {
   value: string;
   onValueChange: (value: string) => void;
@@ -14,9 +22,11 @@ export const Tabs: React.FC<TabsProps> = ({
   children 
 }) => {
   return (
-    <div className={`w-full ${className}`}>
-      {children}
-    </div>
+    <TabsContext.Provider value={{ activeValue: value, onValueChange }}>
+      <div className={`w-full ${className}`}>
+        {children}
+      </div>
+    </TabsContext.Provider>
   );
 };
 
@@ -106,32 +116,3 @@ export const TabsContent: React.FC<TabsContentProps> = ({
     </div>
   );
 };
-
-// Create context
-interface TabsContextType {
-  activeValue: string;
-  onValueChange: (value: string) => void;
-}
-
-const TabsContext = React.createContext<TabsContextType | null>(null);
-
-// Update Tabs component to provide context
-export const TabsProvider: React.FC<TabsProps> = ({ 
-  value, 
-  onValueChange, 
-  className = '', 
-  children 
-}) => {
-  return (
-    <TabsContext.Provider value={{ activeValue: value, onValueChange }}>
-      <div className={`w-full ${className}`}>
-        {children}
-      </div>
-    </TabsContext.Provider>
-  );
-};
-
-// Override the original Tabs component
-Object.assign(Tabs, {
-  Provider: TabsProvider
-});
