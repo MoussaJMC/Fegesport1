@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import NewsCard from '../components/news/NewsCard';
 import EventCard from '../components/events/EventCard';
 import NewsletterSection from '../components/newsletter/NewsletterSection';
+import CardGrid from '../components/cards/CardGrid';
 
 // Data (fallback)
 import { latestNews } from '../data/newsData';
@@ -326,6 +327,18 @@ const HomePage: React.FC = () => {
               {t('common.learnMore')} <ArrowRight size={16} className="ml-2" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Cards Section */}
+      <section className="section bg-secondary-800">
+        <div className="container-custom">
+          <CardGrid 
+            title="ACTUALITÉS ET ÉVÉNEMENTS" 
+            showViewAll={true} 
+            viewAllLink="/news" 
+            limit={6}
+          />
         </div>
       </section>
 
