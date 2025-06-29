@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { Calendar, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NewsItem } from '../../types/news';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,19 @@ interface NewsCardProps {
 
 const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
   const { t } = useTranslation();
+  
+  const getCategoryColor = (category?: string) => {
+    if (!category) return 'bg-gray-600';
+    
+    switch (category) {
+      case 'Communiqué': return 'bg-blue-600';
+      case 'Compétition': return 'bg-green-600';
+      case 'Formation': return 'bg-yellow-600';
+      case 'Partenariat': return 'bg-purple-600';
+      case 'International': return 'bg-orange-600';
+      default: return 'bg-primary-600';
+    }
+  };
   
   return (
     <motion.article 
@@ -30,7 +43,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
           }}
         />
         {news.category && (
-          <span className="absolute top-4 right-4 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className={`absolute top-4 right-4 ${getCategoryColor(news.category)} text-white text-xs font-bold px-3 py-1 rounded-full`}>
             {news.category}
           </span>
         )}
@@ -50,9 +63,12 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
         </p>
         <Link 
           to={`/news/${news.id}`} 
-          className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+          className="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center"
         >
           {t('news.readMore')}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
         </Link>
       </div>
     </motion.article>

@@ -12,3 +12,16 @@ export interface NewsItem {
   };
   tags?: string[];
 }
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category?: string;
+  image_url?: string;
+  author_id?: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}
