@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { AlertCircle, CheckCircle, RefreshCw, Database, FolderPlus } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface FileCategory {
   id: string;
@@ -19,6 +20,7 @@ interface DiagnosticResult {
 }
 
 const FileUploadDiagnostic: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<FileCategory[]>([]);
@@ -38,9 +40,12 @@ const FileUploadDiagnostic: React.FC = () => {
     setLoading(true);
     const results: DiagnosticResult[] = [
       { name: 'Connexion à Supabase', status: 'pending', message: 'Vérification...' },
+      { name: 'Authentification', status: 'pending', message: 'Vérification...' },
+      { name: 'Rôle Administrateur', status: 'pending', message: 'Vérification...' },
       { name: 'Table file_categories', status: 'pending', message: 'Vérification...' },
       { name: 'Catégories disponibles', status: 'pending', message: 'Vérification...' },
-      { name: 'Bucket de stockage', status: 'pending', message: 'Vérification...' }
+      { name: 'Bucket de stockage', status: 'pending', message: 'Vérification...' },
+      { name: 'Permissions de stockage', status: 'pending', message: 'Vérification...' }
     ];
 
     setDiagnostics([...results]);
@@ -77,7 +82,64 @@ const FileUploadDiagnostic: React.FC = () => {
       setDiagnostics([...results]);
     }
 
-    // Test 2: file_categories table
+    // Test 2: Authentication
+    try {
+      if (isAuthenticated && user) {
+        results[1] = {
+          name: 'Authentification',
+          status: 'success',
+          message: `Authentifié en tant que: ${user.email}`,
+          details: { userId: user.id, email: user.email }
+        };
+      } else {
+        results[1] = {
+          name: 'Authentification',
+          status: 'error',
+          message: 'Non authentifié - Connexion requise',
+          details: { isAuthenticated }
+        };
+      }
+      setDiagnostics([...results]);
+    } catch (error: any) {
+      results[1] = {
+        name: 'Authentification',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setDiagnostics([...results]);
+    }
+
+    // Test 3: Admin Role
+    try {
+      const isAdmin = user?.user_metadata?.role === 'admin';
+      if (isAuthenticated && isAdmin) {
+        results[2] = {
+          name: 'Rôle Administrateur',
+          status: 'success',
+          message: 'Rôle administrateur détecté',
+          details: { role: user?.user_metadata?.role }
+        };
+      } else {
+        results[2] = {
+          name: 'Rôle Administrateur',
+          status: 'error',
+          message: 'Rôle administrateur non détecté - Permissions insuffisantes',
+          details: { userMetadata: user?.user_metadata }
+        };
+      }
+      setDiagnostics([...results]);
+    } catch (error: any) {
+      results[2] = {
+        name: 'Rôle Administrateur',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setDiagnostics([...results]);
+    }
+
+    // Test 4: file_categories table
     try {
       const { data: tableExists, error: tableError } = await supabase
         .from('file_categories')
@@ -85,21 +147,21 @@ const FileUploadDiagnostic: React.FC = () => {
         .limit(1);
       
       if (tableError && tableError.code === 'PGRST116') {
-        results[1] = {
+        results[3] = {
           name: 'Table file_categories',
           status: 'error',
           message: 'La table file_categories n\'existe pas',
           details: tableError
         };
       } else if (tableError) {
-        results[1] = {
+        results[3] = {
           name: 'Table file_categories',
           status: 'error',
           message: `Erreur d'accès à la table: ${tableError.message}`,
           details: tableError
         };
       } else {
-        results[1] = {
+        results[3] = {
           name: 'Table file_categories',
           status: 'success',
           message: 'Table file_categories accessible'
@@ -107,7 +169,7 @@ const FileUploadDiagnostic: React.FC = () => {
       }
       setDiagnostics([...results]);
     } catch (error: any) {
-      results[1] = {
+      results[3] = {
         name: 'Table file_categories',
         status: 'error',
         message: `Erreur: ${error.message}`,
@@ -116,7 +178,7 @@ const FileUploadDiagnostic: React.FC = () => {
       setDiagnostics([...results]);
     }
 
-    // Test 3: Categories
+    // Test 5: Categories
     try {
       const { data: categoriesData, error: categoriesError } = await supabase
         .from('file_categories')
@@ -124,21 +186,21 @@ const FileUploadDiagnostic: React.FC = () => {
         .order('name');
       
       if (categoriesError) {
-        results[2] = {
+        results[4] = {
           name: 'Catégories disponibles',
           status: 'error',
           message: `Erreur lors du chargement des catégories: ${categoriesError.message}`,
           details: categoriesError
         };
       } else if (!categoriesData || categoriesData.length === 0) {
-        results[2] = {
+        results[4] = {
           name: 'Catégories disponibles',
           status: 'warning',
           message: 'Aucune catégorie trouvée'
         };
       } else {
         setCategories(categoriesData);
-        results[2] = {
+        results[4] = {
           name: 'Catégories disponibles',
           status: 'success',
           message: `${categoriesData.length} catégories trouvées`,
@@ -147,7 +209,7 @@ const FileUploadDiagnostic: React.FC = () => {
       }
       setDiagnostics([...results]);
     } catch (error: any) {
-      results[2] = {
+      results[4] = {
         name: 'Catégories disponibles',
         status: 'error',
         message: `Erreur: ${error.message}`,
@@ -156,31 +218,100 @@ const FileUploadDiagnostic: React.FC = () => {
       setDiagnostics([...results]);
     }
 
-    // Test 4: Storage bucket
+    // Test 6: Storage bucket
     try {
-      const { data: bucketData, error: bucketError } = await supabase
+      const { data: buckets, error: bucketsError } = await supabase
         .storage
-        .getBucket('static-files');
+        .listBuckets();
       
-      if (bucketError) {
-        results[3] = {
+      if (bucketsError) {
+        results[5] = {
           name: 'Bucket de stockage',
           status: 'error',
-          message: `Erreur d'accès au bucket: ${bucketError.message}`,
-          details: bucketError
+          message: `Erreur d'accès aux buckets: ${bucketsError.message}`,
+          details: bucketsError
         };
       } else {
-        results[3] = {
-          name: 'Bucket de stockage',
+        const staticFilesBucket = buckets?.find(b => b.name === 'static-files');
+        
+        if (!staticFilesBucket) {
+          results[5] = {
+            name: 'Bucket de stockage',
+            status: 'warning',
+            message: 'Bucket static-files non trouvé',
+            details: { availableBuckets: buckets?.map(b => b.name) }
+          };
+        } else {
+          results[5] = {
+            name: 'Bucket de stockage',
+            status: 'success',
+            message: 'Bucket static-files accessible',
+            details: staticFilesBucket
+          };
+        }
+      }
+      setDiagnostics([...results]);
+    } catch (error: any) {
+      results[5] = {
+        name: 'Bucket de stockage',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setDiagnostics([...results]);
+    }
+
+    // Test 7: Storage permissions
+    try {
+      // Try to upload a small test file
+      const testFile = new Blob(['test'], { type: 'text/plain' });
+      const fileName = `test-${Date.now()}.txt`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('static-files')
+        .upload(`test/${fileName}`, testFile);
+      
+      if (uploadError) {
+        if (uploadError.message.includes('new row violates row-level security policy')) {
+          results[6] = {
+            name: 'Permissions de stockage',
+            status: 'error',
+            message: 'Violation de la politique RLS - Permissions insuffisantes',
+            details: uploadError
+          };
+        } else if (uploadError.message.includes('The resource already exists')) {
+          // This is actually fine, it means we can upload
+          results[6] = {
+            name: 'Permissions de stockage',
+            status: 'success',
+            message: 'Permissions de téléchargement OK (conflit de nom de fichier)',
+            details: uploadError
+          };
+        } else {
+          results[6] = {
+            name: 'Permissions de stockage',
+            status: 'error',
+            message: `Erreur de téléchargement: ${uploadError.message}`,
+            details: uploadError
+          };
+        }
+      } else {
+        // Clean up the test file
+        await supabase.storage
+          .from('static-files')
+          .remove([`test/${fileName}`]);
+          
+        results[6] = {
+          name: 'Permissions de stockage',
           status: 'success',
-          message: 'Bucket static-files accessible',
-          details: bucketData
+          message: 'Test de téléchargement réussi',
+          details: { path: uploadData?.path }
         };
       }
       setDiagnostics([...results]);
     } catch (error: any) {
-      results[3] = {
-        name: 'Bucket de stockage',
+      results[6] = {
+        name: 'Permissions de stockage',
         status: 'error',
         message: `Erreur: ${error.message}`,
         details: error
@@ -485,22 +616,31 @@ const FileUploadDiagnostic: React.FC = () => {
             <ul className="list-disc pl-5 text-sm mt-2 space-y-1">
               <li>Assurez-vous que des catégories existent dans la table <code>file_categories</code></li>
               <li>Vérifiez que le bucket de stockage <code>static-files</code> existe et est accessible</li>
-              <li>Vérifiez que les politiques RLS permettent l'accès aux tables</li>
+              <li>Vérifiez que vous êtes connecté avec un compte administrateur</li>
+              <li>Vérifiez que votre compte a le rôle <code>admin</code> dans les métadonnées utilisateur</li>
               <li>Assurez-vous que la taille du fichier ne dépasse pas les limites de Supabase (50MB)</li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-medium">Solution: Créer les catégories manquantes</h4>
+            <h4 className="font-medium">Solution: Créer le bucket de stockage</h4>
             <p className="text-sm mt-1">
-              Si aucune catégorie n'est disponible, utilisez le bouton "Créer catégories par défaut" pour ajouter les catégories essentielles.
+              Si le bucket <code>static-files</code> n'existe pas, vous devez le créer via le dashboard Supabase:
             </p>
+            <ol className="list-decimal pl-5 text-sm mt-2 space-y-1">
+              <li>Allez dans la section Storage du dashboard Supabase</li>
+              <li>Cliquez sur "New Bucket"</li>
+              <li>Nommez-le "static-files"</li>
+              <li>Cochez "Public bucket" pour permettre l'accès public</li>
+              <li>Cliquez sur "Create bucket"</li>
+            </ol>
           </div>
           
           <div>
             <h4 className="font-medium">Solution: Vérifier les permissions</h4>
             <p className="text-sm mt-1">
               Assurez-vous d'être connecté avec un compte administrateur qui a les permissions nécessaires pour télécharger des fichiers.
+              Vérifiez que votre compte utilisateur a le rôle <code>admin</code> dans les métadonnées utilisateur.
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { Upload, X, Image, FileText, Video, Music, Shield, Layout, User, Archive } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface FileCategory {
   id: string;
@@ -25,10 +26,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   onSuccess,
   categories
 }) => {
+  const { isAuthenticated, user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     category_id: '',
@@ -63,30 +66,49 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   };
 
   const uploadFile = async (file: File): Promise<string> => {
+    // Check if user is authenticated
+    if (!isAuthenticated || !user) {
+      throw new Error('You must be logged in to upload files');
+    }
+
+    // Check if user has admin role
+    const isAdmin = user.user_metadata?.role === 'admin';
+    if (!isAdmin) {
+      throw new Error('You need admin privileges to upload files');
+    }
+
+    // Create a unique file name
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `uploads/${fileName}`;
 
-    // Check if user is authenticated
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error('Utilisateur non authentifié');
-    }
-
-    const { error: uploadError } = await supabase.storage
+    // Upload to Supabase Storage
+    const { data, error: uploadError } = await supabase.storage
       .from('static-files')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
     if (uploadError) {
       console.error('Storage upload error:', uploadError);
-      throw new Error(`Erreur de téléchargement: ${uploadError.message}`);
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
     }
 
-    const { data } = supabase.storage
+    if (!data) {
+      throw new Error('Upload failed: No data returned from storage');
+    }
+
+    // Get the public URL
+    const { data: urlData } = supabase.storage
       .from('static-files')
       .getPublicUrl(filePath);
 
-    return data.publicUrl;
+    if (!urlData || !urlData.publicUrl) {
+      throw new Error('Failed to get public URL for uploaded file');
+    }
+
+    return urlData.publicUrl;
   };
 
   const getImageDimensions = (file: File): Promise<{ width: number; height: number } | null> => {
@@ -116,62 +138,74 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       return;
     }
 
-    // Check authentication before starting upload
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error('Vous devez être connecté pour télécharger des fichiers');
-      return;
-    }
-
+    // Reset any previous errors
+    setError(null);
     setUploading(true);
     const progress: { [key: string]: number } = {};
 
     try {
+      // Check authentication status
+      if (!isAuthenticated) {
+        throw new Error('Vous devez être connecté pour télécharger des fichiers');
+      }
+
+      // Check admin status
+      const isAdmin = user?.user_metadata?.role === 'admin';
+      if (!isAdmin) {
+        throw new Error('Vous avez besoin de privilèges administrateur pour télécharger des fichiers');
+      }
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         progress[file.name] = 0;
         setUploadProgress({ ...progress });
 
-        // Upload file to Supabase Storage
-        const fileUrl = await uploadFile(file);
-        progress[file.name] = 50;
-        setUploadProgress({ ...progress });
+        try {
+          // Upload file to Supabase Storage
+          const fileUrl = await uploadFile(file);
+          progress[file.name] = 50;
+          setUploadProgress({ ...progress });
 
-        // Get image dimensions if it's an image
-        const dimensions = await getImageDimensions(file);
-        progress[file.name] = 75;
-        setUploadProgress({ ...progress });
+          // Get image dimensions if it's an image
+          const dimensions = await getImageDimensions(file);
+          progress[file.name] = 75;
+          setUploadProgress({ ...progress });
 
-        // Save file metadata to database
-        const fileData = {
-          filename: file.name.split('.')[0],
-          original_filename: file.name,
-          file_url: fileUrl,
-          file_type: file.type,
-          file_size: file.size,
-          category_id: formData.category_id,
-          title: formData.title || file.name.split('.')[0],
-          alt_text: formData.alt_text,
-          description: formData.description,
-          tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
-          width: dimensions?.width,
-          height: dimensions?.height,
-          is_public: formData.is_public,
-          is_featured: formData.is_featured,
-          uploaded_by: user.id
-        };
+          // Save file metadata to database
+          const fileData = {
+            filename: file.name.split('.')[0],
+            original_filename: file.name,
+            file_url: fileUrl,
+            file_type: file.type,
+            file_size: file.size,
+            category_id: formData.category_id,
+            title: formData.title || file.name.split('.')[0],
+            alt_text: formData.alt_text,
+            description: formData.description,
+            tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+            width: dimensions?.width,
+            height: dimensions?.height,
+            is_public: formData.is_public,
+            is_featured: formData.is_featured,
+            uploaded_by: user?.id
+          };
 
-        const { error } = await supabase
-          .from('static_files')
-          .insert([fileData]);
+          const { error: insertError } = await supabase
+            .from('static_files')
+            .insert([fileData]);
 
-        if (error) {
-          console.error('Database insert error:', error);
-          throw new Error(`Erreur de base de données: ${error.message}`);
+          if (insertError) {
+            console.error('Database insert error:', insertError);
+            throw new Error(`Database insert failed: ${insertError.message}`);
+          }
+
+          progress[file.name] = 100;
+          setUploadProgress({ ...progress });
+        } catch (fileError: any) {
+          console.error(`Error processing file ${file.name}:`, fileError);
+          toast.error(`Erreur avec le fichier ${file.name}: ${fileError.message}`);
+          // Continue with other files
         }
-
-        progress[file.name] = 100;
-        setUploadProgress({ ...progress });
       }
 
       toast.success(`${files.length} fichier(s) téléchargé(s) avec succès`);
@@ -180,7 +214,8 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       resetForm();
     } catch (error: any) {
       console.error('Error uploading files:', error);
-      toast.error(error.message || 'Erreur lors du téléchargement');
+      setError(error.message);
+      toast.error(`Erreur lors du téléchargement: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -227,6 +262,13 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
               <X size={24} />
             </button>
           </div>
+
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+              <strong className="font-bold">Erreur: </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
 
           {/* File Drop Zone */}
           <div
