@@ -32,6 +32,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     category_id: '',
@@ -42,6 +43,14 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     is_public: true,
     is_featured: false
   });
+
+  useEffect(() => {
+    // Check if user is admin
+    if (user) {
+      const userIsAdmin = user.user_metadata?.role === 'admin';
+      setIsAdmin(userIsAdmin);
+    }
+  }, [user]);
 
   const getIconComponent = (iconName: string) => {
     const icons: { [key: string]: React.ComponentType<any> } = {
@@ -72,7 +81,6 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     }
 
     // Check if user has admin role
-    const isAdmin = user.user_metadata?.role === 'admin';
     if (!isAdmin) {
       throw new Error('You need admin privileges to upload files');
     }
@@ -150,7 +158,6 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       }
 
       // Check admin status
-      const isAdmin = user?.user_metadata?.role === 'admin';
       if (!isAdmin) {
         throw new Error('Vous avez besoin de privilèges administrateur pour télécharger des fichiers');
       }
@@ -270,6 +277,20 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             </div>
           )}
 
+          {!isAuthenticated && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded relative">
+              <strong className="font-bold">Attention: </strong>
+              <span className="block sm:inline">Vous devez être connecté pour télécharger des fichiers.</span>
+            </div>
+          )}
+
+          {isAuthenticated && !isAdmin && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded relative">
+              <strong className="font-bold">Attention: </strong>
+              <span className="block sm:inline">Vous avez besoin de privilèges administrateur pour télécharger des fichiers.</span>
+            </div>
+          )}
+
           {/* File Drop Zone */}
           <div
             onDrop={handleDrop}
@@ -284,6 +305,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             <button
               onClick={() => fileInputRef.current?.click()}
               className="btn bg-primary-600 hover:bg-primary-700 text-white"
+              disabled={!isAuthenticated || !isAdmin}
             >
               Sélectionner des fichiers
             </button>
@@ -353,6 +375,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 required
+                disabled={!isAuthenticated || !isAdmin}
               >
                 <option value="">Sélectionner une catégorie</option>
                 {categories.map(category => (
@@ -373,6 +396,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Titre du fichier (optionnel)"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -386,6 +410,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, alt_text: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Description pour l'accessibilité"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -399,6 +424,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Description du fichier"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -412,6 +438,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Séparez les tags par des virgules"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -422,6 +449,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                   checked={formData.is_public}
                   onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
                   className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  disabled={!isAuthenticated || !isAdmin}
                 />
                 <span className="ml-2 text-sm text-gray-700">Public</span>
               </label>
@@ -432,6 +460,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                   checked={formData.is_featured}
                   onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
                   className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  disabled={!isAuthenticated || !isAdmin}
                 />
                 <span className="ml-2 text-sm text-gray-700">Fichier vedette</span>
               </label>
@@ -449,7 +478,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             </button>
             <button
               onClick={handleUpload}
-              disabled={uploading || files.length === 0}
+              disabled={uploading || files.length === 0 || !isAuthenticated || !isAdmin}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading ? 'Téléchargement...' : 'Télécharger'}
