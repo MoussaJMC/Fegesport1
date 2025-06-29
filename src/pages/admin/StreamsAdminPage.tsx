@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Video, Twitch, Youtube, Calendar, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search, Filter, Video, Twitch, Youtube, Calendar, Clock, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
@@ -403,9 +403,20 @@ const StreamsAdminPage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">
-                {editingStream ? 'Modifier le stream' : 'Nouveau stream'}
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">
+                  {editingStream ? 'Modifier le stream' : 'Nouveau stream'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingStream(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={24} />
+                </button>
+              </div>
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
