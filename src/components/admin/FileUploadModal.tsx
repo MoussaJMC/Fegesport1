@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { Upload, X, Image, FileText, Video, Music, Shield, Layout, User, Archive } from 'lucide-react';
