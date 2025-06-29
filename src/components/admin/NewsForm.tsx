@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
-import { Image, Link, Calendar, Tag, Info } from 'lucide-react';
+import { Image, Link, Calendar, Tag, Info, X } from 'lucide-react';
 
 const newsSchema = z.object({
   id: z.string().uuid().optional(),

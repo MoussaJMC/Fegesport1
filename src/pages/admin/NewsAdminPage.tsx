@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Newspaper, Calendar, Tag, Copy, Check } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search, Filter, Newspaper, Calendar, Tag, Copy, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
