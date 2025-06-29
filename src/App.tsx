@@ -15,6 +15,7 @@ import ResourcesPage from './pages/ResourcesPage';
 import PartnersPage from './pages/PartnersPage';
 import ContactPage from './pages/ContactPage';
 import EventPage from './pages/EventPage';
+import DirectPage from './pages/DirectPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -36,6 +37,8 @@ import MessagesAdminPage from './pages/admin/MessagesAdminPage';
 import FilesAdminPage from './pages/admin/FilesAdminPage';
 import ResourcesAdminPage from './pages/admin/ResourcesAdminPage';
 import CardsAdminPage from './pages/admin/CardsAdminPage';
+import SlideshowAdminPage from './pages/admin/SlideshowAdminPage';
+import StreamsAdminPage from './pages/admin/StreamsAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -68,6 +71,8 @@ function App() {
             <Route path="files" element={<FilesAdminPage />} />
             <Route path="resources" element={<ResourcesAdminPage />} />
             <Route path="cards" element={<CardsAdminPage />} />
+            <Route path="slideshow" element={<SlideshowAdminPage />} />
+            <Route path="streams" element={<StreamsAdminPage />} />
           </Route>
 
           {/* Public routes */}
@@ -81,6 +86,7 @@ function App() {
           <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
           <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
           <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
+          <Route path="/direct" element={<PublicLayout><DirectPage /></PublicLayout>} />
           <Route path="/privacy" element={<PublicLayout><PrivacyPage /></PublicLayout>} />
           <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
           <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />

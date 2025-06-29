@@ -4,7 +4,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { 
   Loader2, Home, Newspaper, Calendar, Users, Building2, 
-  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers
+  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers,
+  Image, Video
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -190,6 +191,8 @@ const AdminLayout: React.FC = () => {
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
     { icon: Book, label: 'Ressources', path: '/admin/resources' },
     { icon: Layers, label: 'Cartes', path: '/admin/cards' },
+    { icon: Image, label: 'Diaporama', path: '/admin/slideshow' },
+    { icon: Video, label: 'Streams', path: '/admin/streams' },
   ];
 
   const handleSignOut = async () => {
@@ -222,7 +225,7 @@ const AdminLayout: React.FC = () => {
                   <X size={20} />
                 </button>
               </div>
-              <nav className="flex-1 px-4 space-y-1">
+              <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
                 {menuItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (

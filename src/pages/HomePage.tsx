@@ -10,6 +10,7 @@ import NewsCard from '../components/news/NewsCard';
 import EventCard from '../components/events/EventCard';
 import NewsletterSection from '../components/newsletter/NewsletterSection';
 import CardGrid from '../components/cards/CardGrid';
+import Slideshow from '../components/slideshow/Slideshow';
 
 // Data (fallback)
 import { latestNews } from '../data/newsData';
@@ -272,6 +273,31 @@ const HomePage: React.FC = () => {
         </div>
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white">
           <ChevronRight size={32} className="transform rotate-90" />
+        </div>
+      </section>
+
+      {/* Slideshow Section */}
+      <section className="section bg-secondary-800">
+        <div className="container-custom">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">NOS MEILLEURS MOMENTS</h2>
+            <div className="w-24 h-1 bg-primary-600 mx-auto"></div>
+          </div>
+          
+          <Slideshow 
+            autoplay={true} 
+            interval={5000} 
+            showArrows={true} 
+            showDots={true}
+            height="h-[500px]"
+            className="mb-8"
+          />
+          
+          <div className="text-center">
+            <Link to="/direct" className="inline-flex items-center text-primary-500 hover:text-primary-400 font-medium">
+              Regarder nos streams en direct <ArrowRight size={16} className="ml-2" />
+            </Link>
+          </div>
         </div>
       </section>
 

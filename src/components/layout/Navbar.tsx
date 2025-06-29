@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, ChevronDown, User } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, User, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
@@ -49,7 +49,8 @@ const Navbar: React.FC = () => {
       ]},
       { label: "Ressources", path: "/resources", order: 5 },
       { label: "Partenaires", path: "/partners", order: 6 },
-      { label: "Contact", path: "/contact", order: 7 }
+      { label: "Contact", path: "/contact", order: 7 },
+      { label: "DIRECT", path: "/direct", order: 8 }
     ] as NavItem[]
   });
 
@@ -83,6 +84,15 @@ const Navbar: React.FC = () => {
   const navItems = React.useMemo(() => {
     const items = [...(navigationSettings.items || [])];
     
+    // Add DIRECT link if it doesn't exist
+    if (!items.find(item => item.path === '/direct')) {
+      items.push({
+        label: 'DIRECT',
+        path: '/direct',
+        order: items.length + 1
+      });
+    }
+    
     // Sort by order
     items.sort((a, b) => (a.order || 0) - (b.order || 0));
     
@@ -100,6 +110,9 @@ const Navbar: React.FC = () => {
 
   // Get translated label for navigation items
   const getTranslatedLabel = (label: string): string => {
+    // Special case for DIRECT which should always be uppercase
+    if (label === 'DIRECT') return 'DIRECT';
+    
     // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
       .normalize("NFD")
@@ -187,6 +200,22 @@ const Navbar: React.FC = () => {
                       {getTranslatedLabel(item.label)}
                       <ChevronDown size={14} className="ml-1" />
                     </button>
+                  ) : item.path === '/direct' ? (
+                    <Link
+                      to={item.path}
+                      className={`
+                        px-2 py-1 text-sm font-medium rounded-md transition-colors flex items-center
+                        ${location.pathname === item.path 
+                          ? 'text-primary-500 border-b-2 border-primary-500' 
+                          : scrolled 
+                            ? 'text-gray-300 hover:text-primary-500' 
+                            : 'text-white hover:text-primary-300'
+                        }
+                      `}
+                    >
+                      <Video size={16} className="mr-1" />
+                      {getTranslatedLabel(item.label)}
+                    </Link>
                   ) : (
                     <Link
                       to={item.path}
@@ -336,6 +365,20 @@ const Navbar: React.FC = () => {
                           </div>
                         )}
                       </>
+                    ) : item.path === '/direct' ? (
+                      <Link
+                        to={item.path}
+                        className={`
+                          block px-3 py-2 rounded-md text-base font-medium flex items-center
+                          ${location.pathname === item.path
+                            ? 'bg-secondary-800 text-primary-500'
+                            : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
+                          }
+                        `}
+                      >
+                        <Video size={18} className="mr-2" />
+                        {getTranslatedLabel(item.label)}
+                      </Link>
                     ) : (
                       <Link
                         to={item.path}
