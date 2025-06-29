@@ -67,12 +67,19 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `uploads/${fileName}`;
 
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('Utilisateur non authentifié');
+    }
+
     const { error: uploadError } = await supabase.storage
       .from('static-files')
       .upload(filePath, file);
 
     if (uploadError) {
-      throw uploadError;
+      console.error('Storage upload error:', uploadError);
+      throw new Error(`Erreur de téléchargement: ${uploadError.message}`);
     }
 
     const { data } = supabase.storage
@@ -106,6 +113,13 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
     if (!formData.category_id) {
       toast.error('Veuillez sélectionner une catégorie');
+      return;
+    }
+
+    // Check authentication before starting upload
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Vous devez être connecté pour télécharger des fichiers');
       return;
     }
 
@@ -143,14 +157,18 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
           width: dimensions?.width,
           height: dimensions?.height,
           is_public: formData.is_public,
-          is_featured: formData.is_featured
+          is_featured: formData.is_featured,
+          uploaded_by: user.id
         };
 
         const { error } = await supabase
           .from('static_files')
           .insert([fileData]);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Database insert error:', error);
+          throw new Error(`Erreur de base de données: ${error.message}`);
+        }
 
         progress[file.name] = 100;
         setUploadProgress({ ...progress });
@@ -162,7 +180,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       resetForm();
     } catch (error: any) {
       console.error('Error uploading files:', error);
-      toast.error('Erreur lors du téléchargement');
+      toast.error(error.message || 'Erreur lors du téléchargement');
     } finally {
       setUploading(false);
     }
