@@ -33,6 +33,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [fileSizeError, setFileSizeError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     category_id: '',
@@ -61,13 +62,32 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
-    setFiles(selectedFiles);
+    validateAndSetFiles(selectedFiles);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const droppedFiles = Array.from(event.dataTransfer.files);
-    setFiles(droppedFiles);
+    validateAndSetFiles(droppedFiles);
+  };
+
+  const validateAndSetFiles = (selectedFiles: File[]) => {
+    setFileSizeError(null);
+    
+    // Check for files larger than 50MB (Supabase limit)
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+    const oversizedFiles = selectedFiles.filter(file => file.size > MAX_FILE_SIZE);
+    
+    if (oversizedFiles.length > 0) {
+      const fileNames = oversizedFiles.map(f => f.name).join(', ');
+      setFileSizeError(`Les fichiers suivants dépassent la limite de 50MB: ${fileNames}`);
+      
+      // Filter out oversized files
+      const validFiles = selectedFiles.filter(file => file.size <= MAX_FILE_SIZE);
+      setFiles(validFiles);
+    } else {
+      setFiles(selectedFiles);
+    }
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -83,6 +103,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     // Check if user has admin role
     if (!isAdmin) {
       throw new Error('You need admin privileges to upload files');
+    }
+
+    // Check file size
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`Le fichier ${file.name} dépasse la limite de 50MB`);
     }
 
     // Create a unique file name
@@ -168,6 +194,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         setUploadProgress({ ...progress });
 
         try {
+          // Check file size again
+          const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
+          if (file.size > MAX_FILE_SIZE) {
+            throw new Error(`Le fichier ${file.name} dépasse la limite de 50MB`);
+          }
+
           // Upload file to Supabase Storage
           const fileUrl = await uploadFile(file);
           progress[file.name] = 50;
@@ -240,6 +272,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       is_featured: false
     });
     setUploadProgress({});
+    setFileSizeError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -274,6 +307,14 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
               <strong className="font-bold">Erreur: </strong>
               <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
+          {fileSizeError && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded relative">
+              <strong className="font-bold">Attention: </strong>
+              <span className="block sm:inline">{fileSizeError}</span>
+              <p className="mt-1 text-sm">Supabase a une limite de 50MB par fichier. Les fichiers plus grands n'ont pas été ajoutés.</p>
             </div>
           )}
 
@@ -317,6 +358,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
               className="hidden"
               accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip,.rar"
             />
+            <p className="mt-4 text-sm text-gray-500">Taille maximale: 50MB par fichier</p>
           </div>
 
           {/* Selected Files */}
