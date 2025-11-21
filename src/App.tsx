@@ -39,6 +39,9 @@ import ResourcesAdminPage from './pages/admin/ResourcesAdminPage';
 import CardsAdminPage from './pages/admin/CardsAdminPage';
 import SlideshowAdminPage from './pages/admin/SlideshowAdminPage';
 import StreamsAdminPage from './pages/admin/StreamsAdminPage';
+import NewsletterAdminPage from './pages/admin/NewsletterAdminPage';
+import EventRegistrationsAdminPage from './pages/admin/EventRegistrationsAdminPage';
+import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -73,6 +76,9 @@ function App() {
             <Route path="cards" element={<CardsAdminPage />} />
             <Route path="slideshow" element={<SlideshowAdminPage />} />
             <Route path="streams" element={<StreamsAdminPage />} />
+            <Route path="newsletter" element={<NewsletterAdminPage />} />
+            <Route path="registrations" element={<EventRegistrationsAdminPage />} />
+            <Route path="settings" element={<SiteSettingsAdminPage />} />
           </Route>
 
           {/* Public routes */}

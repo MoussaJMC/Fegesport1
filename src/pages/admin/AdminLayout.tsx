@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { 
-  Loader2, Home, Newspaper, Calendar, Users, Building2, 
+import {
+  Loader2, Home, Newspaper, Calendar, Users, Building2,
   MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers,
-  Image, Video
+  Image, Video, Mail, UserCheck, Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -180,14 +180,17 @@ const AdminLayout: React.FC = () => {
     { icon: Home, label: 'Dashboard', path: '/admin' },
     { icon: Activity, label: 'Diagnostic', path: '/admin/diagnostic' },
     { icon: Database, label: 'Test DB', path: '/admin/test-database' },
+    { icon: Settings, label: 'Paramètres Site', path: '/admin/settings' },
     { icon: Globe, label: 'Pages', path: '/admin/pages' },
     { icon: Newspaper, label: 'Actualités', path: '/admin/news' },
     { icon: Calendar, label: 'Événements', path: '/admin/events' },
+    { icon: UserCheck, label: 'Inscriptions', path: '/admin/registrations' },
     { icon: Users, label: 'Membres', path: '/admin/members' },
     { icon: Tag, label: 'Types d\'Adhésion', path: '/admin/membership-types' },
     { icon: Award, label: 'Notre Direction', path: '/admin/leadership' },
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
+    { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
     { icon: Book, label: 'Ressources', path: '/admin/resources' },
     { icon: Layers, label: 'Cartes', path: '/admin/cards' },
