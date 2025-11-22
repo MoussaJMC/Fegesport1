@@ -1,59 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Handshake, Trophy, Users, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+
+interface Partner {
+  id: string;
+  name: string;
+  logo_url?: string;
+  description: string;
+  partnership_type: 'sponsor' | 'technical' | 'media' | 'institutional';
+  status: 'active' | 'inactive';
+}
 
 const PartnersPage: React.FC = () => {
   const { t } = useTranslation();
+  const [partnersData, setPartnersData] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const partners = [
-    {
-      category: t('partners.title'),
-      items: [
-        {
-          name: 'Ministère de la Jeunesse et des Sports',
-          logo: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg',
-          description: 'Soutien officiel du gouvernement guinéen pour le développement de l\'esport'
-        },
-        {
-          name: 'Comité National Olympique',
-          logo: 'https://images.pexels.com/photos/2381463/pexels-photo-2381463.jpeg',
-          description: 'Partenaire pour la reconnaissance de l\'esport comme discipline sportive'
-        }
-      ]
-    },
-    {
-      category: 'Partenaires Techniques',
-      items: [
-        {
-          name: 'Gaming Academy',
-          logo: 'https://images.pexels.com/photos/7915487/pexels-photo-7915487.jpeg',
-          description: 'Formation et développement des talents esport'
-        },
-        {
-          name: 'ESL Gaming Africa',
-          logo: 'https://images.pexels.com/photos/7862608/pexels-photo-7862608.jpeg',
-          description: 'Organisation de tournois et événements internationaux'
-        }
-      ]
-    },
-    {
-      category: 'Sponsors Officiels',
-      items: [
-        {
-          name: 'TotalEnergies Guinée',
-          logo: 'https://images.pexels.com/photos/2381465/pexels-photo-2381465.jpeg',
-          description: 'Sponsor principal des championnats nationaux'
-        },
-        {
-          name: 'Orange Guinée',
-          logo: 'https://images.pexels.com/photos/2381466/pexels-photo-2381466.jpeg',
-          description: 'Partenaire connectivité pour les compétitions en ligne'
-        }
-      ]
+  useEffect(() => {
+    fetchPartners();
+  }, []);
+
+  const fetchPartners = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPartnersData(data || []);
+    } catch (error) {
+      console.error('Error fetching partners:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const getCategoryLabel = (type: string) => {
+    switch (type) {
+      case 'sponsor': return 'Sponsors Officiels';
+      case 'technical': return 'Partenaires Techniques';
+      case 'media': return 'Partenaires Médias';
+      case 'institutional': return 'Partenaires Institutionnels';
+      default: return 'Partenaires';
+    }
+  };
+
+  const groupedPartners = partnersData.reduce((acc, partner) => {
+    const category = partner.partnership_type;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(partner);
+    return acc;
+  }, {} as Record<string, Partner[]>);
+
+  const partners = Object.entries(groupedPartners).map(([type, items]) => ({
+    category: getCategoryLabel(type),
+    items: items.map(item => ({
+      name: item.name,
+      logo: item.logo_url || 'https://via.placeholder.com/300x200?text=Logo',
+      description: item.description
+    }))
+  }));
 
   const benefits = [
     {
@@ -73,6 +86,14 @@ const PartnersPage: React.FC = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="pt-20 min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-20">
       {/* Hero Section */}
@@ -90,7 +111,14 @@ const PartnersPage: React.FC = () => {
       {/* Partners Grid */}
       <section className="section bg-white">
         <div className="container-custom">
-          {partners.map((category, index) => (
+          {partners.length === 0 ? (
+            <div className="text-center py-12">
+              <Handshake size={64} className="mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun partenaire pour le moment</h3>
+              <p className="text-gray-600">Revenez bientôt pour découvrir nos partenaires</p>
+            </div>
+          ) : (
+            partners.map((category, index) => (
             <div key={index} className="mb-16 last:mb-0">
               <h2 className="text-2xl font-bold mb-8">{category.category}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -119,7 +147,8 @@ const PartnersPage: React.FC = () => {
                 ))}
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 
