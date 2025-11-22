@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import CardItem from './CardItem';
+import { CardTranslations } from '../../utils/translations';
+import { useTranslation } from 'react-i18next';
 
 interface Card {
   id: string;
@@ -9,6 +11,7 @@ interface Card {
   image_url?: string;
   category: 'communiqué' | 'compétition' | 'partenariat';
   is_active: boolean;
+  translations?: CardTranslations;
 }
 
 interface CardGridProps {
@@ -19,13 +22,14 @@ interface CardGridProps {
   viewAllLink?: string;
 }
 
-const CardGrid: React.FC<CardGridProps> = ({ 
-  category, 
-  limit = 3, 
-  title, 
+const CardGrid: React.FC<CardGridProps> = ({
+  category,
+  limit = 3,
+  title,
   showViewAll = false,
   viewAllLink = '/news'
 }) => {
+  const { t } = useTranslation();
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -160,7 +164,7 @@ const CardGrid: React.FC<CardGridProps> = ({
           <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">{title}</h2>
           {showViewAll && (
             <a href={viewAllLink} className="text-primary-500 hover:text-primary-400 font-medium flex items-center">
-              Voir tout <span aria-hidden="true" className="ml-1">→</span>
+              {t('common.viewAll')} <span aria-hidden="true" className="ml-1">→</span>
             </a>
           )}
         </div>
@@ -175,6 +179,7 @@ const CardGrid: React.FC<CardGridProps> = ({
             content={card.content}
             imageUrl={card.image_url}
             category={card.category}
+            translations={card.translations}
           />
         ))}
       </div>
