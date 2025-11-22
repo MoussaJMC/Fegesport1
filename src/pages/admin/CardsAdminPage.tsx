@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Eye, Search, Filter, Tag, Copy, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import CardFormBilingual from '../../components/admin/CardFormBilingual';
+import { CardTranslations } from '../../utils/translations';
 
 interface Card {
   id: string;
@@ -13,6 +15,7 @@ interface Card {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  translations?: CardTranslations;
 }
 
 const CardsAdminPage: React.FC = () => {
@@ -23,20 +26,6 @@ const CardsAdminPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState<{
-    title: string;
-    content: string;
-    image_url: string;
-    category: 'communiqué' | 'compétition' | 'partenariat';
-    is_active: boolean;
-  }>({
-    title: '',
-    content: '',
-    image_url: '',
-    category: 'communiqué',
-    is_active: true
-  });
 
   useEffect(() => {
     fetchCards();
@@ -160,109 +149,20 @@ const CardsAdminPage: React.FC = () => {
     }
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // Check if we're using real data or mock data
-      const isRealData = cards.length > 0 && cards[0].id !== '1';
-      
-      if (isRealData) {
-        if (editingCard) {
-          // Update existing card
-          const { error } = await supabase
-            .from('cards')
-            .update({
-              title: formData.title,
-              content: formData.content,
-              image_url: formData.image_url || null,
-              category: formData.category,
-              is_active: formData.is_active
-            })
-            .eq('id', editingCard.id);
-
-          if (error) throw error;
-        } else {
-          // Create new card
-          const { error } = await supabase
-            .from('cards')
-            .insert([{
-              title: formData.title,
-              content: formData.content,
-              image_url: formData.image_url || null,
-              category: formData.category,
-              is_active: formData.is_active
-            }]);
-
-          if (error) throw error;
-        }
-      } else {
-        // Using mock data, just update the local state
-        if (editingCard) {
-          setCards(cards.map(card => 
-            card.id === editingCard.id 
-              ? { 
-                  ...card, 
-                  title: formData.title,
-                  content: formData.content,
-                  image_url: formData.image_url,
-                  category: formData.category,
-                  is_active: formData.is_active,
-                  updated_at: new Date().toISOString()
-                } 
-              : card
-          ));
-        } else {
-          const newCard: Card = {
-            id: `mock-${Date.now()}`,
-            title: formData.title,
-            content: formData.content,
-            image_url: formData.image_url,
-            category: formData.category,
-            is_active: formData.is_active,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          setCards([newCard, ...cards]);
-        }
-      }
-      
-      toast.success(`Carte ${editingCard ? 'mise à jour' : 'créée'} avec succès`);
-      setShowForm(false);
-      setEditingCard(null);
-      resetForm();
-      
-      // Refresh data if using real data
-      if (isRealData) {
-        fetchCards();
-      }
-    } catch (error) {
-      console.error('Error saving card:', error);
-      toast.error('Erreur lors de la sauvegarde');
-    }
-  };
-
   const handleEdit = (card: Card) => {
-    setFormData({
-      title: card.title,
-      content: card.content,
-      image_url: card.image_url || '',
-      category: card.category,
-      is_active: card.is_active
-    });
     setEditingCard(card);
     setShowForm(true);
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      content: '',
-      image_url: '',
-      category: 'communiqué',
-      is_active: true
-    });
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingCard(null);
+    fetchCards();
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditingCard(null);
   };
 
   const copyToClipboard = (id: string) => {
@@ -315,7 +215,6 @@ const CardsAdminPage: React.FC = () => {
         </div>
         <button
           onClick={() => {
-            resetForm();
             setEditingCard(null);
             setShowForm(true);
           }}
@@ -377,109 +276,30 @@ const CardsAdminPage: React.FC = () => {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">
-                {editingCard ? 'Modifier la carte' : 'Nouvelle carte'}
-              </h2>
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Titre
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contenu
-                  </label>
-                  <textarea
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    URL de l'image
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  />
-                  {formData.image_url && (
-                    <div className="mt-2">
-                      <img 
-                        src={formData.image_url} 
-                        alt="Aperçu" 
-                        className="h-32 w-auto object-cover rounded"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Image+non+disponible';
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Catégorie
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  >
-                    <option value="communiqué">Communiqué</option>
-                    <option value="compétition">Compétition</option>
-                    <option value="partenariat">Partenariat</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="is_active"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                  />
-                  <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
-                    Carte active
-                  </label>
-                </div>
-
-                <div className="flex justify-end space-x-4 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      setEditingCard(null);
-                    }}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    {editingCard ? 'Mettre à jour' : 'Créer'}
-                  </button>
-                </div>
-              </form>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {editingCard ? 'Modifier la carte' : 'Nouvelle carte'}
+                </h2>
+                <button
+                  onClick={handleFormCancel}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <CardFormBilingual
+                initialData={editingCard ? {
+                  id: editingCard.id,
+                  category: editingCard.category,
+                  image_url: editingCard.image_url,
+                  is_active: editingCard.is_active,
+                  translations: editingCard.translations
+                } : undefined}
+                onSuccess={handleFormSuccess}
+                onCancel={handleFormCancel}
+              />
             </div>
           </div>
         </div>
@@ -566,7 +386,6 @@ const CardsAdminPage: React.FC = () => {
           transition={{ duration: 0.3, delay: filteredCards.length * 0.05 }}
           className="bg-white rounded-lg shadow border-2 border-dashed border-gray-300 flex items-center justify-center h-64 cursor-pointer hover:border-primary-500 transition-colors"
           onClick={() => {
-            resetForm();
             setEditingCard(null);
             setShowForm(true);
           }}
