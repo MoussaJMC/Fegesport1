@@ -4,13 +4,21 @@ import { Calendar, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NewsItem } from '../../types/news';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../hooks/useLanguage';
+import { getNewsTranslation, NewsTranslations } from '../../utils/translations';
 
 interface NewsCardProps {
-  news: NewsItem;
+  news: NewsItem & { translations?: NewsTranslations };
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+
+  // Get translated content
+  const translated = news.translations
+    ? getNewsTranslation(news.translations, currentLanguage)
+    : { title: news.title, excerpt: news.excerpt, content: '' };
   
   const getCategoryColor = (category?: string) => {
     if (!category) return 'bg-gray-600';
@@ -55,11 +63,11 @@ const NewsCard: React.FC<NewsCardProps> = ({ news }) => {
         </div>
         <h3 className="text-xl font-bold mb-2 line-clamp-2 card-title">
           <Link to={`/news/${news.id}`} className="hover:text-primary-600 transition-colors">
-            {news.title}
+            {translated.title || news.title}
           </Link>
         </h3>
         <p className="text-gray-600 mb-4 line-clamp-3 flex-grow card-description">
-          {news.excerpt}
+          {translated.excerpt || news.excerpt}
         </p>
         <Link 
           to={`/news/${news.id}`} 
