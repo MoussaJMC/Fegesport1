@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus, AlertTriangle, RefreshCw } from 'lucide-react';
+import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus, AlertTriangle, RefreshCw, FileText, UserCheck, Award, Layers, Image, Video } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -12,6 +12,13 @@ interface DashboardStats {
   partners: number;
   messages: number;
   news: number;
+  newsletter: number;
+  registrations: number;
+  resources: number;
+  leadership: number;
+  cards: number;
+  slideshow: number;
+  streams: number;
   recentActivity: Array<{
     id: string;
     type: string;
@@ -29,6 +36,13 @@ const DashboardPage: React.FC = () => {
     partners: 0,
     messages: 0,
     news: 0,
+    newsletter: 0,
+    registrations: 0,
+    resources: 0,
+    leadership: 0,
+    cards: 0,
+    slideshow: 0,
+    streams: 0,
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
@@ -81,12 +95,32 @@ const DashboardPage: React.FC = () => {
         }
       };
 
-      const [membersResult, eventsResult, partnersResult, messagesResult, newsResult] = await Promise.all([
+      const [
+        membersResult,
+        eventsResult,
+        partnersResult,
+        messagesResult,
+        newsResult,
+        newsletterResult,
+        registrationsResult,
+        resourcesResult,
+        leadershipResult,
+        cardsResult,
+        slideshowResult,
+        streamsResult
+      ] = await Promise.all([
         fetchWithTimeout(supabase.from('members').select('id', { count: 'exact', head: true }), 'members'),
         fetchWithTimeout(supabase.from('events').select('id', { count: 'exact', head: true }), 'events'),
         fetchWithTimeout(supabase.from('partners').select('id', { count: 'exact', head: true }), 'partners'),
         fetchWithTimeout(supabase.from('contact_messages').select('id', { count: 'exact', head: true }), 'messages'),
-        fetchWithTimeout(supabase.from('news').select('id', { count: 'exact', head: true }), 'news')
+        fetchWithTimeout(supabase.from('news').select('id', { count: 'exact', head: true }), 'news'),
+        fetchWithTimeout(supabase.from('newsletter_subscriptions').select('id', { count: 'exact', head: true }), 'newsletter'),
+        fetchWithTimeout(supabase.from('event_registrations').select('id', { count: 'exact', head: true }), 'registrations'),
+        fetchWithTimeout(supabase.from('static_files').select('id', { count: 'exact', head: true }), 'resources'),
+        fetchWithTimeout(supabase.from('leadership_team').select('id', { count: 'exact', head: true }), 'leadership'),
+        fetchWithTimeout(supabase.from('cards').select('id', { count: 'exact', head: true }), 'cards'),
+        fetchWithTimeout(supabase.from('slideshow_images').select('id', { count: 'exact', head: true }), 'slideshow'),
+        fetchWithTimeout(supabase.from('streams').select('id', { count: 'exact', head: true }), 'streams')
       ]);
 
       // Fetch recent activity (latest entries from different tables)
@@ -147,6 +181,13 @@ const DashboardPage: React.FC = () => {
         partners: partnersResult.count || 0,
         messages: messagesResult.count || 0,
         news: newsResult.count || 0,
+        newsletter: newsletterResult.count || 0,
+        registrations: registrationsResult.count || 0,
+        resources: resourcesResult.count || 0,
+        leadership: leadershipResult.count || 0,
+        cards: cardsResult.count || 0,
+        slideshow: slideshowResult.count || 0,
+        streams: streamsResult.count || 0,
         recentActivity: recentActivity.slice(0, 5)
       });
 
@@ -189,53 +230,101 @@ const DashboardPage: React.FC = () => {
   };
 
   const menuItems = [
-    { 
-      title: 'Membres', 
-      icon: Users, 
-      path: '/admin/members', 
+    {
+      title: 'Membres',
+      icon: Users,
+      path: '/admin/members',
       count: stats.members,
       color: 'bg-blue-500',
       description: 'Gérer les membres'
     },
-    { 
-      title: 'Événements', 
-      icon: Calendar, 
-      path: '/admin/events', 
+    {
+      title: 'Événements',
+      icon: Calendar,
+      path: '/admin/events',
       count: stats.events,
       color: 'bg-green-500',
       description: 'Organiser les événements'
     },
-    { 
-      title: 'Partenaires', 
-      icon: Building, 
-      path: '/admin/partners', 
+    {
+      title: 'Inscriptions',
+      icon: UserCheck,
+      path: '/admin/registrations',
+      count: stats.registrations,
+      color: 'bg-teal-500',
+      description: 'Inscriptions aux événements'
+    },
+    {
+      title: 'Partenaires',
+      icon: Building,
+      path: '/admin/partners',
       count: stats.partners,
       color: 'bg-purple-500',
       description: 'Gérer les partenariats'
     },
-    { 
-      title: 'Messages', 
-      icon: Mail, 
-      path: '/admin/messages', 
+    {
+      title: 'Direction',
+      icon: Award,
+      path: '/admin/leadership',
+      count: stats.leadership,
+      color: 'bg-amber-500',
+      description: 'Équipe de direction'
+    },
+    {
+      title: 'Messages',
+      icon: Mail,
+      path: '/admin/messages',
       count: stats.messages,
       color: 'bg-orange-500',
       description: 'Messages de contact'
     },
-    { 
-      title: 'Actualités', 
-      icon: Newspaper, 
-      path: '/admin/news', 
+    {
+      title: 'Newsletter',
+      icon: Mail,
+      path: '/admin/newsletter',
+      count: stats.newsletter,
+      color: 'bg-cyan-500',
+      description: 'Abonnés newsletter'
+    },
+    {
+      title: 'Actualités',
+      icon: Newspaper,
+      path: '/admin/news',
       count: stats.news,
       color: 'bg-red-500',
       description: 'Publier des actualités'
     },
-    { 
-      title: 'Diagnostic', 
-      icon: Activity, 
-      path: '/admin/diagnostic', 
-      count: '✓',
-      color: 'bg-gray-500',
-      description: 'Diagnostic système'
+    {
+      title: 'Fichiers',
+      icon: FileText,
+      path: '/admin/files',
+      count: stats.resources,
+      color: 'bg-indigo-500',
+      description: 'Gestion des fichiers'
+    },
+    {
+      title: 'Cartes',
+      icon: Layers,
+      path: '/admin/cards',
+      count: stats.cards,
+      color: 'bg-pink-500',
+      description: 'Cartes d\'information'
+    },
+    {
+      title: 'Diaporama',
+      icon: Image,
+      path: '/admin/slideshow',
+      count: stats.slideshow,
+      color: 'bg-violet-500',
+      description: 'Images du diaporama'
+    },
+    {
+      title: 'Streams',
+      icon: Video,
+      path: '/admin/streams',
+      count: stats.streams,
+      color: 'bg-rose-500',
+      description: 'Diffusions en direct'
     }
   ];
 
