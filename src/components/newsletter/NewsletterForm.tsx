@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,12 +6,16 @@ import { toast } from 'sonner';
 import { Mail, Send, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
+import { newsletterLimiter, sanitizeInput, validate, secureSubmit } from '../../lib/security';
 
 const newsletterSchema = z.object({
-  email: z.string().email('Email invalide'),
+  email: z.string()
+    .email('Email invalide')
+    .refine(val => validate.email(val), 'Format d\'email invalide'),
   whatsapp: z.string()
     .min(8, 'Numéro WhatsApp invalide')
-    .regex(/^\+?[0-9]+$/, 'Format de numéro invalide'),
+    .regex(/^\+?[0-9]+$/, 'Format de numéro invalide')
+    .refine(val => validate.phone(val), 'Format de téléphone invalide'),
   acceptNotifications: z.literal(true, {
     errorMap: () => ({ message: 'Vous devez accepter de recevoir les notifications' }),
   }),
@@ -21,34 +25,50 @@ type NewsletterFormData = z.infer<typeof newsletterSchema>;
 
 const NewsletterForm: React.FC = () => {
   const { t } = useTranslation();
+  const [formStartTime] = useState(Date.now());
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<NewsletterFormData>({
     resolver: zodResolver(newsletterSchema),
   });
 
   const onSubmit = async (data: NewsletterFormData) => {
     try {
-      // Insert into newsletter_subscriptions table
-      const { error } = await supabase
-        .from('newsletter_subscriptions')
-        .insert([{
-          email: data.email,
-          whatsapp: data.whatsapp,
-          status: 'active'
-        }]);
-        
-      if (error) {
-        if (error.code === '23505') { // Unique constraint violation
-          toast.error('Cette adresse email est déjà inscrite à la newsletter');
-          return;
+      // Sanitize inputs
+      const sanitizedData = {
+        email: sanitizeInput.email(data.email),
+        whatsapp: sanitizeInput.phone(data.whatsapp),
+      };
+
+      // Use secure submit with rate limiting
+      await secureSubmit(
+        sanitizedData,
+        async (secureData) => {
+          const { error } = await supabase
+            .from('newsletter_subscriptions')
+            .insert([{
+              email: secureData.email,
+              whatsapp: secureData.whatsapp,
+              status: 'active'
+            }]);
+
+          if (error) {
+            if (error.code === '23505') {
+              throw new Error('Cette adresse email est déjà inscrite à la newsletter');
+            }
+            throw error;
+          }
+        },
+        {
+          rateLimiter: newsletterLimiter,
+          sanitize: true,
+          validateTiming: true,
         }
-        throw error;
-      }
-      
+      );
+
       toast.success(t('newsletter.success'));
       reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Newsletter subscription error:', error);
-      toast.error(t('common.error'));
+      toast.error(error.message || t('common.error'));
     }
   };
 

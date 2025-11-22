@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,20 +6,38 @@ import { toast } from 'sonner';
 import { FormField, FormTextarea, FormSelect, FormSubmitButton } from '../ui/Form';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
+import { contactFormLimiter, sanitizeInput, validate, secureSubmit } from '../../lib/security';
 
 const contactSchema = z.object({
   subject: z.string().min(1, 'Veuillez sélectionner un sujet'),
-  firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
-  lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Email invalide'),
-  phone: z.string().min(8, 'Numéro de téléphone invalide'),
-  message: z.string().min(50, 'Le message doit contenir au moins 50 caractères'),
+  firstName: z.string()
+    .min(2, 'Le prénom doit contenir au moins 2 caractères')
+    .max(50, 'Le prénom est trop long')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  lastName: z.string()
+    .min(2, 'Le nom doit contenir au moins 2 caractères')
+    .max(50, 'Le nom est trop long')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  email: z.string()
+    .email('Email invalide')
+    .refine(val => validate.email(val), 'Format d\'email invalide'),
+  phone: z.string()
+    .min(8, 'Numéro de téléphone invalide')
+    .refine(val => validate.phone(val), 'Format de téléphone invalide'),
+  message: z.string()
+    .min(50, 'Le message doit contenir au moins 50 caractères')
+    .max(2000, 'Le message est trop long')
+    .refine(val => validate.noXSS(val), 'Contenu invalide détecté')
+    .refine(val => validate.noSqlInjection(val), 'Contenu invalide détecté'),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const ContactForm: React.FC = () => {
   const { t } = useTranslation();
+  const [formStartTime] = useState(Date.now());
   const methods = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
@@ -28,24 +46,44 @@ const ContactForm: React.FC = () => {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      // Insert message into contact_messages table
-      const { error } = await supabase
-        .from('contact_messages')
-        .insert([{
-          name: `${data.firstName} ${data.lastName}`,
-          email: data.email,
-          subject: data.subject,
-          message: data.message,
-          status: 'unread'
-        }]);
+      // Sanitize inputs
+      const sanitizedData = {
+        firstName: sanitizeInput.text(data.firstName),
+        lastName: sanitizeInput.text(data.lastName),
+        email: sanitizeInput.email(data.email),
+        phone: sanitizeInput.phone(data.phone),
+        subject: sanitizeInput.text(data.subject),
+        message: sanitizeInput.multiline(data.message),
+      };
 
-      if (error) throw error;
-      
+      // Use secure submit with rate limiting
+      await secureSubmit(
+        sanitizedData,
+        async (secureData) => {
+          const { error } = await supabase
+            .from('contact_messages')
+            .insert([{
+              name: `${secureData.firstName} ${secureData.lastName}`,
+              email: secureData.email,
+              subject: secureData.subject,
+              message: secureData.message,
+              status: 'unread'
+            }]);
+
+          if (error) throw error;
+        },
+        {
+          rateLimiter: contactFormLimiter,
+          sanitize: true,
+          validateTiming: true,
+        }
+      );
+
       toast.success('Message envoyé avec succès!');
       methods.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting contact form:', error);
-      toast.error(t('common.error'));
+      toast.error(error.message || t('common.error'));
     }
   };
 
