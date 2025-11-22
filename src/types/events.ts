@@ -1,3 +1,5 @@
+import { EventTranslations } from '../utils/translations';
+
 export interface EventPrice {
   id: string;
   name: string;
@@ -22,4 +24,5 @@ export interface EventItem {
   rules?: string;
   maxParticipants?: number;
   currentParticipants?: number;
+  translations?: EventTranslations;
 }

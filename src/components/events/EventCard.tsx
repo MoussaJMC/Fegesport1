@@ -4,6 +4,8 @@ import { Calendar, MapPin, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { EventItem } from '../../types/events';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../hooks/useLanguage';
+import { getEventTranslation } from '../../utils/translations';
 
 interface EventCardProps {
   event: EventItem;
@@ -11,6 +13,12 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+
+  // Get translated content
+  const translated = event.translations
+    ? getEventTranslation(event.translations, currentLanguage)
+    : { title: event.title, description: event.description, location: event.location || '' };
   
   return (
     <motion.div 
@@ -45,14 +53,14 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </div>
         <h3 className="text-lg font-bold mb-2 line-clamp-2 card-title">
           <Link to={`/events/${event.id}`} className="hover:text-primary-600 transition-colors">
-            {event.title}
+            {translated.title || event.title}
           </Link>
         </h3>
         <div className="flex flex-col space-y-1 mb-3">
-          {event.location && (
+          {(translated.location || event.location) && (
             <div className="flex items-center text-sm text-gray-600">
               <MapPin size={14} className="mr-1 text-gray-400 flex-shrink-0" />
-              <span className="line-clamp-1">{event.location}</span>
+              <span className="line-clamp-1">{translated.location || event.location}</span>
             </div>
           )}
           {event.time && (
