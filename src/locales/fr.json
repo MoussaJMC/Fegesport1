@@ -78,8 +78,8 @@
     "types": {
       "title": "Types d'Adhésion",
       "player": "Joueur Individuel",
-      "player_price": "15 000",
-      "player_period": "par an",
+      "player_price": "Contribution volontaire",
+      "player_period": "",
       "club": "Club Esport",
       "club_price": "150 000",
       "club_period": "par an",
@@ -90,7 +90,7 @@
     },
     "form": {
       "title": "Formulaire d'Adhésion",
-      "continue": "Continuer vers le paiement",
+      "continue": "Continuer",
       "success": "Votre adhésion a été finalisée avec succès !"
     },
     "questions": {

@@ -61,7 +61,7 @@ const MembershipPage: React.FC = () => {
       {
         id: 'player',
         name: t('membership.types.player'),
-        description: 'Adhésion pour les joueurs individuels',
+        description: 'Inscription gratuite avec contribution volontaire',
         price: 15000,
         period: t('membership.types.player_period'),
         features: [
@@ -69,7 +69,8 @@ const MembershipPage: React.FC = () => {
           'Participation aux tournois officiels',
           'Accès aux formations',
           'Newsletter exclusive',
-          'Badge digital officiel'
+          'Badge digital officiel',
+          'Contribution volontaire suggérée: 15 000 GNF'
         ],
         is_active: true
       },
@@ -200,10 +201,16 @@ const MembershipPage: React.FC = () => {
                         whileHover={{ y: -10 }}
                       >
                         <h3 className="text-2xl font-bold mb-2 text-white">{type.name}</h3>
-                        <div className="text-3xl font-bold text-primary-500 mb-1">
-                          {type.price === 0 ? t('membership.types.partner_price') :
-                            `${type.price.toLocaleString()} `}
-                          <span className="text-sm font-normal text-gray-400">GNF</span>
+                        <div className="text-2xl font-bold text-primary-500 mb-1">
+                          {type.id === 'player' ? (
+                            <span>{t('membership.types.player_price')}</span>
+                          ) : type.price === 0 ? (
+                            <span>{t('membership.types.partner_price')}</span>
+                          ) : (
+                            <>
+                              {type.price.toLocaleString()} <span className="text-sm font-normal text-gray-400">GNF</span>
+                            </>
+                          )}
                         </div>
                         <p className="text-gray-400 mb-6">{type.period}</p>
                         <ul className="space-y-3">

@@ -113,7 +113,7 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
       {
         id: 'player',
         name: t('membership.types.player'),
-        description: 'Adhésion pour les joueurs individuels',
+        description: 'Inscription gratuite avec contribution volontaire',
         price: 15000,
         period: t('membership.types.player_period'),
         features: [
@@ -121,7 +121,8 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           'Participation aux tournois officiels',
           'Accès aux formations',
           'Newsletter exclusive',
-          'Badge digital officiel'
+          'Badge digital officiel',
+          'Contribution volontaire suggérée: 15 000 GNF'
         ],
         is_active: true
       },
@@ -161,22 +162,26 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
   const onSubmit = async (data: MembershipFormData) => {
     try {
       setIsSubmitting(true);
-      
+
       // First, let's test the database connection
       console.log('Testing database connection...');
       const { data: testData, error: testError } = await supabase
         .from('members')
         .select('count')
         .limit(1);
-      
+
       if (testError) {
         console.error('Database connection test failed:', testError);
         toast.error('Erreur de connexion à la base de données');
         return;
       }
-      
+
       console.log('Database connection successful');
-      
+
+      // For individual players, registration is free with optional contribution
+      // For clubs and partners, payment is required
+      const isPlayerType = data.type === 'player';
+
       // Prepare member data for database insertion
       const memberData = {
         first_name: data.firstName,
@@ -187,7 +192,7 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
         address: data.address,
         city: data.city,
         member_type: data.type as 'player' | 'club' | 'partner',
-        status: 'pending' as const,
+        status: (isPlayerType ? 'active' : 'pending') as 'active' | 'pending',
         membership_start: new Date().toISOString().split('T')[0], // Today's date
         membership_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // One year from now
       };
@@ -208,16 +213,21 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
       }
 
       console.log('Member successfully inserted:', insertedMember);
-      
+
       // Store form data for payment processing
       setFormData(data);
-      
-      // Show success message
-      toast.success('Données d\'inscription enregistrées avec succès!');
-      
-      // Proceed to payment
+
+      if (isPlayerType) {
+        // For players, registration is complete but they can make a voluntary contribution
+        toast.success('Inscription réussie ! Votre adhésion est maintenant active.');
+      } else {
+        // For clubs and partners, show success message and proceed to payment
+        toast.success('Données d\'inscription enregistrées avec succès!');
+      }
+
+      // Show payment section
       setShowPayment(true);
-      
+
     } catch (error: any) {
       console.error('Unexpected error during member inscription:', error);
       toast.error(t('common.error'));
@@ -378,20 +388,59 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           </FormSubmitButton>
         ) : (
           <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">✅ Inscription enregistrée</h3>
-              <p className="text-green-700">
-                Vos données d'inscription ont été enregistrées avec succès dans notre base de données. 
-                Procédez maintenant au paiement pour finaliser votre adhésion.
-              </p>
-            </div>
-            <h3 className="text-lg font-semibold text-white">Paiement</h3>
-            <PayPalButton
-              amount={selectedMembershipType?.price.toString() || "15000"}
-              currency="XOF"
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentError}
-            />
+            {watchedType === 'player' ? (
+              <>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2">✅ Inscription réussie</h3>
+                  <p className="text-green-700 mb-3">
+                    Félicitations ! Votre adhésion en tant que joueur individuel est maintenant active.
+                  </p>
+                  <p className="text-green-700">
+                    Vous pouvez faire une contribution volontaire pour soutenir la FEGESPORT et le développement de l'esport en Guinée.
+                  </p>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-2">💙 Contribution Volontaire</h3>
+                  <p className="text-blue-700 mb-4">
+                    Votre contribution nous aide à organiser des tournois, former des joueurs et développer l'écosystème esport guinéen.
+                  </p>
+                  <PayPalButton
+                    amount={selectedMembershipType?.price.toString() || "15000"}
+                    currency="XOF"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    methods.reset();
+                    setShowPayment(false);
+                    setFormData(null);
+                  }}
+                  className="w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                >
+                  Terminer sans contribution
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2">✅ Inscription enregistrée</h3>
+                  <p className="text-green-700">
+                    Vos données d'inscription ont été enregistrées avec succès dans notre base de données.
+                    Procédez maintenant au paiement pour finaliser votre adhésion.
+                  </p>
+                </div>
+                <h3 className="text-lg font-semibold text-white">Paiement requis</h3>
+                <PayPalButton
+                  amount={selectedMembershipType?.price.toString() || "150000"}
+                  currency="XOF"
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
+              </>
+            )}
           </div>
         )}
       </form>
