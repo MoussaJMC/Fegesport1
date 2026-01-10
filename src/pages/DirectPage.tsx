@@ -122,9 +122,14 @@ const DirectPage: React.FC = () => {
 
   const renderEmbed = (stream: Stream) => {
     if (stream.platform === 'youtube') {
+      const isChannelId = stream.stream_id.startsWith('UC');
+      const embedUrl = isChannelId
+        ? `https://www.youtube.com/embed/live_stream?channel=${stream.stream_id}&autoplay=1`
+        : `https://www.youtube.com/embed/${stream.stream_id}?autoplay=1&rel=0`;
+
       return (
         <iframe
-          src={`https://www.youtube.com/embed/${stream.stream_id}?autoplay=1&rel=0`}
+          src={embedUrl}
           className="w-full aspect-video rounded-lg"
           title={stream.title}
           frameBorder="0"
@@ -143,7 +148,7 @@ const DirectPage: React.FC = () => {
         ></iframe>
       );
     }
-    
+
     return (
       <div className="w-full aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
         <p className="text-white">Stream non disponible</p>
@@ -196,8 +201,12 @@ const DirectPage: React.FC = () => {
                       </div>
                       <div className="flex space-x-2">
                         {activeStream.platform === 'youtube' && (
-                          <a 
-                            href={`https://www.youtube.com/watch?v=${activeStream.stream_id}`}
+                          <a
+                            href={
+                              activeStream.stream_id.startsWith('UC')
+                                ? `https://www.youtube.com/channel/${activeStream.stream_id}/live`
+                                : `https://www.youtube.com/watch?v=${activeStream.stream_id}`
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
@@ -207,7 +216,7 @@ const DirectPage: React.FC = () => {
                           </a>
                         )}
                         {activeStream.platform === 'twitch' && (
-                          <a 
+                          <a
                             href={`https://www.twitch.tv/${activeStream.stream_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -329,21 +338,21 @@ const DirectPage: React.FC = () => {
               <div className="bg-secondary-700 rounded-lg p-6">
                 <h3 className="text-xl font-bold text-white mb-4">Chaînes Officielles</h3>
                 <div className="space-y-4">
-                  <a 
-                    href="https://www.youtube.com/@FEGESPORT" 
+                  <a
+                    href="https://www.youtube.com/@fegesporttv7126"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 bg-secondary-600 rounded-lg hover:bg-secondary-500 transition-colors"
                   >
                     <div className="flex items-center">
                       <Youtube className="text-red-500 mr-3" size={24} />
-                      <span className="text-white">YouTube FEGESPORT</span>
+                      <span className="text-white">FEGESPORT TV</span>
                     </div>
                     <ExternalLink size={16} className="text-gray-400" />
                   </a>
-                  
-                  <a 
-                    href="https://www.twitch.tv/fegesport" 
+
+                  <a
+                    href="https://www.twitch.tv/fegesport"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-3 bg-secondary-600 rounded-lg hover:bg-secondary-500 transition-colors"

@@ -448,7 +448,7 @@ const StreamsAdminPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.platform === 'youtube' ? 'ID de la vidéo YouTube' : 'Nom de la chaîne Twitch'}
+                      {formData.platform === 'youtube' ? 'ID de vidéo ou ID de chaîne YouTube' : 'Nom de la chaîne Twitch'}
                     </label>
                     <div className="relative">
                       {formData.platform === 'youtube' ? (
@@ -461,13 +461,13 @@ const StreamsAdminPage: React.FC = () => {
                         value={formData.stream_id}
                         onChange={(e) => setFormData({ ...formData, stream_id: e.target.value })}
                         className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                        placeholder={formData.platform === 'youtube' ? 'dQw4w9WgXcQ' : 'fegesport'}
+                        placeholder={formData.platform === 'youtube' ? 'dQw4w9WgXcQ ou UCrqM0rNeu8-tK2fKiKwlxTQ' : 'fegesport'}
                         required
                       />
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      {formData.platform === 'youtube' 
-                        ? 'Exemple: Pour https://www.youtube.com/watch?v=dQw4w9WgXcQ, entrez dQw4w9WgXcQ' 
+                      {formData.platform === 'youtube'
+                        ? 'Pour une vidéo: dQw4w9WgXcQ | Pour un live de chaîne: UCrqM0rNeu8-tK2fKiKwlxTQ (commence par UC)'
                         : 'Exemple: Pour https://www.twitch.tv/fegesport, entrez fegesport'}
                     </p>
                   </div>
@@ -664,10 +664,12 @@ const StreamsAdminPage: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
-                      <button 
+                      <button
                         onClick={() => {
-                          const url = stream.platform === 'youtube' 
-                            ? `https://www.youtube.com/watch?v=${stream.stream_id}`
+                          const url = stream.platform === 'youtube'
+                            ? stream.stream_id.startsWith('UC')
+                              ? `https://www.youtube.com/channel/${stream.stream_id}/live`
+                              : `https://www.youtube.com/watch?v=${stream.stream_id}`
                             : `https://www.twitch.tv/${stream.stream_id}`;
                           window.open(url, '_blank');
                         }}
@@ -757,9 +759,12 @@ const StreamsAdminPage: React.FC = () => {
           <div>
             <h3 className="font-medium">2. Intégration YouTube</h3>
             <p className="text-sm mt-1">
-              Pour les streams YouTube, vous devez fournir l'ID de la vidéo (la partie après <code>v=</code> dans l'URL).
-              Par exemple, pour <code>https://www.youtube.com/watch?v=dQw4w9WgXcQ</code>, l'ID est <code>dQw4w9WgXcQ</code>.
+              Pour les streams YouTube, vous avez deux options :
             </p>
+            <ul className="text-sm mt-2 ml-4 space-y-1">
+              <li><strong>Vidéo spécifique :</strong> Utilisez l'ID de la vidéo (ex: dQw4w9WgXcQ pour https://www.youtube.com/watch?v=dQw4w9WgXcQ)</li>
+              <li><strong>Live de chaîne :</strong> Utilisez l'ID de la chaîne qui commence par UC (ex: UCrqM0rNeu8-tK2fKiKwlxTQ). Le système affichera automatiquement le stream en direct de la chaîne.</li>
+            </ul>
           </div>
           
           <div>
