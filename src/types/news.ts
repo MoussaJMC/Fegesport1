@@ -1,3 +1,5 @@
+import { NewsTranslations } from '../utils/translations';
+
 export interface NewsItem {
   id: string;
   title: string;
@@ -11,6 +13,7 @@ export interface NewsItem {
     avatar?: string;
   };
   tags?: string[];
+  translations?: NewsTranslations;
 }
 
 export interface NewsArticle {

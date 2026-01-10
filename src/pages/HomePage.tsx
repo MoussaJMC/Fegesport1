@@ -110,7 +110,8 @@ const HomePage: React.FC = () => {
           author: {
             name: 'FEGESPORT',
           },
-          tags: []
+          tags: [],
+          translations: item.translations
         }));
         setNews(mappedNews);
       }
