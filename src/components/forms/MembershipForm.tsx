@@ -14,7 +14,6 @@ const membershipSchema = z.object({
   lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   email: z.string().email('Email invalide'),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
-  birthDate: z.string().optional(),
   ageCategory: z.string().optional(),
   address: z.string().min(10, 'Adresse requise'),
   city: z.string().min(2, 'Ville requise'),
@@ -24,14 +23,6 @@ const membershipSchema = z.object({
   acceptTerms: z.literal(true, {
     errorMap: () => ({ message: 'Vous devez accepter les conditions d\'utilisation' }),
   }),
-}).refine((data) => {
-  if (data.type === 'player') {
-    return !!data.ageCategory;
-  }
-  return !!data.birthDate;
-}, {
-  message: 'Veuillez sélectionner votre catégorie d\'âge',
-  path: ['ageCategory'],
 });
 
 type MembershipFormData = z.infer<typeof membershipSchema>;
@@ -201,16 +192,10 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
         city: data.city,
         member_type: data.type as 'player' | 'club' | 'partner',
         status: (isPlayerType ? 'active' : 'pending') as 'active' | 'pending',
-        membership_start: new Date().toISOString().split('T')[0], // Today's date
-        membership_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // One year from now
+        membership_start: new Date().toISOString().split('T')[0],
+        membership_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        age_category: data.ageCategory || null,
       };
-
-      // For players, use age category; for clubs/partners, use birth date
-      if (isPlayerType && data.ageCategory) {
-        memberData.age_category = data.ageCategory;
-      } else if (data.birthDate) {
-        memberData.birth_date = data.birthDate;
-      }
 
       console.log('Attempting to insert member data:', memberData);
 
@@ -339,27 +324,16 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           />
         </div>
 
-        {watchedType === 'player' ? (
-          <FormSelect
-            name="ageCategory"
-            label="Catégorie d'âge"
-            required
-            error={errors.ageCategory?.message}
-            options={[
-              { value: '03-16', label: '3 à 16 ans' },
-              { value: '17-35', label: '17 à 35 ans' },
-              { value: '36+', label: '36 ans et plus' },
-            ]}
-          />
-        ) : (
-          <FormField
-            name="birthDate"
-            label="Date de naissance"
-            type="date"
-            required
-            error={errors.birthDate?.message}
-          />
-        )}
+        <FormSelect
+          name="ageCategory"
+          label="Catégorie d'âge"
+          error={errors.ageCategory?.message}
+          options={[
+            { value: '03-16', label: '3 à 16 ans' },
+            { value: '17-35', label: '17 à 35 ans' },
+            { value: '36+', label: '36 ans et plus' },
+          ]}
+        />
 
         <FormField
           name="address"

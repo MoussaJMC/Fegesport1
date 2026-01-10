@@ -9,7 +9,7 @@ interface Member {
   last_name: string;
   email: string;
   phone?: string;
-  birth_date?: string;
+  age_category?: string;
   address?: string;
   city?: string;
   member_type: 'player' | 'club' | 'partner';
@@ -88,7 +88,7 @@ const TestDatabasePage: React.FC = () => {
         last_name: 'User',
         email: `test-${Date.now()}@example.com`,
         phone: '+224123456789',
-        birth_date: '1990-01-01',
+        age_category: '17-35',
         address: 'Test Address',
         city: 'Conakry',
         member_type: 'player' as const,

@@ -11,7 +11,6 @@ const memberSchema = z.object({
   last_name: z.string().min(1, 'Le nom est requis'),
   email: z.string().email('Email invalide'),
   phone: z.string().min(8, 'Numéro de téléphone invalide').optional().or(z.literal('')),
-  birth_date: z.string().min(1, 'La date de naissance est requise').optional().or(z.literal('')),
   age_category: z.string().optional().or(z.literal('')),
   address: z.string().min(1, 'L\'adresse est requise').optional().or(z.literal('')),
   city: z.string().min(1, 'La ville est requise').optional().or(z.literal('')),
@@ -37,7 +36,6 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
       last_name: initialData?.last_name || '',
       email: initialData?.email || '',
       phone: initialData?.phone || '',
-      birth_date: initialData?.birth_date || '',
       age_category: (initialData as any)?.age_category || '',
       address: initialData?.address || '',
       city: initialData?.city || '',
@@ -54,7 +52,6 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
       const cleanData = {
         ...data,
         phone: data.phone || null,
-        birth_date: data.birth_date || null,
         age_category: data.age_category || null,
         address: data.address || null,
         city: data.city || null,
@@ -137,34 +134,20 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Date de naissance</label>
-          <input
-            type="date"
-            {...register('birth_date')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-          />
-          {errors.birth_date && (
-            <p className="mt-1 text-sm text-red-600">{errors.birth_date.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Catégorie d'âge</label>
-          <select
-            {...register('age_category')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-          >
-            <option value="">Sélectionner</option>
-            <option value="03-16">3 à 16 ans</option>
-            <option value="17-35">17 à 35 ans</option>
-            <option value="36+">36 ans et plus</option>
-          </select>
-          {errors.age_category && (
-            <p className="mt-1 text-sm text-red-600">{errors.age_category.message}</p>
-          )}
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Catégorie d'âge</label>
+        <select
+          {...register('age_category')}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+        >
+          <option value="">Sélectionner</option>
+          <option value="03-16">3 à 16 ans</option>
+          <option value="17-35">17 à 35 ans</option>
+          <option value="36+">36 ans et plus</option>
+        </select>
+        {errors.age_category && (
+          <p className="mt-1 text-sm text-red-600">{errors.age_category.message}</p>
+        )}
       </div>
 
       <div>

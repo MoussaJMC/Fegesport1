@@ -13,7 +13,7 @@ interface Member {
   last_name: string;
   email: string;
   phone?: string;
-  birth_date?: string;
+  age_category?: string;
   address?: string;
   city?: string;
   member_type: 'player' | 'club' | 'partner';
