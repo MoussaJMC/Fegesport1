@@ -178,8 +178,6 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     const progress: { [key: string]: number } = {};
 
     try {
-      console.log('=== STARTING FILE UPLOAD ===');
-
       // Check authentication status
       if (!isAuthenticated) {
         throw new Error('Vous devez être connecté pour télécharger des fichiers');
@@ -197,18 +195,11 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         throw new Error('Utilisateur non trouvé');
       }
 
-      console.log('Current user ID:', currentUser.id);
-      console.log('User email:', currentUser.email);
-      console.log('User metadata:', currentUser.user_metadata);
-      console.log('User role:', currentUser.user_metadata?.role);
-
       // Check admin status
       const userRole = currentUser.user_metadata?.role;
       if (userRole !== 'admin') {
         throw new Error(`Privilèges insuffisants. Votre rôle: ${userRole || 'aucun'}`);
       }
-
-      console.log('✅ User is admin, proceeding with upload');
 
       let successCount = 0;
       let failCount = 0;
@@ -219,8 +210,6 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         setUploadProgress({ ...progress });
 
         try {
-          console.log(`\n--- Processing file ${i + 1}/${files.length}: ${file.name} ---`);
-
           // Check file size again
           const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
           if (file.size > MAX_FILE_SIZE) {
@@ -228,9 +217,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
           }
 
           // Upload file to Supabase Storage
-          console.log('Uploading to storage...');
           const fileUrl = await uploadFile(file);
-          console.log('✅ Storage upload successful:', fileUrl);
           progress[file.name] = 50;
           setUploadProgress({ ...progress });
 
@@ -258,51 +245,38 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             uploaded_by: currentUser.id
           };
 
-          console.log('Inserting into database:', fileData);
-
-          const { data: insertedData, error: insertError } = await supabase
+          const { error: insertError } = await supabase
             .from('static_files')
             .insert([fileData])
             .select();
 
           if (insertError) {
-            console.error('❌ Database insert error:', insertError);
-            console.error('Error code:', insertError.code);
-            console.error('Error details:', insertError.details);
-            console.error('Error hint:', insertError.hint);
-            console.error('Error message:', insertError.message);
+            console.error('Database insert error:', insertError);
             throw new Error(`Échec d'insertion DB: ${insertError.message}`);
           }
-
-          console.log('✅ Successfully inserted into database:', insertedData);
 
           progress[file.name] = 100;
           setUploadProgress({ ...progress });
           successCount++;
         } catch (fileError: any) {
-          console.error(`❌ Error processing file ${file.name}:`, fileError);
+          console.error(`Error processing file ${file.name}:`, fileError);
           toast.error(`Erreur avec ${file.name}: ${fileError.message}`);
           failCount++;
         }
       }
-
-      console.log(`\n=== UPLOAD COMPLETE: ${successCount} succeeded, ${failCount} failed ===\n`);
 
       if (successCount > 0) {
         toast.success(`${successCount} fichier(s) téléchargé(s) avec succès!`);
         resetForm();
         onClose();
 
-        // Call onSuccess AFTER closing to prevent UI blocking
-        setTimeout(async () => {
-          console.log('Refreshing file list...');
-          await onSuccess();
-        }, 100);
+        // Refresh file list after closing modal
+        setTimeout(() => onSuccess(), 100);
       } else {
         toast.error('Aucun fichier n\'a pu être téléchargé');
       }
     } catch (error: any) {
-      console.error('❌ UPLOAD ERROR:', error);
+      console.error('Upload error:', error);
       setError(error.message);
       toast.error(`Erreur: ${error.message}`);
     } finally {

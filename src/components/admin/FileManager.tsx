@@ -53,7 +53,6 @@ const FileManager: React.FC = () => {
   useEffect(() => {
     fetchCategories();
     fetchFiles();
-    checkOrphanedFiles();
 
     // Setup real-time subscription
     const subscription = supabase
@@ -89,7 +88,6 @@ const FileManager: React.FC = () => {
 
   const fetchFiles = async () => {
     try {
-      console.log('=== FETCHING FILES FROM DATABASE ===');
       setLoading(true);
 
       const { data, error } = await supabase
@@ -100,25 +98,10 @@ const FileManager: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('❌ Error fetching files:', error);
-        throw error;
-      }
-
-      console.log(`✅ Loaded ${data?.length || 0} files from database`);
-
-      if (data && data.length > 0) {
-        console.log('Most recent 3 files:');
-        data.slice(0, 3).forEach((file, index) => {
-          console.log(`  ${index + 1}. ${file.original_filename} (${file.title}) - Created: ${file.created_at}`);
-        });
-      } else {
-        console.log('⚠️ No files found in database');
-      }
-
+      if (error) throw error;
       setFiles(data || []);
     } catch (error) {
-      console.error('❌ Error fetching files:', error);
+      console.error('Error fetching files:', error);
       toast.error('Erreur lors du chargement des fichiers');
     } finally {
       setLoading(false);
@@ -187,13 +170,8 @@ const FileManager: React.FC = () => {
   };
 
   const handleUploadSuccess = async () => {
-    console.log('=== UPLOAD SUCCESS CALLBACK - REFRESHING FILES ===');
-
-    // Simple refresh with a small delay for database propagation
     await new Promise(resolve => setTimeout(resolve, 200));
     await fetchFiles();
-
-    console.log('=== FILES REFRESHED ===');
   };
 
   const handleRefresh = async () => {
@@ -201,236 +179,6 @@ const FileManager: React.FC = () => {
     await fetchFiles();
     setRefreshing(false);
     toast.success('Liste des fichiers actualisée');
-  };
-
-  const checkOrphanedFiles = async () => {
-    try {
-      console.log('=== CHECKING FOR ORPHANED FILES ===');
-
-      // Get all files from storage
-      const { data: storageFiles, error: storageError } = await supabase.storage
-        .from('static-files')
-        .list('uploads');
-
-      if (storageError) {
-        console.error('Storage error:', storageError);
-        toast.error('Erreur lors de l\'accès au storage');
-        return;
-      }
-
-      console.log(`Storage files (${storageFiles?.length || 0}):`, storageFiles?.map(f => f.name));
-
-      // Get all file URLs from database
-      const { data: dbFiles } = await supabase
-        .from('static_files')
-        .select('original_filename, file_url');
-
-      console.log(`Database files (${dbFiles?.length || 0}):`, dbFiles?.map(f => f.original_filename));
-
-      const dbFileNames = dbFiles?.map(f => f.original_filename) || [];
-
-      // Find orphaned files
-      const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
-
-      console.log(`Orphaned files (${orphaned.length}):`, orphaned.map(f => f.name));
-
-      if (orphaned.length > 0) {
-        toast.warning(`${orphaned.length} fichier(s) orphelin(s) trouvé(s): ${orphaned.map(f => f.name).join(', ')}`);
-      } else {
-        toast.success('Aucun fichier orphelin trouvé');
-      }
-    } catch (error: any) {
-      console.error('Error checking orphaned files:', error);
-      toast.error('Erreur lors de la vérification');
-    }
-  };
-
-  const testInsertPermissions = async () => {
-    try {
-      console.log('=== Testing Insert Permissions ===');
-
-      // Get current user
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      console.log('Current user:', currentUser);
-      console.log('User metadata:', currentUser?.user_metadata);
-      console.log('App metadata:', currentUser?.app_metadata);
-
-      // Test if categories exist
-      if (!categories || categories.length === 0) {
-        console.error('No categories available');
-        toast.error('Aucune catégorie disponible');
-        return;
-      }
-
-      // Create test data
-      const testData = {
-        filename: 'test_insert',
-        original_filename: 'test_insert.txt',
-        file_url: 'https://example.com/test.txt',
-        file_type: 'text/plain',
-        file_size: 100,
-        category_id: categories[0].id,
-        title: 'Test Insert',
-        is_public: true,
-        is_featured: false,
-        uploaded_by: currentUser?.id
-      };
-
-      console.log('Attempting to insert test data:', testData);
-
-      const { data, error } = await supabase
-        .from('static_files')
-        .insert([testData])
-        .select();
-
-      if (error) {
-        console.error('=== INSERT ERROR ===');
-        console.error('Code:', error.code);
-        console.error('Message:', error.message);
-        console.error('Details:', error.details);
-        console.error('Hint:', error.hint);
-        toast.error(`Erreur: ${error.message}`);
-      } else {
-        console.log('=== INSERT SUCCESS ===');
-        console.log('Inserted data:', data);
-        toast.success('Test d\'insertion réussi!');
-        await fetchFiles();
-      }
-    } catch (error: any) {
-      console.error('=== EXCEPTION ===', error);
-      toast.error(`Exception: ${error.message}`);
-    }
-  };
-
-  const recoverOrphanedFiles = async () => {
-    if (!confirm('Voulez-vous enregistrer tous les fichiers orphelins dans la base de données?')) {
-      return;
-    }
-
-    try {
-      console.log('=== RECOVERING ORPHANED FILES ===');
-
-      // Get current user
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-      if (!currentUser) {
-        toast.error('Vous devez être connecté');
-        return;
-      }
-
-      console.log('Current user:', currentUser.id);
-
-      // Get all files from storage
-      const { data: storageFiles, error: storageError } = await supabase.storage
-        .from('static-files')
-        .list('uploads');
-
-      if (storageError) {
-        console.error('Storage error:', storageError);
-        toast.error('Erreur lors de l\'accès au storage');
-        return;
-      }
-
-      console.log(`Found ${storageFiles?.length || 0} files in storage:`, storageFiles);
-
-      // Get all file URLs from database
-      const { data: dbFiles } = await supabase
-        .from('static_files')
-        .select('file_url, original_filename');
-
-      console.log(`Found ${dbFiles?.length || 0} files in database:`, dbFiles);
-
-      const dbFileNames = dbFiles?.map(f => f.original_filename) || [];
-
-      // Find orphaned files
-      const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
-
-      if (orphaned.length === 0) {
-        toast.info('Aucun fichier orphelin à récupérer');
-        return;
-      }
-
-      console.log(`Found ${orphaned.length} orphaned files to recover:`, orphaned);
-
-      // Get first category as default
-      const defaultCategory = categories[0]?.id;
-
-      if (!defaultCategory) {
-        toast.error('Aucune catégorie disponible');
-        return;
-      }
-
-      console.log('Using default category:', defaultCategory);
-
-      let recovered = 0;
-      let failed = 0;
-
-      for (const file of orphaned) {
-        try {
-          const { data: { publicUrl } } = supabase.storage
-            .from('static-files')
-            .getPublicUrl(`uploads/${file.name}`);
-
-          console.log(`Processing ${file.name}, URL: ${publicUrl}`);
-
-          // Get mime type from extension
-          const ext = file.name.split('.').pop()?.toLowerCase();
-          const mimeTypes: { [key: string]: string } = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'gif': 'image/gif',
-            'pdf': 'application/pdf',
-            'doc': 'application/msword',
-            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'txt': 'text/plain'
-          };
-
-          const fileData = {
-            filename: file.name.replace(/\.[^/.]+$/, ''),
-            original_filename: file.name,
-            file_url: publicUrl,
-            file_type: mimeTypes[ext || ''] || 'application/octet-stream',
-            file_size: 0,
-            category_id: defaultCategory,
-            title: file.name.replace(/\.[^/.]+$/, ''),
-            is_public: true,
-            is_featured: false,
-            uploaded_by: currentUser.id
-          };
-
-          console.log('Inserting file data:', fileData);
-
-          const { data: insertedData, error: insertError } = await supabase
-            .from('static_files')
-            .insert([fileData])
-            .select();
-
-          if (insertError) {
-            console.error(`❌ Failed to recover ${file.name}:`, insertError);
-            failed++;
-          } else {
-            console.log(`✅ Successfully recovered ${file.name}`, insertedData);
-            recovered++;
-          }
-        } catch (error) {
-          console.error(`❌ Exception recovering ${file.name}:`, error);
-          failed++;
-        }
-      }
-
-      console.log(`=== RECOVERY COMPLETE: ${recovered} succeeded, ${failed} failed ===`);
-
-      if (recovered > 0) {
-        toast.success(`${recovered} fichier(s) récupéré(s) avec succès!`);
-        await fetchFiles();
-      } else {
-        toast.error(`Échec de la récupération. Erreurs: ${failed}`);
-      }
-    } catch (error: any) {
-      console.error('Error recovering orphaned files:', error);
-      toast.error(`Erreur: ${error.message}`);
-    }
   };
 
   const hasActiveFilters = searchTerm || selectedCategory;
@@ -459,27 +207,6 @@ const FileManager: React.FC = () => {
           <p className="text-gray-600">Gérer les images, documents et autres fichiers statiques</p>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={checkOrphanedFiles}
-            className="btn bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm"
-            title="Vérifier les fichiers orphelins"
-          >
-            Diagnostic
-          </button>
-          <button
-            onClick={testInsertPermissions}
-            className="btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 text-sm"
-            title="Tester les permissions d'insertion"
-          >
-            Test Insert
-          </button>
-          <button
-            onClick={recoverOrphanedFiles}
-            className="btn bg-orange-100 hover:bg-orange-200 text-orange-700 text-sm"
-            title="Récupérer les fichiers orphelins"
-          >
-            Récupérer
-          </button>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
