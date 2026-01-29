@@ -71,6 +71,7 @@ const FileManager: React.FC = () => {
 
   const fetchFiles = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('static_files')
         .select(`
@@ -143,9 +144,8 @@ const FileManager: React.FC = () => {
     );
   };
 
-  const handleUploadSuccess = () => {
-    fetchFiles();
-    setShowUploadModal(false);
+  const handleUploadSuccess = async () => {
+    await fetchFiles();
   };
 
   const hasActiveFilters = searchTerm || selectedCategory;

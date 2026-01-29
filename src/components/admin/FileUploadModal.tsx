@@ -248,9 +248,11 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       }
 
       toast.success(`${files.length} fichier(s) téléchargé(s) avec succès`);
-      onSuccess();
-      onClose();
       resetForm();
+
+      // Call onSuccess and wait for it to complete before closing
+      await onSuccess();
+      onClose();
     } catch (error: any) {
       console.error('Error uploading files:', error);
       setError(error.message);
