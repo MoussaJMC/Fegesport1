@@ -50,20 +50,27 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      console.log('Submitting news data:', data);
+      // DIAGNOSTIC: Vérifier le JWT
+      const { data: jwtData } = await supabase.rpc('get_jwt_claims');
+      console.log('=== JWT CLAIMS ===', jwtData);
+
+      const cleanData = {
+        title: data.title,
+        excerpt: data.excerpt,
+        content: data.content,
+        category: data.category,
+        image_url: data.image_url || null,
+        published: data.published,
+      };
+
+      console.log('Submitting news data:', cleanData);
 
       if (initialData?.id) {
-        // Update using RPC function
         const { data: result, error } = await supabase
-          .rpc('update_news_as_admin', {
-            p_id: initialData.id,
-            p_title: data.title,
-            p_excerpt: data.excerpt,
-            p_content: data.content,
-            p_category: data.category,
-            p_image_url: data.image_url || null,
-            p_published: data.published
-          });
+          .from('news')
+          .update(cleanData)
+          .eq('id', initialData.id)
+          .select();
 
         if (error) {
           console.error('Update error:', error);
@@ -72,16 +79,10 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
         console.log('Update result:', result);
         toast.success('Actualité mise à jour avec succès');
       } else {
-        // Create using RPC function
         const { data: result, error } = await supabase
-          .rpc('create_news_as_admin', {
-            p_title: data.title,
-            p_excerpt: data.excerpt,
-            p_content: data.content,
-            p_category: data.category,
-            p_image_url: data.image_url || null,
-            p_published: data.published
-          });
+          .from('news')
+          .insert([cleanData])
+          .select();
 
         if (error) {
           console.error('Insert error:', error);
