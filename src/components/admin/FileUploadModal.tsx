@@ -290,10 +290,17 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
       if (successCount > 0) {
         toast.success(`${successCount} fichier(s) téléchargé(s) avec succès!`);
-        resetForm();
 
-        // Call onSuccess and wait for it to complete before closing
+        // Wait a bit for database propagation
+        console.log('Waiting for database propagation...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Call onSuccess and wait for it to complete
+        console.log('Calling onSuccess to refresh file list...');
         await onSuccess();
+
+        console.log('Closing modal...');
+        resetForm();
         onClose();
       } else {
         toast.error('Aucun fichier n\'a pu être téléchargé');

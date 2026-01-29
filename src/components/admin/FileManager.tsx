@@ -140,6 +140,13 @@ const FileManager: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const isRecentFile = (createdAt: string) => {
+    const fileDate = new Date(createdAt);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - fileDate.getTime()) / (1000 * 60);
+    return diffMinutes < 5; // Files created in the last 5 minutes
+  };
+
   const filteredFiles = files.filter(file => {
     const matchesSearch = file.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          file.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -180,7 +187,39 @@ const FileManager: React.FC = () => {
   };
 
   const handleUploadSuccess = async () => {
+    console.log('=== UPLOAD SUCCESS CALLBACK - REFRESHING FILES ===');
+    setRefreshing(true);
+
+    // Wait a moment to ensure database has fully committed
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Force a fresh fetch from database
     await fetchFiles();
+
+    // Wait and fetch one more time to be absolutely sure
+    await new Promise(resolve => setTimeout(resolve, 700));
+
+    console.log('Fetching files one more time to ensure latest data...');
+    const { data: latestFiles, error } = await supabase
+      .from('static_files')
+      .select(`
+        *,
+        category:file_categories(*)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error && latestFiles) {
+      console.log(`✅ Final fetch: Found ${latestFiles.length} files total`);
+      setFiles(latestFiles);
+
+      // Show confirmation with file count
+      toast.success(`Liste actualisée - ${latestFiles.length} fichier(s) au total`, {
+        duration: 3000
+      });
+    }
+
+    setRefreshing(false);
+    console.log('=== FILES REFRESHED ===');
   };
 
   const handleRefresh = async () => {
@@ -584,13 +623,13 @@ const FileManager: React.FC = () => {
                     className={`relative group border-2 rounded-lg p-3 cursor-pointer transition-all ${
                       selectedFiles.includes(file.id)
                         ? 'border-primary-500 bg-primary-50'
-                        : index === 0
+                        : isRecentFile(file.created_at)
                         ? 'border-green-500 bg-green-50'
                         : 'border-gray-200 hover:border-primary-300'
                     }`}
                     onClick={() => toggleFileSelection(file.id)}
                   >
-                    {index === 0 && (
+                    {isRecentFile(file.created_at) && (
                       <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-10">
                         NOUVEAU
                       </div>
