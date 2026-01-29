@@ -50,19 +50,20 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      const cleanData = {
-        ...data,
-        image_url: data.image_url || null
-      };
-
-      console.log('Submitting news data:', cleanData);
+      console.log('Submitting news data:', data);
 
       if (initialData?.id) {
+        // Update using RPC function
         const { data: result, error } = await supabase
-          .from('news')
-          .update(cleanData)
-          .eq('id', initialData.id)
-          .select();
+          .rpc('update_news_as_admin', {
+            p_id: initialData.id,
+            p_title: data.title,
+            p_excerpt: data.excerpt,
+            p_content: data.content,
+            p_category: data.category,
+            p_image_url: data.image_url || null,
+            p_published: data.published
+          });
 
         if (error) {
           console.error('Update error:', error);
@@ -71,10 +72,16 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
         console.log('Update result:', result);
         toast.success('Actualité mise à jour avec succès');
       } else {
+        // Create using RPC function
         const { data: result, error } = await supabase
-          .from('news')
-          .insert([cleanData])
-          .select();
+          .rpc('create_news_as_admin', {
+            p_title: data.title,
+            p_excerpt: data.excerpt,
+            p_content: data.content,
+            p_category: data.category,
+            p_image_url: data.image_url || null,
+            p_published: data.published
+          });
 
         if (error) {
           console.error('Insert error:', error);
