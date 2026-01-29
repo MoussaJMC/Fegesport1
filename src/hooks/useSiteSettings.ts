@@ -43,7 +43,7 @@ export function useSiteSettings() {
       // Fallback to default settings if database fails
       setSettings({
         site_logo: {
-          main_logo: "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg",
+          main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
           alt_text: "FEGESPORT Logo",
           width: 48,
           height: 48,

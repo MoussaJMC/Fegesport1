@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
 
   // Get settings from database
   const logoSettings = getSetting('site_logo', {
-    main_logo: "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg",
+    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
     alt_text: "FEGESPORT Logo",
     width: 48,
     height: 48,
@@ -221,20 +221,27 @@ const HomePage: React.FC = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-secondary-900 via-secondary-900/90 to-secondary-900/80"></div>
         <div className="container-custom relative z-10 text-center pt-20">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <img 
-              src={logoSettings.main_logo}
-              alt={logoSettings.alt_text || "FEGESPORT Logo"}
-              className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6"
-              onError={(e) => {
-                e.currentTarget.src = "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg";
-              }}
-            />
+            {logoSettings.main_logo ? (
+              <img
+                src={logoSettings.main_logo}
+                alt={logoSettings.alt_text || "FEGESPORT Logo"}
+                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 object-cover"
+                onError={(e) => {
+                  console.error('Hero logo failed to load:', logoSettings.main_logo);
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 bg-primary-600 flex items-center justify-center">
+                <span className="text-white font-bold text-3xl sm:text-4xl">FGE</span>
+              </div>
+            )}
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
