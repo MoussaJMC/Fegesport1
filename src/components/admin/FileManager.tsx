@@ -89,7 +89,9 @@ const FileManager: React.FC = () => {
 
   const fetchFiles = async () => {
     try {
+      console.log('=== FETCHING FILES FROM DATABASE ===');
       setLoading(true);
+
       const { data, error } = await supabase
         .from('static_files')
         .select(`
@@ -98,14 +100,25 @@ const FileManager: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      console.log(`Loaded ${data?.length || 0} files from database`);
-      if (data && data.length > 0) {
-        console.log('Most recent file:', data[0]);
+      if (error) {
+        console.error('❌ Error fetching files:', error);
+        throw error;
       }
+
+      console.log(`✅ Loaded ${data?.length || 0} files from database`);
+
+      if (data && data.length > 0) {
+        console.log('Most recent 3 files:');
+        data.slice(0, 3).forEach((file, index) => {
+          console.log(`  ${index + 1}. ${file.original_filename} (${file.title}) - Created: ${file.created_at}`);
+        });
+      } else {
+        console.log('⚠️ No files found in database');
+      }
+
       setFiles(data || []);
     } catch (error) {
-      console.error('Error fetching files:', error);
+      console.error('❌ Error fetching files:', error);
       toast.error('Erreur lors du chargement des fichiers');
     } finally {
       setLoading(false);
