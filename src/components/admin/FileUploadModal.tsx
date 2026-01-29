@@ -418,7 +418,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 required
               >
                 <option value="">Sélectionner une catégorie</option>
-                {categories.map(category => (
+                {categories?.map(category => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
