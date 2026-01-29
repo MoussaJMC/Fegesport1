@@ -183,26 +183,10 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         throw new Error('Vous devez être connecté pour télécharger des fichiers');
       }
 
-      // Get current user info
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-
-      if (userError) {
-        console.error('Error getting user:', userError);
-        throw new Error(`Erreur d'authentification: ${userError.message}`);
-      }
-
-      if (!currentUser) {
-        throw new Error('Utilisateur non trouvé');
-      }
-
       // Check admin status
-      const userRole = currentUser.user_metadata?.role;
-      if (userRole !== 'admin') {
-        throw new Error(`Privilèges insuffisants. Votre rôle: ${userRole || 'aucun'}`);
+      if (!isAdmin) {
+        throw new Error('Vous avez besoin de privilèges administrateur pour télécharger des fichiers');
       }
-
-      let successCount = 0;
-      let failCount = 0;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -235,50 +219,42 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             file_size: file.size,
             category_id: formData.category_id,
             title: formData.title || file.name.split('.')[0],
-            alt_text: formData.alt_text || '',
-            description: formData.description || '',
+            alt_text: formData.alt_text,
+            description: formData.description,
             tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
             width: dimensions?.width,
             height: dimensions?.height,
             is_public: formData.is_public,
             is_featured: formData.is_featured,
-            uploaded_by: currentUser.id
+            uploaded_by: user?.id
           };
 
           const { error: insertError } = await supabase
             .from('static_files')
-            .insert([fileData])
-            .select();
+            .insert([fileData]);
 
           if (insertError) {
             console.error('Database insert error:', insertError);
-            throw new Error(`Échec d'insertion DB: ${insertError.message}`);
+            throw new Error(`Database insert failed: ${insertError.message}`);
           }
 
           progress[file.name] = 100;
           setUploadProgress({ ...progress });
-          successCount++;
         } catch (fileError: any) {
           console.error(`Error processing file ${file.name}:`, fileError);
-          toast.error(`Erreur avec ${file.name}: ${fileError.message}`);
-          failCount++;
+          toast.error(`Erreur avec le fichier ${file.name}: ${fileError.message}`);
+          // Continue with other files
         }
       }
 
-      if (successCount > 0) {
-        toast.success(`${successCount} fichier(s) téléchargé(s) avec succès!`);
-        resetForm();
-        onClose();
-
-        // Refresh file list after closing modal
-        setTimeout(() => onSuccess(), 100);
-      } else {
-        toast.error('Aucun fichier n\'a pu être téléchargé');
-      }
+      toast.success(`${files.length} fichier(s) téléchargé(s) avec succès`);
+      onSuccess();
+      onClose();
+      resetForm();
     } catch (error: any) {
-      console.error('Upload error:', error);
+      console.error('Error uploading files:', error);
       setError(error.message);
-      toast.error(`Erreur: ${error.message}`);
+      toast.error(`Erreur lors du téléchargement: ${error.message}`);
     } finally {
       setUploading(false);
     }
