@@ -53,6 +53,7 @@ const FileManager: React.FC = () => {
   useEffect(() => {
     fetchCategories();
     fetchFiles();
+    checkOrphanedFiles();
 
     // Setup real-time subscription
     const subscription = supabase
@@ -174,6 +175,48 @@ const FileManager: React.FC = () => {
     await fetchFiles();
     setRefreshing(false);
     toast.success('Liste des fichiers actualisée');
+  };
+
+  const checkOrphanedFiles = async () => {
+    try {
+      console.log('Checking for orphaned files in storage...');
+
+      // Get all files from storage
+      const { data: storageFiles, error: storageError } = await supabase.storage
+        .from('static-files')
+        .list('uploads');
+
+      if (storageError) {
+        console.error('Storage error:', storageError);
+        return;
+      }
+
+      console.log(`Found ${storageFiles?.length || 0} files in storage`);
+
+      // Get all file URLs from database
+      const { data: dbFiles } = await supabase
+        .from('static_files')
+        .select('file_url');
+
+      const dbFileNames = dbFiles?.map(f => {
+        const url = new URL(f.file_url);
+        return url.pathname.split('/').pop();
+      }) || [];
+
+      // Find orphaned files
+      const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
+
+      console.log(`Found ${orphaned.length} orphaned files:`, orphaned);
+
+      if (orphaned.length > 0) {
+        toast.warning(`${orphaned.length} fichier(s) dans le storage sans entrée dans la base de données`);
+      } else {
+        toast.success('Aucun fichier orphelin trouvé');
+      }
+    } catch (error: any) {
+      console.error('Error checking orphaned files:', error);
+      toast.error('Erreur lors de la vérification');
+    }
   };
 
   const hasActiveFilters = searchTerm || selectedCategory;
