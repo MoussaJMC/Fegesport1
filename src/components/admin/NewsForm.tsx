@@ -28,6 +28,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [contentHeight, setContentHeight] = useState<number>(200);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [diagnosticInfo, setDiagnosticInfo] = useState<any>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
@@ -50,9 +52,15 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      // DIAGNOSTIC: Vérifier le JWT
+      setErrorDetails(null);
+
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: jwtData } = await supabase.rpc('get_jwt_claims');
-      console.log('=== JWT CLAIMS ===', jwtData);
+
+      setDiagnosticInfo({
+        user: user ? { id: user.id, email: user.email } : null,
+        jwtClaims: jwtData
+      });
 
       const cleanData = {
         title: data.title,
@@ -63,8 +71,6 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
         published: data.published,
       };
 
-      console.log('Submitting news data:', cleanData);
-
       if (initialData?.id) {
         const { data: result, error } = await supabase
           .from('news')
@@ -73,10 +79,14 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           .select();
 
         if (error) {
-          console.error('Update error:', error);
+          setErrorDetails(JSON.stringify({
+            operation: 'UPDATE',
+            error: error,
+            data: cleanData,
+            user: user?.email
+          }, null, 2));
           throw error;
         }
-        console.log('Update result:', result);
         toast.success('Actualité mise à jour avec succès');
       } else {
         const { data: result, error } = await supabase
@@ -85,15 +95,18 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           .select();
 
         if (error) {
-          console.error('Insert error:', error);
+          setErrorDetails(JSON.stringify({
+            operation: 'INSERT',
+            error: error,
+            data: cleanData,
+            user: user?.email
+          }, null, 2));
           throw error;
         }
-        console.log('Insert result:', result);
         toast.success('Actualité créée avec succès');
       }
       onSuccess();
     } catch (error: any) {
-      console.error('Error saving news:', error);
       const errorMessage = error?.message || 'Une erreur est survenue';
       toast.error(`Erreur: ${errorMessage}`);
     }
@@ -115,6 +128,27 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {diagnosticInfo && (
+        <div className="bg-blue-50 border-2 border-blue-400 rounded-lg p-4">
+          <h3 className="text-lg font-bold text-blue-900 mb-2">Informations de diagnostic</h3>
+          <pre className="bg-white p-3 rounded text-xs overflow-auto max-h-40">
+            {JSON.stringify(diagnosticInfo, null, 2)}
+          </pre>
+        </div>
+      )}
+
+      {errorDetails && (
+        <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4">
+          <h3 className="text-lg font-bold text-red-900 mb-2">Erreur détaillée</h3>
+          <pre className="bg-white p-3 rounded text-xs overflow-auto max-h-60 text-red-800">
+            {errorDetails}
+          </pre>
+          <p className="text-sm text-red-700 mt-2">
+            Copiez ce message et envoyez-le pour obtenir de l'aide.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
           <div>
