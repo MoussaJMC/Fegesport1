@@ -219,6 +219,165 @@ const FileManager: React.FC = () => {
     }
   };
 
+  const testInsertPermissions = async () => {
+    try {
+      console.log('=== Testing Insert Permissions ===');
+
+      // Get current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      console.log('Current user:', currentUser);
+      console.log('User metadata:', currentUser?.user_metadata);
+      console.log('App metadata:', currentUser?.app_metadata);
+
+      // Test if categories exist
+      if (!categories || categories.length === 0) {
+        console.error('No categories available');
+        toast.error('Aucune catégorie disponible');
+        return;
+      }
+
+      // Create test data
+      const testData = {
+        filename: 'test_insert',
+        original_filename: 'test_insert.txt',
+        file_url: 'https://example.com/test.txt',
+        file_type: 'text/plain',
+        file_size: 100,
+        category_id: categories[0].id,
+        title: 'Test Insert',
+        is_public: true,
+        is_featured: false,
+        uploaded_by: currentUser?.id
+      };
+
+      console.log('Attempting to insert test data:', testData);
+
+      const { data, error } = await supabase
+        .from('static_files')
+        .insert([testData])
+        .select();
+
+      if (error) {
+        console.error('=== INSERT ERROR ===');
+        console.error('Code:', error.code);
+        console.error('Message:', error.message);
+        console.error('Details:', error.details);
+        console.error('Hint:', error.hint);
+        toast.error(`Erreur: ${error.message}`);
+      } else {
+        console.log('=== INSERT SUCCESS ===');
+        console.log('Inserted data:', data);
+        toast.success('Test d\'insertion réussi!');
+        await fetchFiles();
+      }
+    } catch (error: any) {
+      console.error('=== EXCEPTION ===', error);
+      toast.error(`Exception: ${error.message}`);
+    }
+  };
+
+  const recoverOrphanedFiles = async () => {
+    if (!confirm('Voulez-vous enregistrer tous les fichiers orphelins dans la base de données?')) {
+      return;
+    }
+
+    try {
+      console.log('Recovering orphaned files...');
+
+      // Get current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      if (!currentUser) {
+        toast.error('Vous devez être connecté');
+        return;
+      }
+
+      // Get all files from storage
+      const { data: storageFiles, error: storageError } = await supabase.storage
+        .from('static-files')
+        .list('uploads');
+
+      if (storageError) {
+        console.error('Storage error:', storageError);
+        toast.error('Erreur lors de l\'accès au storage');
+        return;
+      }
+
+      // Get all file URLs from database
+      const { data: dbFiles } = await supabase
+        .from('static_files')
+        .select('file_url');
+
+      const dbFileNames = dbFiles?.map(f => {
+        const url = new URL(f.file_url);
+        return url.pathname.split('/').pop();
+      }) || [];
+
+      // Find orphaned files
+      const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
+
+      if (orphaned.length === 0) {
+        toast.info('Aucun fichier orphelin à récupérer');
+        return;
+      }
+
+      console.log(`Recovering ${orphaned.length} orphaned files...`);
+
+      // Get first category as default
+      const defaultCategory = categories[0]?.id;
+
+      if (!defaultCategory) {
+        toast.error('Aucune catégorie disponible');
+        return;
+      }
+
+      let recovered = 0;
+      for (const file of orphaned) {
+        try {
+          const { data: { publicUrl } } = supabase.storage
+            .from('static-files')
+            .getPublicUrl(`uploads/${file.name}`);
+
+          const fileData = {
+            filename: file.name.split('.')[0],
+            original_filename: file.name,
+            file_url: publicUrl,
+            file_type: file.metadata?.mimetype || 'application/octet-stream',
+            file_size: file.metadata?.size || 0,
+            category_id: defaultCategory,
+            title: file.name.split('.')[0],
+            is_public: true,
+            is_featured: false,
+            uploaded_by: currentUser.id
+          };
+
+          const { error: insertError } = await supabase
+            .from('static_files')
+            .insert([fileData]);
+
+          if (insertError) {
+            console.error(`Failed to recover ${file.name}:`, insertError);
+          } else {
+            recovered++;
+            console.log(`Recovered ${file.name}`);
+          }
+        } catch (error) {
+          console.error(`Error recovering ${file.name}:`, error);
+        }
+      }
+
+      if (recovered > 0) {
+        toast.success(`${recovered} fichier(s) récupéré(s) avec succès!`);
+        await fetchFiles();
+      } else {
+        toast.error('Aucun fichier n\'a pu être récupéré');
+      }
+    } catch (error: any) {
+      console.error('Error recovering orphaned files:', error);
+      toast.error('Erreur lors de la récupération');
+    }
+  };
+
   const hasActiveFilters = searchTerm || selectedCategory;
   const hasFiles = files.length > 0;
   const hasFilteredFiles = filteredFiles.length > 0;
@@ -245,6 +404,20 @@ const FileManager: React.FC = () => {
           <p className="text-gray-600">Gérer les images, documents et autres fichiers statiques</p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={testInsertPermissions}
+            className="btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 text-sm"
+            title="Tester les permissions d'insertion"
+          >
+            Test Insert
+          </button>
+          <button
+            onClick={recoverOrphanedFiles}
+            className="btn bg-orange-100 hover:bg-orange-200 text-orange-700 text-sm"
+            title="Récupérer les fichiers orphelins"
+          >
+            Récupérer
+          </button>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
