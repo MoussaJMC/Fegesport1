@@ -26,8 +26,6 @@ interface NewsFormProps {
 
 const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const [contentHeight, setContentHeight] = useState<number>(200);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [diagnosticInfo, setDiagnosticInfo] = useState<any>(null);
 
@@ -42,13 +40,6 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
       published: initialData?.published || false,
     },
   });
-
-  // Auto-resize content textarea
-  React.useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight);
-    }
-  }, [watch('content')]);
 
   const onSubmit = async (data: NewsFormData) => {
     try {
@@ -265,17 +256,9 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           </label>
           <textarea
             {...register('content')}
-            ref={contentRef}
-            style={{ height: `${contentHeight}px` }}
+            rows={10}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
             placeholder="Contenu détaillé de l'actualité"
-            onChange={(e) => {
-              if (contentRef.current) {
-                contentRef.current.style.height = 'auto';
-                contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
-                setContentHeight(contentRef.current.scrollHeight);
-              }
-            }}
           />
           {errors.content && (
             <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
