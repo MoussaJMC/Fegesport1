@@ -23,7 +23,7 @@ const EventPage: React.FC = () => {
           .from('events')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching event from Supabase:', error);

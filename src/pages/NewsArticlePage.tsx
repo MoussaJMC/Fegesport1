@@ -38,7 +38,7 @@ const NewsArticlePage: React.FC = () => {
           .from('news')
           .select('*')
           .eq('id', id)
-          .single();
+          .maybeSingle();
         
         if (error) {
           console.error('Error fetching article from Supabase:', error);

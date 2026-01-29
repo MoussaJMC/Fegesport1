@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
         .from('pages')
         .select('id')
         .eq('slug', 'home')
-        .single();
+        .maybeSingle();
 
       if (pageError) {
         console.error('Error fetching home page:', pageError);
