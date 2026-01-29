@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { 
-  Upload, Search, Filter, Grid, List, Eye, Download, 
+import {
+  Upload, Search, Filter, Grid, List, Eye, Download,
   Trash2, Edit, Plus, Image, FileText, Video, Music,
-  Shield, Layout, User, Archive, X, Copy, ExternalLink
+  Shield, Layout, User, Archive, X, Copy, ExternalLink, RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FileUploadModal from './FileUploadModal';
@@ -48,10 +48,27 @@ const FileManager: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [previewFile, setPreviewFile] = useState<StaticFile | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchCategories();
     fetchFiles();
+
+    // Setup real-time subscription
+    const subscription = supabase
+      .channel('static_files_changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'static_files' },
+        () => {
+          console.log('File change detected, refreshing...');
+          fetchFiles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchCategories = async () => {
@@ -81,6 +98,10 @@ const FileManager: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log(`Loaded ${data?.length || 0} files from database`);
+      if (data && data.length > 0) {
+        console.log('Most recent file:', data[0]);
+      }
       setFiles(data || []);
     } catch (error) {
       console.error('Error fetching files:', error);
@@ -148,6 +169,13 @@ const FileManager: React.FC = () => {
     await fetchFiles();
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchFiles();
+    setRefreshing(false);
+    toast.success('Liste des fichiers actualisée');
+  };
+
   const hasActiveFilters = searchTerm || selectedCategory;
   const hasFiles = files.length > 0;
   const hasFilteredFiles = filteredFiles.length > 0;
@@ -165,16 +193,31 @@ const FileManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestionnaire de Fichiers</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Gestionnaire de Fichiers
+            <span className="ml-3 text-base font-normal text-gray-500">
+              ({filteredFiles.length} fichier{filteredFiles.length !== 1 ? 's' : ''} affiché{filteredFiles.length !== 1 ? 's' : ''})
+            </span>
+          </h1>
           <p className="text-gray-600">Gérer les images, documents et autres fichiers statiques</p>
         </div>
-        <button
-          onClick={() => setShowUploadModal(true)}
-          className="btn bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          Télécharger
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="btn bg-gray-100 hover:bg-gray-200 text-gray-700"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            Actualiser
+          </button>
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="btn bg-primary-600 hover:bg-primary-700 text-white"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Télécharger
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -274,12 +317,19 @@ const FileManager: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                     className={`relative group border-2 rounded-lg p-3 cursor-pointer transition-all ${
-                      selectedFiles.includes(file.id) 
-                        ? 'border-primary-500 bg-primary-50' 
+                      selectedFiles.includes(file.id)
+                        ? 'border-primary-500 bg-primary-50'
+                        : index === 0
+                        ? 'border-green-500 bg-green-50'
                         : 'border-gray-200 hover:border-primary-300'
                     }`}
                     onClick={() => toggleFileSelection(file.id)}
                   >
+                    {index === 0 && (
+                      <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-10">
+                        NOUVEAU
+                      </div>
+                    )}
                     <div className="aspect-square mb-2 bg-gray-100 rounded-lg overflow-hidden">
                       {file.file_type.startsWith('image/') ? (
                         <img 
