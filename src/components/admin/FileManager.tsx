@@ -188,37 +188,11 @@ const FileManager: React.FC = () => {
 
   const handleUploadSuccess = async () => {
     console.log('=== UPLOAD SUCCESS CALLBACK - REFRESHING FILES ===');
-    setRefreshing(true);
 
-    // Wait a moment to ensure database has fully committed
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // Force a fresh fetch from database
+    // Simple refresh with a small delay for database propagation
+    await new Promise(resolve => setTimeout(resolve, 200));
     await fetchFiles();
 
-    // Wait and fetch one more time to be absolutely sure
-    await new Promise(resolve => setTimeout(resolve, 700));
-
-    console.log('Fetching files one more time to ensure latest data...');
-    const { data: latestFiles, error } = await supabase
-      .from('static_files')
-      .select(`
-        *,
-        category:file_categories(*)
-      `)
-      .order('created_at', { ascending: false });
-
-    if (!error && latestFiles) {
-      console.log(`✅ Final fetch: Found ${latestFiles.length} files total`);
-      setFiles(latestFiles);
-
-      // Show confirmation with file count
-      toast.success(`Liste actualisée - ${latestFiles.length} fichier(s) au total`, {
-        duration: 3000
-      });
-    }
-
-    setRefreshing(false);
     console.log('=== FILES REFRESHED ===');
   };
 
