@@ -26,8 +26,8 @@ interface NewsFormProps {
 
 const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null);
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
-  const [diagnosticInfo, setDiagnosticInfo] = useState<any>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [contentHeight, setContentHeight] = useState<number>(200);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setValue } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
@@ -41,26 +41,21 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
     },
   });
 
+  // Auto-resize content textarea
+  React.useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [watch('content')]);
+
   const onSubmit = async (data: NewsFormData) => {
     try {
-      setErrorDetails(null);
-
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data: jwtData } = await supabase.rpc('get_jwt_claims');
-
-      setDiagnosticInfo({
-        user: user ? { id: user.id, email: user.email } : null,
-        jwtClaims: jwtData
-      });
-
       const cleanData = {
-        title: data.title,
-        excerpt: data.excerpt,
-        content: data.content,
-        category: data.category,
-        image_url: data.image_url || null,
-        published: data.published,
+        ...data,
+        image_url: data.image_url || null
       };
+
+      console.log('Submitting news data:', cleanData);
 
       if (initialData?.id) {
         const { data: result, error } = await supabase
@@ -70,14 +65,10 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           .select();
 
         if (error) {
-          setErrorDetails(JSON.stringify({
-            operation: 'UPDATE',
-            error: error,
-            data: cleanData,
-            user: user?.email
-          }, null, 2));
+          console.error('Update error:', error);
           throw error;
         }
+        console.log('Update result:', result);
         toast.success('Actualité mise à jour avec succès');
       } else {
         const { data: result, error } = await supabase
@@ -86,18 +77,15 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           .select();
 
         if (error) {
-          setErrorDetails(JSON.stringify({
-            operation: 'INSERT',
-            error: error,
-            data: cleanData,
-            user: user?.email
-          }, null, 2));
+          console.error('Insert error:', error);
           throw error;
         }
+        console.log('Insert result:', result);
         toast.success('Actualité créée avec succès');
       }
       onSuccess();
     } catch (error: any) {
+      console.error('Error saving news:', error);
       const errorMessage = error?.message || 'Une erreur est survenue';
       toast.error(`Erreur: ${errorMessage}`);
     }
@@ -119,27 +107,6 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {diagnosticInfo && (
-        <div className="bg-blue-50 border-2 border-blue-400 rounded-lg p-4">
-          <h3 className="text-lg font-bold text-blue-900 mb-2">Informations de diagnostic</h3>
-          <pre className="bg-white p-3 rounded text-xs overflow-auto max-h-40">
-            {JSON.stringify(diagnosticInfo, null, 2)}
-          </pre>
-        </div>
-      )}
-
-      {errorDetails && (
-        <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4">
-          <h3 className="text-lg font-bold text-red-900 mb-2">Erreur détaillée</h3>
-          <pre className="bg-white p-3 rounded text-xs overflow-auto max-h-60 text-red-800">
-            {errorDetails}
-          </pre>
-          <p className="text-sm text-red-700 mt-2">
-            Copiez ce message et envoyez-le pour obtenir de l'aide.
-          </p>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
           <div>
@@ -256,9 +223,17 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
           </label>
           <textarea
             {...register('content')}
-            rows={10}
+            ref={contentRef}
+            style={{ height: `${contentHeight}px` }}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
             placeholder="Contenu détaillé de l'actualité"
+            onChange={(e) => {
+              if (contentRef.current) {
+                contentRef.current.style.height = 'auto';
+                contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
+                setContentHeight(contentRef.current.scrollHeight);
+              }
+            }}
           />
           {errors.content && (
             <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>

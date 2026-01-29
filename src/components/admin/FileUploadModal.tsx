@@ -229,24 +229,14 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             uploaded_by: user?.id
           };
 
-          console.log('Attempting to insert file data:', fileData);
-          console.log('Current user:', user);
-          console.log('User metadata:', user?.user_metadata);
-
-          const { data: insertedData, error: insertError } = await supabase
+          const { error: insertError } = await supabase
             .from('static_files')
-            .insert([fileData])
-            .select();
+            .insert([fileData]);
 
           if (insertError) {
             console.error('Database insert error:', insertError);
-            console.error('Error code:', insertError.code);
-            console.error('Error details:', insertError.details);
-            console.error('Error hint:', insertError.hint);
             throw new Error(`Database insert failed: ${insertError.message}`);
           }
-
-          console.log('File successfully inserted into database:', insertedData);
 
           progress[file.name] = 100;
           setUploadProgress({ ...progress });
@@ -258,11 +248,9 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       }
 
       toast.success(`${files.length} fichier(s) téléchargé(s) avec succès`);
-      resetForm();
-
-      // Call onSuccess and wait for it to complete before closing
-      await onSuccess();
+      onSuccess();
       onClose();
+      resetForm();
     } catch (error: any) {
       console.error('Error uploading files:', error);
       setError(error.message);
@@ -358,6 +346,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             <button
               onClick={() => fileInputRef.current?.click()}
               className="btn bg-primary-600 hover:bg-primary-700 text-white"
+              disabled={!isAuthenticated || !isAdmin}
             >
               Sélectionner des fichiers
             </button>
@@ -428,9 +417,10 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 required
+                disabled={!isAuthenticated || !isAdmin}
               >
                 <option value="">Sélectionner une catégorie</option>
-                {categories?.map(category => (
+                {categories.map(category => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -448,6 +438,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Titre du fichier (optionnel)"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -461,6 +452,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, alt_text: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Description pour l'accessibilité"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -474,6 +466,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Description du fichier"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -487,6 +480,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Séparez les tags par des virgules"
+                disabled={!isAuthenticated || !isAdmin}
               />
             </div>
 
@@ -497,6 +491,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                   checked={formData.is_public}
                   onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
                   className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  disabled={!isAuthenticated || !isAdmin}
                 />
                 <span className="ml-2 text-sm text-gray-700">Public</span>
               </label>
@@ -507,6 +502,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                   checked={formData.is_featured}
                   onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
                   className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  disabled={!isAuthenticated || !isAdmin}
                 />
                 <span className="ml-2 text-sm text-gray-700">Fichier vedette</span>
               </label>
@@ -524,7 +520,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             </button>
             <button
               onClick={handleUpload}
-              disabled={uploading || files.length === 0}
+              disabled={uploading || files.length === 0 || !isAuthenticated || !isAdmin}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading ? 'Téléchargement...' : 'Télécharger'}
