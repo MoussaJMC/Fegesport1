@@ -30,12 +30,19 @@ const Navbar: React.FC = () => {
 
   // Get settings from database
   const logoSettings = getSetting('site_logo', {
-    main_logo: "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg",
+    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
     alt_text: "FEGESPORT Logo",
     width: 48,
     height: 48,
     link: "/"
   });
+
+  // Debug logo loading
+  useEffect(() => {
+    if (!settingsLoading && logoSettings) {
+      console.log('Logo settings loaded:', logoSettings);
+    }
+  }, [settingsLoading, logoSettings]);
 
   const navigationSettings = getSetting('main_navigation', {
     brand_text: "FEGESPORT",
@@ -159,20 +166,30 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to={logoSettings.link || "/"} className="flex items-center space-x-2">
-            {logoSettings.main_logo && (
-              <img 
+            {logoSettings.main_logo ? (
+              <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "Logo"}
-                className="rounded"
-                style={{ 
-                  width: logoSettings.width || 48, 
-                  height: logoSettings.height || 48 
+                className="rounded object-cover"
+                style={{
+                  width: logoSettings.width || 48,
+                  height: logoSettings.height || 48
                 }}
                 onError={(e) => {
-                  // Fallback to default logo if image fails to load
-                  e.currentTarget.src = "https://images.pexels.com/photos/7915559/pexels-photo-7915559.jpeg";
+                  console.error('Logo failed to load:', logoSettings.main_logo);
+                  e.currentTarget.style.display = 'none';
                 }}
               />
+            ) : (
+              <div
+                className="bg-primary-600 rounded flex items-center justify-center"
+                style={{
+                  width: logoSettings.width || 48,
+                  height: logoSettings.height || 48
+                }}
+              >
+                <span className="text-white font-bold text-xl">FGE</span>
+              </div>
             )}
             <span className={`text-xl md:text-2xl font-bold ${scrolled ? 'text-primary-500' : 'text-white'}`}>
               {navigationSettings.brand_text || "FEGESPORT"}
