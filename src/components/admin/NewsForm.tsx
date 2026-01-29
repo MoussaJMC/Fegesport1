@@ -50,30 +50,44 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSuccess, onCancel })
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      // Clean up empty image_url
       const cleanData = {
         ...data,
         image_url: data.image_url || null
       };
 
+      console.log('Submitting news data:', cleanData);
+
       if (initialData?.id) {
-        const { error } = await supabase
+        const { data: result, error } = await supabase
           .from('news')
           .update(cleanData)
-          .eq('id', initialData.id);
-        if (error) throw error;
+          .eq('id', initialData.id)
+          .select();
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        console.log('Update result:', result);
         toast.success('Actualité mise à jour avec succès');
       } else {
-        const { error } = await supabase
+        const { data: result, error } = await supabase
           .from('news')
-          .insert([cleanData]);
-        if (error) throw error;
+          .insert([cleanData])
+          .select();
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        console.log('Insert result:', result);
         toast.success('Actualité créée avec succès');
       }
       onSuccess();
     } catch (error: any) {
       console.error('Error saving news:', error);
-      toast.error('Une erreur est survenue');
+      const errorMessage = error?.message || 'Une erreur est survenue';
+      toast.error(`Erreur: ${errorMessage}`);
     }
   };
 

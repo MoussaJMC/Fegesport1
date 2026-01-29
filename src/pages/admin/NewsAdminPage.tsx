@@ -31,10 +31,34 @@ const NewsAdminPage = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [copied, setCopied] = useState<string | null>(null);
   const [previewNews, setPreviewNews] = useState<NewsItem | null>(null);
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [diagnosticInfo, setDiagnosticInfo] = useState<any>(null);
 
   useEffect(() => {
     fetchNews();
+    checkAdminStatus();
   }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userMetadata = user?.user_metadata;
+
+      const { data: testResult, error: testError } = await supabase
+        .rpc('is_admin');
+
+      setDiagnosticInfo({
+        user: user ? { id: user.id, email: user.email } : null,
+        metadata: userMetadata,
+        isAdminResult: testResult,
+        error: testError
+      });
+
+      console.log('Admin status:', { user, metadata: userMetadata, isAdminResult: testResult });
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
 
   const fetchNews = async () => {
     try {
@@ -148,17 +172,35 @@ const NewsAdminPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">Gestion des Actualités</h1>
           <p className="text-gray-600">Gérer les actualités et publications</p>
         </div>
-        <button
-          onClick={() => {
-            setEditingNews(null);
-            setShowForm(true);
-          }}
-          className="btn bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvelle Actualité
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowDiagnostic(!showDiagnostic)}
+            className="btn bg-gray-600 hover:bg-gray-700 text-white"
+          >
+            Diagnostic
+          </button>
+          <button
+            onClick={() => {
+              setEditingNews(null);
+              setShowForm(true);
+            }}
+            className="btn bg-primary-600 hover:bg-primary-700 text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nouvelle Actualité
+          </button>
+        </div>
       </div>
+
+      {/* Diagnostic Panel */}
+      {showDiagnostic && diagnosticInfo && (
+        <div className="bg-white p-4 rounded-lg shadow border-2 border-yellow-400">
+          <h3 className="text-lg font-bold mb-2">Diagnostic d'authentification</h3>
+          <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto">
+            {JSON.stringify(diagnosticInfo, null, 2)}
+          </pre>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
