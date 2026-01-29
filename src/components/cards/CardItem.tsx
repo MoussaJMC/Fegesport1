@@ -44,12 +44,7 @@ const CardItem: React.FC<CardProps> = ({ id, title, content, imageUrl, category,
   };
 
   const getDefaultLink = () => {
-    switch (category) {
-      case 'communiqué': return `/news/${id}`;
-      case 'compétition': return `/events/${id}`;
-      case 'partenariat': return `/partners`;
-      default: return '#';
-    }
+    return `/card/${id}`;
   };
 
   const finalLinkTo = linkTo || getDefaultLink();
