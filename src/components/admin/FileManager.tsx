@@ -179,7 +179,7 @@ const FileManager: React.FC = () => {
 
   const checkOrphanedFiles = async () => {
     try {
-      console.log('Checking for orphaned files in storage...');
+      console.log('=== CHECKING FOR ORPHANED FILES ===');
 
       // Get all files from storage
       const { data: storageFiles, error: storageError } = await supabase.storage
@@ -188,28 +188,28 @@ const FileManager: React.FC = () => {
 
       if (storageError) {
         console.error('Storage error:', storageError);
+        toast.error('Erreur lors de l\'accès au storage');
         return;
       }
 
-      console.log(`Found ${storageFiles?.length || 0} files in storage`);
+      console.log(`Storage files (${storageFiles?.length || 0}):`, storageFiles?.map(f => f.name));
 
       // Get all file URLs from database
       const { data: dbFiles } = await supabase
         .from('static_files')
-        .select('file_url');
+        .select('original_filename, file_url');
 
-      const dbFileNames = dbFiles?.map(f => {
-        const url = new URL(f.file_url);
-        return url.pathname.split('/').pop();
-      }) || [];
+      console.log(`Database files (${dbFiles?.length || 0}):`, dbFiles?.map(f => f.original_filename));
+
+      const dbFileNames = dbFiles?.map(f => f.original_filename) || [];
 
       // Find orphaned files
       const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
 
-      console.log(`Found ${orphaned.length} orphaned files:`, orphaned);
+      console.log(`Orphaned files (${orphaned.length}):`, orphaned.map(f => f.name));
 
       if (orphaned.length > 0) {
-        toast.warning(`${orphaned.length} fichier(s) dans le storage sans entrée dans la base de données`);
+        toast.warning(`${orphaned.length} fichier(s) orphelin(s) trouvé(s): ${orphaned.map(f => f.name).join(', ')}`);
       } else {
         toast.success('Aucun fichier orphelin trouvé');
       }
@@ -282,7 +282,7 @@ const FileManager: React.FC = () => {
     }
 
     try {
-      console.log('Recovering orphaned files...');
+      console.log('=== RECOVERING ORPHANED FILES ===');
 
       // Get current user
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -291,6 +291,8 @@ const FileManager: React.FC = () => {
         toast.error('Vous devez être connecté');
         return;
       }
+
+      console.log('Current user:', currentUser.id);
 
       // Get all files from storage
       const { data: storageFiles, error: storageError } = await supabase.storage
@@ -303,15 +305,16 @@ const FileManager: React.FC = () => {
         return;
       }
 
+      console.log(`Found ${storageFiles?.length || 0} files in storage:`, storageFiles);
+
       // Get all file URLs from database
       const { data: dbFiles } = await supabase
         .from('static_files')
-        .select('file_url');
+        .select('file_url, original_filename');
 
-      const dbFileNames = dbFiles?.map(f => {
-        const url = new URL(f.file_url);
-        return url.pathname.split('/').pop();
-      }) || [];
+      console.log(`Found ${dbFiles?.length || 0} files in database:`, dbFiles);
+
+      const dbFileNames = dbFiles?.map(f => f.original_filename) || [];
 
       // Find orphaned files
       const orphaned = storageFiles?.filter(f => !dbFileNames.includes(f.name)) || [];
@@ -321,7 +324,7 @@ const FileManager: React.FC = () => {
         return;
       }
 
-      console.log(`Recovering ${orphaned.length} orphaned files...`);
+      console.log(`Found ${orphaned.length} orphaned files to recover:`, orphaned);
 
       // Get first category as default
       const defaultCategory = categories[0]?.id;
@@ -331,50 +334,76 @@ const FileManager: React.FC = () => {
         return;
       }
 
+      console.log('Using default category:', defaultCategory);
+
       let recovered = 0;
+      let failed = 0;
+
       for (const file of orphaned) {
         try {
           const { data: { publicUrl } } = supabase.storage
             .from('static-files')
             .getPublicUrl(`uploads/${file.name}`);
 
+          console.log(`Processing ${file.name}, URL: ${publicUrl}`);
+
+          // Get mime type from extension
+          const ext = file.name.split('.').pop()?.toLowerCase();
+          const mimeTypes: { [key: string]: string } = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'pdf': 'application/pdf',
+            'doc': 'application/msword',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'txt': 'text/plain'
+          };
+
           const fileData = {
-            filename: file.name.split('.')[0],
+            filename: file.name.replace(/\.[^/.]+$/, ''),
             original_filename: file.name,
             file_url: publicUrl,
-            file_type: file.metadata?.mimetype || 'application/octet-stream',
-            file_size: file.metadata?.size || 0,
+            file_type: mimeTypes[ext || ''] || 'application/octet-stream',
+            file_size: 0,
             category_id: defaultCategory,
-            title: file.name.split('.')[0],
+            title: file.name.replace(/\.[^/.]+$/, ''),
             is_public: true,
             is_featured: false,
             uploaded_by: currentUser.id
           };
 
-          const { error: insertError } = await supabase
+          console.log('Inserting file data:', fileData);
+
+          const { data: insertedData, error: insertError } = await supabase
             .from('static_files')
-            .insert([fileData]);
+            .insert([fileData])
+            .select();
 
           if (insertError) {
-            console.error(`Failed to recover ${file.name}:`, insertError);
+            console.error(`❌ Failed to recover ${file.name}:`, insertError);
+            failed++;
           } else {
+            console.log(`✅ Successfully recovered ${file.name}`, insertedData);
             recovered++;
-            console.log(`Recovered ${file.name}`);
           }
         } catch (error) {
-          console.error(`Error recovering ${file.name}:`, error);
+          console.error(`❌ Exception recovering ${file.name}:`, error);
+          failed++;
         }
       }
+
+      console.log(`=== RECOVERY COMPLETE: ${recovered} succeeded, ${failed} failed ===`);
 
       if (recovered > 0) {
         toast.success(`${recovered} fichier(s) récupéré(s) avec succès!`);
         await fetchFiles();
       } else {
-        toast.error('Aucun fichier n\'a pu être récupéré');
+        toast.error(`Échec de la récupération. Erreurs: ${failed}`);
       }
     } catch (error: any) {
       console.error('Error recovering orphaned files:', error);
-      toast.error('Erreur lors de la récupération');
+      toast.error(`Erreur: ${error.message}`);
     }
   };
 
@@ -404,6 +433,13 @@ const FileManager: React.FC = () => {
           <p className="text-gray-600">Gérer les images, documents et autres fichiers statiques</p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={checkOrphanedFiles}
+            className="btn bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm"
+            title="Vérifier les fichiers orphelins"
+          >
+            Diagnostic
+          </button>
           <button
             onClick={testInsertPermissions}
             className="btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 text-sm"
