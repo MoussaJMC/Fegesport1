@@ -1,113 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { FileText, Download, Book, Shield, Eye } from 'lucide-react';
+import { FileText, Download, Book, Shield, Eye, Image, File } from 'lucide-react';
 import PDFViewer from '../components/resources/PDFViewer';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
+
+interface FileCategory {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface StaticFile {
+  id: string;
+  title: string;
+  description: string;
+  file_url: string;
+  file_type: string;
+  file_size: number;
+  category_id: string;
+  original_filename: string;
+}
+
+interface GroupedFiles {
+  category: FileCategory;
+  files: StaticFile[];
+}
 
 const ResourcesPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [selectedPDF, setSelectedPDF] = useState<string | null>(null);
+  const [resources, setResources] = useState<GroupedFiles[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Updated resources with CORS-enabled PDF URL
-  const resources = [
-    {
-      category: t('resources.categories.official'),
-      items: [
-        {
-          title: 'Statuts de la FEGESPORT',
-          description: 'Document officiel détaillant la structure et le fonctionnement de la fédération',
-          type: 'PDF',
-          size: '2.1 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'Règlement Intérieur',
-          description: 'Règles et procédures internes de la FEGESPORT',
-          type: 'PDF',
-          size: '1.8 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'Code de Conduite',
-          description: 'Normes de comportement pour tous les membres',
-          type: 'PDF',
-          size: '1.2 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        }
-      ]
-    },
-    {
-      category: t('resources.categories.guides'),
-      items: [
-        {
-          title: 'Guide des Compétitions',
-          description: 'Procédures et règlements pour l\'organisation de tournois',
-          type: 'PDF',
-          size: '3.5 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'Manuel des Arbitres',
-          description: 'Guide complet pour l\'arbitrage des compétitions esport',
-          type: 'PDF',
-          size: '4.2 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'Guide du Streaming',
-          description: 'Bonnes pratiques pour la diffusion des événements',
-          type: 'PDF',
-          size: '2.8 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        }
-      ]
-    },
-    {
-      category: t('resources.categories.reports'),
-      items: [
-        {
-          title: 'Rapport Annuel 2024',
-          description: 'Bilan des activités et résultats de la FEGESPORT',
-          type: 'PDF',
-          size: '5.1 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'État de l\'Esport en Guinée',
-          description: 'Étude sur le développement de l\'esport national',
-          type: 'PDF',
-          size: '3.7 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        },
-        {
-          title: 'Impact Économique',
-          description: 'Analyse de l\'impact économique de l\'esport',
-          type: 'PDF',
-          size: '2.9 MB',
-          url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
-        }
-      ]
+  useEffect(() => {
+    loadResources();
+  }, []);
+
+  const loadResources = async () => {
+    try {
+      const { data: categories, error: catError } = await supabase
+        .from('file_categories')
+        .select('*')
+        .order('name');
+
+      if (catError) throw catError;
+
+      const { data: files, error: filesError } = await supabase
+        .from('static_files')
+        .select('*')
+        .eq('is_public', true)
+        .order('created_at', { ascending: false });
+
+      if (filesError) throw filesError;
+
+      const grouped = categories?.map(category => ({
+        category,
+        files: files?.filter(file => file.category_id === category.id) || []
+      })).filter(group => group.files.length > 0) || [];
+
+      setResources(grouped);
+    } catch (error) {
+      console.error('Error loading resources:', error);
+      toast.error(t('common.error'));
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const handleViewPDF = (url: string) => {
     setSelectedPDF(url);
   };
 
-  const handleDownloadPDF = (url: string, title: string) => {
+  const handleDownloadPDF = async (url: string, title: string, fileId: string) => {
     try {
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}.pdf`;
+      link.download = title;
+      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      await supabase.rpc('increment_download_count', { file_id: fileId });
+
+      toast.success(t('resources.download_started') || 'Téléchargement démarré');
     } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast.error(t('common.error'));
+      console.error('Error downloading file:', error);
     }
   };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+  };
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith('image/')) return <Image size={24} />;
+    if (fileType === 'application/pdf') return <FileText size={24} />;
+    return <File size={24} />;
+  };
+
+  const isPDF = (fileType: string) => fileType === 'application/pdf';
 
   return (
     <div className="pt-20">
@@ -151,52 +149,73 @@ const ResourcesPage: React.FC = () => {
       {/* Resources Grid */}
       <section className="section bg-gray-50">
         <div className="container-custom">
-          <div className="space-y-12">
-            {resources.map((category, index) => (
-              <div key={index}>
-                <h2 className="text-2xl font-bold mb-6">{category.category}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {category.items.map((item, itemIndex) => (
-                    <motion.div
-                      key={itemIndex}
-                      className="card p-6"
-                      whileHover={{ y: -5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className="flex items-start">
-                        <div className="bg-primary-100 p-3 rounded-lg flex-shrink-0">
-                          <FileText className="text-primary-600" size={24} />
-                        </div>
-                        <div className="ml-4 flex-grow">
-                          <h3 className="font-bold mb-2 card-title">{item.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4 card-description">{item.description}</p>
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                            <span className="text-sm text-gray-500 mb-2 sm:mb-0">{item.type} • {item.size}</span>
-                            <div className="flex space-x-2">
-                              <button 
-                                onClick={() => handleViewPDF(item.url)}
-                                className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
-                              >
-                                <Eye size={16} className="mr-1" />
-                                {t('resources.actions.view')}
-                              </button>
-                              <button 
-                                onClick={() => handleDownloadPDF(item.url, item.title)}
-                                className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
-                              >
-                                <Download size={16} className="mr-1" />
-                                {t('resources.actions.download')}
-                              </button>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">{t('common.loading')}</p>
+            </div>
+          ) : resources.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-600">{t('resources.no_resources') || 'Aucune ressource disponible pour le moment'}</p>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {resources.map((group, index) => (
+                <div key={group.category.id}>
+                  <h2 className="text-2xl font-bold mb-2">{group.category.name}</h2>
+                  <p className="text-gray-600 mb-6">{group.category.description}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {group.files.map((file) => (
+                      <motion.div
+                        key={file.id}
+                        className="card p-6"
+                        whileHover={{ y: -5 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-start">
+                          <div className="bg-primary-100 p-3 rounded-lg flex-shrink-0">
+                            <div className="text-primary-600">
+                              {getFileIcon(file.file_type)}
+                            </div>
+                          </div>
+                          <div className="ml-4 flex-grow">
+                            <h3 className="font-bold mb-2 card-title">{file.title || file.original_filename}</h3>
+                            {file.description && (
+                              <p className="text-sm text-gray-600 mb-4 card-description">{file.description}</p>
+                            )}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <span className="text-sm text-gray-500">
+                                {file.file_type.split('/')[1].toUpperCase()} • {formatFileSize(file.file_size || 0)}
+                              </span>
+                              <div className="flex space-x-2">
+                                {isPDF(file.file_type) && (
+                                  <button
+                                    onClick={() => handleViewPDF(file.file_url)}
+                                    className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
+                                  >
+                                    <Eye size={16} className="mr-1" />
+                                    {t('resources.actions.view') || 'Voir'}
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDownloadPDF(file.file_url, file.original_filename, file.id)}
+                                  className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
+                                >
+                                  <Download size={16} className="mr-1" />
+                                  {t('resources.actions.download') || 'Télécharger'}
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
