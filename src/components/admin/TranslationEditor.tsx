@@ -134,8 +134,8 @@ const TranslationEditor: React.FC<TranslationEditorProps> = ({
               <textarea
                 value={getFieldValue(field.name)}
                 onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                rows={field.name === 'content' ? 10 : 3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-y"
                 placeholder={`${field.label} en ${
                   activeLanguage === 'fr' ? 'français' : 'anglais'
                 }`}
