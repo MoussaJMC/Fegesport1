@@ -43,12 +43,11 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const initializeData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      setLoading(true);
+      setError(null);
 
-        // Load data in parallel for better performance
-        await Promise.all([
+      try {
+        await Promise.allSettled([
           fetchPageData(),
           fetchLatestNews(),
           fetchUpcomingEvents(),
@@ -56,29 +55,38 @@ const HomePage: React.FC = () => {
         ]);
       } catch (err) {
         console.error('Error initializing data:', err);
-        setError('Une erreur est survenue lors du chargement des données');
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
       }
     };
 
     initializeData();
 
-    // Subscribe to real-time updates for community stats
-    const channel = subscribeToCommunityStats(() => {
-      console.log('Community stats changed, refreshing...');
-      fetchStats();
-    });
+    let channel: any = null;
+    try {
+      channel = subscribeToCommunityStats(() => {
+        console.log('Community stats changed, refreshing...');
+        fetchStats();
+      });
+    } catch (err) {
+      console.error('Error subscribing to community stats:', err);
+    }
 
-    // Cleanup subscription on unmount
     return () => {
-      channel.unsubscribe();
+      if (channel) {
+        try {
+          channel.unsubscribe();
+        } catch (err) {
+          console.error('Error unsubscribing:', err);
+        }
+      }
     };
   }, []);
 
   const fetchPageData = async () => {
     try {
-      // First, get the home page ID
       const { data: pageData, error: pageError } = await supabase
         .from('pages')
         .select('id')
@@ -91,7 +99,6 @@ const HomePage: React.FC = () => {
       }
 
       if (pageData) {
-        // Then fetch the page sections
         const { data: sections, error: sectionsError } = await supabase
           .from('page_sections')
           .select('*')
@@ -108,8 +115,6 @@ const HomePage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error in fetchPageData:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -216,32 +221,13 @@ const HomePage: React.FC = () => {
   const aboutSection = getSection('about');
   const statsSection = getSection('stats');
 
-  // Loading state
+  // Simple loading state for mobile
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-900">
+      <div className="min-h-screen flex items-center justify-center bg-secondary-900 px-4">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-primary-500 border-t-transparent"></div>
-          <p className="mt-4 text-white text-lg">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-900">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="text-red-500 text-6xl mb-4">⚠</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Erreur de chargement</h1>
-          <p className="text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="btn bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md"
-          >
-            Recharger la page
-          </button>
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-base">Chargement...</p>
         </div>
       </div>
     );
@@ -250,77 +236,53 @@ const HomePage: React.FC = () => {
   return (
     <>
       {/* Hero Section */}
-      <section 
-        className="relative min-h-screen flex items-center justify-center bg-secondary-900"
-        style={{
-          backgroundImage: `url("${heroSection?.image_url || "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundBlendMode: 'overlay',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900 via-secondary-900/90 to-secondary-900/80"></div>
-        <div className="container-custom relative z-10 text-center pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
+      <section className="relative bg-secondary-900 py-20 md:py-32 min-h-[80vh] flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{
+            backgroundImage: `url("${heroSection?.image_url || "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"}")`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary-900/90 via-secondary-900/95 to-secondary-900"></div>
+        <div className="container-custom relative z-10 text-center px-4">
+          <div className="mb-8">
             {logoSettings.main_logo ? (
               <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "FEGESPORT Logo"}
-                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 object-cover"
+                className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 object-cover"
                 onError={(e) => {
                   console.error('Hero logo failed to load:', logoSettings.main_logo);
                   e.currentTarget.style.display = 'none';
                 }}
+                loading="eager"
               />
             ) : (
-              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 bg-primary-600 flex items-center justify-center">
-                <span className="text-white font-bold text-3xl sm:text-4xl">FGE</span>
+              <div className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 bg-primary-600 flex items-center justify-center">
+                <span className="text-white font-bold text-2xl sm:text-3xl">FGE</span>
               </div>
             )}
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white"
-          >
+          </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">
             {t('home.hero.title')}
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg sm:text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300"
-          >
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-300">
             {t('home.hero.subtitle')}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Link 
-              to="/membership" 
-              className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8 py-4 rounded-full"
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/membership"
+              className="btn bg-primary-600 hover:bg-primary-700 text-white text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 rounded-full"
             >
               {t('home.hero.cta')}
             </Link>
-            <Link 
-              to="/about" 
-              className="btn bg-secondary-800 hover:bg-secondary-700 text-white text-lg px-8 py-4 rounded-full"
+            <Link
+              to="/about"
+              className="btn bg-secondary-800 hover:bg-secondary-700 text-white text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 rounded-full"
             >
               {t('common.learnMore')}
             </Link>
-          </motion.div>
-        </div>
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white">
-          <ChevronRight size={32} className="transform rotate-90" />
+          </div>
         </div>
       </section>
 

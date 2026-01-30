@@ -96,10 +96,12 @@ const Slideshow: React.FC<SlideshowProps> = ({
   }
 
   return (
-    <div 
+    <div
       className={`relative overflow-hidden rounded-lg ${height} ${className}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.div
@@ -107,28 +109,29 @@ const Slideshow: React.FC<SlideshowProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
           className="absolute inset-0"
         >
-          <img 
-            src={slides[currentIndex].image_url} 
+          <img
+            src={slides[currentIndex].image_url}
             alt={slides[currentIndex].title}
             className="w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
               e.currentTarget.src = 'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg';
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-          
-          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-            <h3 className="text-2xl font-bold mb-2">{slides[currentIndex].title}</h3>
+
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 text-white">
+            <h3 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2">{slides[currentIndex].title}</h3>
             {slides[currentIndex].description && (
-              <p className="text-gray-200">{slides[currentIndex].description}</p>
+              <p className="text-sm sm:text-base text-gray-200 line-clamp-2">{slides[currentIndex].description}</p>
             )}
             {slides[currentIndex].link && (
-              <a 
+              <a
                 href={slides[currentIndex].link}
-                className="inline-block mt-3 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                className="inline-block mt-2 sm:mt-3 px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
               >
                 En savoir plus
               </a>
@@ -141,17 +144,17 @@ const Slideshow: React.FC<SlideshowProps> = ({
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10"
+            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 p-1.5 sm:p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10 touch-manipulation"
             aria-label="Précédent"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10"
+            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 p-1.5 sm:p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10 touch-manipulation"
             aria-label="Suivant"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={20} className="sm:w-6 sm:h-6" />
           </button>
         </>
       )}
