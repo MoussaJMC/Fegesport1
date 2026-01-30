@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Globe, ChevronDown, User, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +25,7 @@ const Navbar: React.FC = () => {
   const [membershipMenuOpen, setMembershipMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { getSetting, loading: settingsLoading } = useSiteSettings();
 
@@ -119,18 +120,25 @@ const Navbar: React.FC = () => {
   const getTranslatedLabel = (label: string): string => {
     // Special case for DIRECT which should always be uppercase
     if (label === 'DIRECT') return 'DIRECT';
-    
+
     // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, '');
-    
+
     // Check if we have a translation for this key
     const translationKey = `navigation.${key}`;
     const hasTranslation = i18n.exists(translationKey);
-    
+
     return hasTranslation ? t(translationKey) : label;
+  };
+
+  // Handle logo click to always scroll to top and navigate to home
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/');
   };
 
   // Show loading state or fallback if settings are loading
@@ -165,12 +173,16 @@ const Navbar: React.FC = () => {
       <nav className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={logoSettings.link || "/"} className="flex items-center space-x-2">
+          <Link
+            to={logoSettings.link || "/"}
+            className="flex items-center space-x-2"
+            onClick={handleLogoClick}
+          >
             {logoSettings.main_logo ? (
               <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "Logo"}
-                className="rounded object-cover"
+                className="rounded object-cover cursor-pointer"
                 style={{
                   width: logoSettings.width || 48,
                   height: logoSettings.height || 48
@@ -182,7 +194,7 @@ const Navbar: React.FC = () => {
               />
             ) : (
               <div
-                className="bg-primary-600 rounded flex items-center justify-center"
+                className="bg-primary-600 rounded flex items-center justify-center cursor-pointer"
                 style={{
                   width: logoSettings.width || 48,
                   height: logoSettings.height || 48
@@ -191,7 +203,7 @@ const Navbar: React.FC = () => {
                 <span className="text-white font-bold text-xl">FGE</span>
               </div>
             )}
-            <span className={`text-xl md:text-2xl font-bold ${scrolled ? 'text-primary-500' : 'text-white'}`}>
+            <span className={`text-xl md:text-2xl font-bold cursor-pointer ${scrolled ? 'text-primary-500' : 'text-white'}`}>
               {navigationSettings.brand_text || "FEGESPORT"}
             </span>
           </Link>
