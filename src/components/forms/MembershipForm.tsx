@@ -199,12 +199,9 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
 
       console.log('Attempting to insert member data:', memberData);
 
-      // Insert member data into database
-      const { data: insertedMember, error: insertError } = await supabase
-        .from('members')
-        .insert([memberData])
-        .select()
-        .single();
+      // Use the register_member function to bypass RLS for public registration
+      const { data: insertedMemberId, error: insertError } = await supabase
+        .rpc('register_member', { member_data: memberData });
 
       if (insertError) {
         console.error('Database insertion error:', insertError);
@@ -212,7 +209,7 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
         return;
       }
 
-      console.log('Member successfully inserted:', insertedMember);
+      console.log('Member successfully inserted with ID:', insertedMemberId);
 
       if (isPlayerType) {
         // For players, registration is complete and free
