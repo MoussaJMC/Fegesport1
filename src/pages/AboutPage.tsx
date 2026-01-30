@@ -18,6 +18,7 @@ const AboutPage: React.FC = () => {
   const { t } = useTranslation();
   const [leadershipTeam, setLeadershipTeam] = useState<LeadershipMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     fetchLeadershipTeam();
@@ -50,6 +51,18 @@ const AboutPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleBio = (memberId: string) => {
+    setExpandedBios(prev => ({
+      ...prev,
+      [memberId]: !prev[memberId]
+    }));
+  };
+
+  const truncateBio = (bio: string, maxLength: number = 300) => {
+    if (bio.length <= maxLength) return bio;
+    return bio.substring(0, maxLength);
   };
 
   const getDefaultLeadershipTeam = (): LeadershipMember[] => {
@@ -261,8 +274,19 @@ const AboutPage: React.FC = () => {
                     <h3 className="text-xl font-bold mb-1 card-title">{member.name}</h3>
                     <p className="text-primary-600 font-medium mb-4">{member.position}</p>
                     <p className="text-gray-600 card-description text-sm">
-                      {member.bio}
+                      {expandedBios[member.id]
+                        ? member.bio
+                        : truncateBio(member.bio, 300)}
+                      {member.bio.length > 300 && !expandedBios[member.id] && '...'}
                     </p>
+                    {member.bio.length > 300 && (
+                      <button
+                        onClick={() => toggleBio(member.id)}
+                        className="mt-3 text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors duration-200"
+                      >
+                        {expandedBios[member.id] ? 'Moins' : 'Plus'}
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               ))}
