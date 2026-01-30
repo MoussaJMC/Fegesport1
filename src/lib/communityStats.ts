@@ -9,42 +9,67 @@ export interface CommunityStats {
 
 export async function fetchCommunityStats(): Promise<CommunityStats> {
   try {
+    console.log('[fetchCommunityStats] Starting fetch...');
+
     // Get active players count
-    const { count: playersCount } = await supabase
+    const playersResult = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
       .eq('member_type', 'player')
       .eq('status', 'active');
 
+    console.log('[fetchCommunityStats] Players result:', playersResult);
+    if (playersResult.error) {
+      console.error('[fetchCommunityStats] Players error:', playersResult.error);
+    }
+
     // Get active clubs count
-    const { count: clubsCount } = await supabase
+    const clubsResult = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
       .eq('member_type', 'club')
       .eq('status', 'active');
 
+    console.log('[fetchCommunityStats] Clubs result:', clubsResult);
+    if (clubsResult.error) {
+      console.error('[fetchCommunityStats] Clubs error:', clubsResult.error);
+    }
+
     // Get partners count from both members table and partners table
-    const { count: memberPartnersCount } = await supabase
+    const memberPartnersResult = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
       .eq('member_type', 'partner')
       .eq('status', 'active');
 
-    const { count: directPartnersCount } = await supabase
+    console.log('[fetchCommunityStats] Member partners result:', memberPartnersResult);
+    if (memberPartnersResult.error) {
+      console.error('[fetchCommunityStats] Member partners error:', memberPartnersResult.error);
+    }
+
+    const directPartnersResult = await supabase
       .from('partners')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
 
-    // Combine partner counts
-    const totalPartners = (memberPartnersCount || 0) + (directPartnersCount || 0);
+    console.log('[fetchCommunityStats] Direct partners result:', directPartnersResult);
+    if (directPartnersResult.error) {
+      console.error('[fetchCommunityStats] Direct partners error:', directPartnersResult.error);
+    }
 
-    return {
-      players: playersCount || 0,
-      clubs: clubsCount || 0,
+    // Combine partner counts
+    const totalPartners = (memberPartnersResult.count || 0) + (directPartnersResult.count || 0);
+
+    const stats = {
+      players: playersResult.count || 0,
+      clubs: clubsResult.count || 0,
       partners: totalPartners || 0
     };
+
+    console.log('[fetchCommunityStats] Final stats:', stats);
+    return stats;
   } catch (error) {
-    console.error('Error fetching community stats:', error);
+    console.error('[fetchCommunityStats] Exception:', error);
     return {
       players: 0,
       clubs: 0,

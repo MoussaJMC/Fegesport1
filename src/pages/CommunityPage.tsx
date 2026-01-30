@@ -64,10 +64,12 @@ const CommunityPage: React.FC = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
+      console.log('[CommunityPage] Fetching stats...');
       const communityStats = await fetchCommunityStats();
+      console.log('[CommunityPage] Stats received:', communityStats);
       setStats(communityStats);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('[CommunityPage] Error fetching stats:', error);
     } finally {
       setLoading(false);
     }
