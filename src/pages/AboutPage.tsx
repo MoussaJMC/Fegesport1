@@ -243,22 +243,24 @@ const AboutPage: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="card overflow-hidden"
+                  className="card overflow-hidden text-center"
                 >
-                  <div className="h-64 sm:h-72 bg-gray-200 relative">
-                    <img 
-                      src={member.image_url} 
-                      alt={member.name} 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/300x400?text=Photo+non+disponible';
-                      }}
-                    />
+                  <div className="pt-8 pb-4 px-6 bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                      <img
+                        src={member.image_url}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/150?text=Photo';
+                        }}
+                      />
+                    </div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold mb-1 card-title">{member.name}</h3>
                     <p className="text-primary-600 font-medium mb-4">{member.position}</p>
-                    <p className="text-gray-600 card-description">
+                    <p className="text-gray-600 card-description text-sm">
                       {member.bio}
                     </p>
                   </div>

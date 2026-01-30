@@ -114,19 +114,13 @@ const LeadershipAdminPage: React.FC = () => {
     }
 
     try {
-      // Check if we're using real data or mock data
-      const isRealData = members.length > 0 && members[0].id !== '1';
-      
-      if (isRealData) {
-        const { error } = await supabase
-          .from('leadership_team')
-          .delete()
-          .eq('id', id);
+      const { error } = await supabase
+        .from('leadership_team')
+        .delete()
+        .eq('id', id);
 
-        if (error) throw error;
-      }
-      
-      // Update local state regardless
+      if (error) throw error;
+
       setMembers(members.filter(member => member.id !== id));
       toast.success('Membre supprimé avec succès');
     } catch (error) {
@@ -137,25 +131,19 @@ const LeadershipAdminPage: React.FC = () => {
 
   const toggleActiveStatus = async (id: string, currentStatus: boolean) => {
     try {
-      // Check if we're using real data or mock data
-      const isRealData = members.length > 0 && members[0].id !== '1';
-      
-      if (isRealData) {
-        const { error } = await supabase
-          .from('leadership_team')
-          .update({ is_active: !currentStatus })
-          .eq('id', id);
+      const { error } = await supabase
+        .from('leadership_team')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
 
-        if (error) throw error;
-      }
-      
-      // Update local state regardless
-      setMembers(members.map(member => 
-        member.id === id 
-          ? { ...member, is_active: !currentStatus } 
+      if (error) throw error;
+
+      setMembers(members.map(member =>
+        member.id === id
+          ? { ...member, is_active: !currentStatus }
           : member
       ));
-      
+
       toast.success(`Membre ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
     } catch (error) {
       console.error('Error updating leadership member status:', error);
@@ -165,85 +153,42 @@ const LeadershipAdminPage: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      // Check if we're using real data or mock data
-      const isRealData = members.length > 0 && members[0].id !== '1';
-      
-      if (isRealData) {
-        if (editingMember) {
-          // Update existing member
-          const { error } = await supabase
-            .from('leadership_team')
-            .update({
-              name: formData.name,
-              position: formData.position,
-              bio: formData.bio,
-              image_url: formData.image_url,
-              is_active: formData.is_active
-            })
-            .eq('id', editingMember.id);
+      if (editingMember) {
+        const { error } = await supabase
+          .from('leadership_team')
+          .update({
+            name: formData.name,
+            position: formData.position,
+            bio: formData.bio,
+            image_url: formData.image_url,
+            is_active: formData.is_active
+          })
+          .eq('id', editingMember.id);
 
-          if (error) throw error;
-        } else {
-          // Create new member
-          const maxOrder = Math.max(...members.map(m => m.order), 0);
-          const { error } = await supabase
-            .from('leadership_team')
-            .insert([{
-              name: formData.name,
-              position: formData.position,
-              bio: formData.bio,
-              image_url: formData.image_url,
-              order: maxOrder + 1,
-              is_active: formData.is_active
-            }]);
-
-          if (error) throw error;
-        }
+        if (error) throw error;
       } else {
-        // Using mock data, just update the local state
-        if (editingMember) {
-          setMembers(members.map(member => 
-            member.id === editingMember.id 
-              ? { 
-                  ...member, 
-                  name: formData.name,
-                  position: formData.position,
-                  bio: formData.bio,
-                  image_url: formData.image_url,
-                  is_active: formData.is_active,
-                  updated_at: new Date().toISOString()
-                } 
-              : member
-          ));
-        } else {
-          const maxOrder = Math.max(...members.map(m => m.order), 0);
-          const newMember: LeadershipMember = {
-            id: `mock-${Date.now()}`,
+        const maxOrder = Math.max(...members.map(m => m.order), 0);
+        const { error } = await supabase
+          .from('leadership_team')
+          .insert([{
             name: formData.name,
             position: formData.position,
             bio: formData.bio,
             image_url: formData.image_url,
             order: maxOrder + 1,
-            is_active: formData.is_active,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          setMembers([...members, newMember].sort((a, b) => a.order - b.order));
-        }
+            is_active: formData.is_active
+          }]);
+
+        if (error) throw error;
       }
-      
+
       toast.success(`Membre ${editingMember ? 'mis à jour' : 'créé'} avec succès`);
       setShowForm(false);
       setEditingMember(null);
       resetForm();
-      
-      // Refresh data if using real data
-      if (isRealData) {
-        fetchLeadershipMembers();
-      }
+      await fetchLeadershipMembers();
     } catch (error) {
       console.error('Error saving leadership member:', error);
       toast.error('Erreur lors de la sauvegarde');
@@ -275,29 +220,22 @@ const LeadershipAdminPage: React.FC = () => {
   const moveUp = async (id: string) => {
     const index = members.findIndex(m => m.id === id);
     if (index <= 0) return;
-    
+
     try {
       const currentMember = members[index];
       const prevMember = members[index - 1];
-      
-      // Check if we're using real data or mock data
-      const isRealData = members.length > 0 && members[0].id !== '1';
-      
-      if (isRealData) {
-        // Update orders in database
-        await Promise.all([
-          supabase.from('leadership_team').update({ order: prevMember.order }).eq('id', currentMember.id),
-          supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', prevMember.id)
-        ]);
-      }
-      
-      // Update local state
+
+      await Promise.all([
+        supabase.from('leadership_team').update({ order: prevMember.order }).eq('id', currentMember.id),
+        supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', prevMember.id)
+      ]);
+
       const newMembers = [...members];
       newMembers[index] = { ...currentMember, order: prevMember.order };
       newMembers[index - 1] = { ...prevMember, order: currentMember.order };
       newMembers.sort((a, b) => a.order - b.order);
       setMembers(newMembers);
-      
+
       toast.success('Ordre mis à jour');
     } catch (error) {
       console.error('Error moving member up:', error);
@@ -308,29 +246,22 @@ const LeadershipAdminPage: React.FC = () => {
   const moveDown = async (id: string) => {
     const index = members.findIndex(m => m.id === id);
     if (index >= members.length - 1) return;
-    
+
     try {
       const currentMember = members[index];
       const nextMember = members[index + 1];
-      
-      // Check if we're using real data or mock data
-      const isRealData = members.length > 0 && members[0].id !== '1';
-      
-      if (isRealData) {
-        // Update orders in database
-        await Promise.all([
-          supabase.from('leadership_team').update({ order: nextMember.order }).eq('id', currentMember.id),
-          supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', nextMember.id)
-        ]);
-      }
-      
-      // Update local state
+
+      await Promise.all([
+        supabase.from('leadership_team').update({ order: nextMember.order }).eq('id', currentMember.id),
+        supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', nextMember.id)
+      ]);
+
       const newMembers = [...members];
       newMembers[index] = { ...currentMember, order: nextMember.order };
       newMembers[index + 1] = { ...nextMember, order: currentMember.order };
       newMembers.sort((a, b) => a.order - b.order);
       setMembers(newMembers);
-      
+
       toast.success('Ordre mis à jour');
     } catch (error) {
       console.error('Error moving member down:', error);
@@ -528,15 +459,17 @@ const LeadershipAdminPage: React.FC = () => {
             transition={{ duration: 0.3, delay: index * 0.05 }}
             className={`bg-white rounded-lg shadow overflow-hidden ${!member.is_active ? 'opacity-60' : ''}`}
           >
-            <div className="h-48 bg-gray-200 relative">
-              <img 
-                src={member.image_url} 
-                alt={member.name} 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Image+non+disponible';
-                }}
-              />
+            <div className="p-6 bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center relative">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                <img
+                  src={member.image_url}
+                  alt={member.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/150?text=Photo';
+                  }}
+                />
+              </div>
               {!member.is_active && (
                 <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                   Inactif
