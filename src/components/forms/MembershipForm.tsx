@@ -167,20 +167,30 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
     try {
       setIsSubmitting(true);
 
-      // First, let's test the database connection
-      console.log('Testing database connection...');
-      const { data: testData, error: testError } = await supabase
+      // First, check if email already exists
+      console.log('Checking if email already exists...');
+      const { data: existingMember, error: checkError } = await supabase
         .from('members')
-        .select('count')
-        .limit(1);
+        .select('id, email, status, member_type')
+        .eq('email', data.email)
+        .maybeSingle();
 
-      if (testError) {
-        console.error('Database connection test failed:', testError);
+      if (checkError) {
+        console.error('Error checking existing email:', checkError);
         toast.error('Erreur de connexion à la base de données');
         return;
       }
 
-      console.log('Database connection successful');
+      if (existingMember) {
+        console.log('Email already exists:', existingMember);
+        toast.error(
+          `Cet email est déjà enregistré. Si vous avez déjà un compte, veuillez contacter l'administrateur pour toute modification.`,
+          { duration: 5000 }
+        );
+        return;
+      }
+
+      console.log('Email is available, proceeding with registration...');
 
       // Get the selected membership type to determine member_type
       const selectedType = membershipTypes.find(type => type.id === data.type);
@@ -233,7 +243,16 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
 
       if (insertError) {
         console.error('Database insertion error:', insertError);
-        toast.error(`Erreur lors de l'inscription: ${insertError.message}`);
+
+        // Handle duplicate email error specifically
+        if (insertError.message.includes('duplicate key') || insertError.message.includes('unique constraint')) {
+          toast.error(
+            'Cet email est déjà enregistré. Si vous avez déjà un compte, veuillez contacter l\'administrateur.',
+            { duration: 5000 }
+          );
+        } else {
+          toast.error(`Erreur lors de l'inscription: ${insertError.message}`);
+        }
         return;
       }
 

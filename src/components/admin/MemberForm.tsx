@@ -67,6 +67,18 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
         if (error) throw error;
         toast.success('Membre mis à jour avec succès');
       } else {
+        // Check if email already exists before creating
+        const { data: existingMember } = await supabase
+          .from('members')
+          .select('id, email')
+          .eq('email', data.email)
+          .maybeSingle();
+
+        if (existingMember) {
+          toast.error('Un membre avec cet email existe déjà');
+          return;
+        }
+
         const { error } = await supabase
           .from('members')
           .insert([cleanData]);
@@ -76,7 +88,13 @@ const MemberForm: React.FC<MemberFormProps> = ({ initialData, onSuccess, onCance
       onSuccess();
     } catch (error: any) {
       console.error('Error saving member:', error);
-      toast.error('Une erreur est survenue');
+
+      // Handle duplicate email error specifically
+      if (error.message && (error.message.includes('duplicate key') || error.message.includes('unique constraint'))) {
+        toast.error('Un membre avec cet email existe déjà');
+      } else {
+        toast.error('Une erreur est survenue');
+      }
     }
   };
 
