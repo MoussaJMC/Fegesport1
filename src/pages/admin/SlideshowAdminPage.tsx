@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Image, ArrowUp, ArrowDown, Link as LinkIcon, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search, Filter, Image, ArrowUp, ArrowDown, Link as LinkIcon, X, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SlideImage {
@@ -45,7 +45,7 @@ const SlideshowAdminPage: React.FC = () => {
   const fetchSlides = async () => {
     try {
       setLoading(true);
-      
+
       // Try to fetch from Supabase
       const { data, error } = await supabase
         .from('slideshow_images')
@@ -54,56 +54,21 @@ const SlideshowAdminPage: React.FC = () => {
 
       if (error) {
         console.error('Error fetching slides:', error);
-        // If table doesn't exist or other error, use mock data
-        setSlides(getMockSlides());
-      } else if (data && data.length > 0) {
-        setSlides(data);
+        toast.error(`Erreur lors du chargement: ${error.message}`);
+        setSlides([]);
       } else {
-        // No data found, use mock data
-        setSlides(getMockSlides());
+        setSlides(data || []);
+        console.log(`${data?.length || 0} diaporama(s) chargé(s) depuis la base de données`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in fetchSlides:', error);
-      setSlides(getMockSlides());
+      toast.error('Erreur lors du chargement des diaporamas');
+      setSlides([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getMockSlides = (): SlideImage[] => {
-    return [
-      {
-        id: '1',
-        title: 'Tournoi National FIFA 25',
-        description: 'Les meilleurs joueurs guinéens s\'affrontent pour le titre de champion national',
-        image_url: 'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg',
-        sort_order: 1,
-        is_active: true,
-        created_at: '2025-01-15T10:00:00Z',
-        updated_at: '2025-01-15T10:00:00Z'
-      },
-      {
-        id: '2',
-        title: 'Formation des Arbitres Esport',
-        description: 'Programme de certification pour les arbitres officiels de la FEGESPORT',
-        image_url: 'https://images.pexels.com/photos/159393/gamepad-video-game-controller-game-controller-controller-159393.jpeg',
-        sort_order: 2,
-        is_active: true,
-        created_at: '2025-01-15T10:00:00Z',
-        updated_at: '2025-01-15T10:00:00Z'
-      },
-      {
-        id: '3',
-        title: 'Championnat PUBG Mobile',
-        description: 'Les meilleures équipes guinéennes s\'affrontent dans une compétition intense',
-        image_url: 'https://images.pexels.com/photos/7862608/pexels-photo-7862608.jpeg',
-        sort_order: 3,
-        is_active: true,
-        created_at: '2025-01-15T10:00:00Z',
-        updated_at: '2025-01-15T10:00:00Z'
-      }
-    ];
-  };
 
   const deleteSlide = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
@@ -111,139 +76,81 @@ const SlideshowAdminPage: React.FC = () => {
     }
 
     try {
-      // Check if we're using real data or mock data
-      const isRealData = slides.length > 0 && slides[0].id !== '1';
-      
-      if (isRealData) {
-        const { error } = await supabase
-          .from('slideshow_images')
-          .delete()
-          .eq('id', id);
+      const { error } = await supabase
+        .from('slideshow_images')
+        .delete()
+        .eq('id', id);
 
-        if (error) throw error;
-      }
-      
-      // Update local state regardless
-      setSlides(slides.filter(slide => slide.id !== id));
+      if (error) throw error;
+
       toast.success('Image supprimée avec succès');
-    } catch (error) {
+      fetchSlides();
+    } catch (error: any) {
       console.error('Error deleting slide:', error);
-      toast.error('Erreur lors de la suppression');
+      toast.error(`Erreur lors de la suppression: ${error.message}`);
     }
   };
 
   const toggleActiveStatus = async (id: string, currentStatus: boolean) => {
     try {
-      // Check if we're using real data or mock data
-      const isRealData = slides.length > 0 && slides[0].id !== '1';
-      
-      if (isRealData) {
-        const { error } = await supabase
-          .from('slideshow_images')
-          .update({ is_active: !currentStatus })
-          .eq('id', id);
+      const { error } = await supabase
+        .from('slideshow_images')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
 
-        if (error) throw error;
-      }
-      
-      // Update local state regardless
-      setSlides(slides.map(slide => 
-        slide.id === id 
-          ? { ...slide, is_active: !currentStatus } 
-          : slide
-      ));
-      
+      if (error) throw error;
+
       toast.success(`Image ${!currentStatus ? 'activée' : 'désactivée'} avec succès`);
-    } catch (error) {
+      fetchSlides();
+    } catch (error: any) {
       console.error('Error updating slide status:', error);
-      toast.error('Erreur lors de la mise à jour');
+      toast.error(`Erreur lors de la mise à jour: ${error.message}`);
     }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      // Check if we're using real data or mock data
-      const isRealData = slides.length > 0 && slides[0].id !== '1';
-      
-      if (isRealData) {
-        if (editingSlide) {
-          // Update existing slide
-          const { error } = await supabase
-            .from('slideshow_images')
-            .update({
-              title: formData.title,
-              description: formData.description || null,
-              image_url: formData.image_url,
-              link: formData.link || null,
-              is_active: formData.is_active
-            })
-            .eq('id', editingSlide.id);
-
-          if (error) throw error;
-        } else {
-          // Create new slide
-          const maxOrder = Math.max(...slides.map(s => s.sort_order), 0);
-          const { error } = await supabase
-            .from('slideshow_images')
-            .insert([{
-              title: formData.title,
-              description: formData.description || null,
-              image_url: formData.image_url,
-              link: formData.link || null,
-              sort_order: maxOrder + 1,
-              is_active: formData.is_active
-            }]);
-
-          if (error) throw error;
-        }
-      } else {
-        // Using mock data, just update the local state
-        if (editingSlide) {
-          setSlides(slides.map(slide => 
-            slide.id === editingSlide.id 
-              ? { 
-                  ...slide, 
-                  title: formData.title,
-                  description: formData.description,
-                  image_url: formData.image_url,
-                  link: formData.link,
-                  is_active: formData.is_active,
-                  updated_at: new Date().toISOString()
-                } 
-              : slide
-          ));
-        } else {
-          const maxOrder = Math.max(...slides.map(s => s.sort_order), 0);
-          const newSlide: SlideImage = {
-            id: `mock-${Date.now()}`,
+      if (editingSlide) {
+        // Update existing slide
+        const { error } = await supabase
+          .from('slideshow_images')
+          .update({
             title: formData.title,
-            description: formData.description,
+            description: formData.description || null,
             image_url: formData.image_url,
-            link: formData.link,
+            link: formData.link || null,
+            is_active: formData.is_active
+          })
+          .eq('id', editingSlide.id);
+
+        if (error) throw error;
+      } else {
+        // Create new slide
+        const maxOrder = slides.length > 0 ? Math.max(...slides.map(s => s.sort_order)) : 0;
+        const { error } = await supabase
+          .from('slideshow_images')
+          .insert([{
+            title: formData.title,
+            description: formData.description || null,
+            image_url: formData.image_url,
+            link: formData.link || null,
             sort_order: maxOrder + 1,
-            is_active: formData.is_active,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          setSlides([...slides, newSlide].sort((a, b) => a.sort_order - b.sort_order));
-        }
+            is_active: formData.is_active
+          }]);
+
+        if (error) throw error;
       }
-      
+
       toast.success(`Image ${editingSlide ? 'mise à jour' : 'créée'} avec succès`);
       setShowForm(false);
       setEditingSlide(null);
       resetForm();
-      
-      // Refresh data if using real data
-      if (isRealData) {
-        fetchSlides();
-      }
-    } catch (error) {
+      fetchSlides();
+    } catch (error: any) {
       console.error('Error saving slide:', error);
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error(`Erreur lors de la sauvegarde: ${error.message}`);
     }
   };
 
@@ -272,66 +179,44 @@ const SlideshowAdminPage: React.FC = () => {
   const moveUp = async (id: string) => {
     const index = slides.findIndex(s => s.id === id);
     if (index <= 0) return;
-    
+
     try {
       const currentSlide = slides[index];
       const prevSlide = slides[index - 1];
-      
-      // Check if we're using real data or mock data
-      const isRealData = slides.length > 0 && slides[0].id !== '1';
-      
-      if (isRealData) {
-        // Update orders in database
-        await Promise.all([
-          supabase.from('slideshow_images').update({ sort_order: prevSlide.sort_order }).eq('id', currentSlide.id),
-          supabase.from('slideshow_images').update({ sort_order: currentSlide.sort_order }).eq('id', prevSlide.id)
-        ]);
-      }
-      
-      // Update local state
-      const newSlides = [...slides];
-      newSlides[index] = { ...currentSlide, sort_order: prevSlide.sort_order };
-      newSlides[index - 1] = { ...prevSlide, sort_order: currentSlide.sort_order };
-      newSlides.sort((a, b) => a.sort_order - b.sort_order);
-      setSlides(newSlides);
-      
+
+      // Update orders in database
+      await Promise.all([
+        supabase.from('slideshow_images').update({ sort_order: prevSlide.sort_order }).eq('id', currentSlide.id),
+        supabase.from('slideshow_images').update({ sort_order: currentSlide.sort_order }).eq('id', prevSlide.id)
+      ]);
+
       toast.success('Ordre mis à jour');
-    } catch (error) {
+      fetchSlides();
+    } catch (error: any) {
       console.error('Error moving slide up:', error);
-      toast.error('Erreur lors du déplacement');
+      toast.error(`Erreur lors du déplacement: ${error.message}`);
     }
   };
 
   const moveDown = async (id: string) => {
     const index = slides.findIndex(s => s.id === id);
     if (index >= slides.length - 1) return;
-    
+
     try {
       const currentSlide = slides[index];
       const nextSlide = slides[index + 1];
-      
-      // Check if we're using real data or mock data
-      const isRealData = slides.length > 0 && slides[0].id !== '1';
-      
-      if (isRealData) {
-        // Update orders in database
-        await Promise.all([
-          supabase.from('slideshow_images').update({ sort_order: nextSlide.sort_order }).eq('id', currentSlide.id),
-          supabase.from('slideshow_images').update({ sort_order: currentSlide.sort_order }).eq('id', nextSlide.id)
-        ]);
-      }
-      
-      // Update local state
-      const newSlides = [...slides];
-      newSlides[index] = { ...currentSlide, sort_order: nextSlide.sort_order };
-      newSlides[index + 1] = { ...nextSlide, sort_order: currentSlide.sort_order };
-      newSlides.sort((a, b) => a.sort_order - b.sort_order);
-      setSlides(newSlides);
-      
+
+      // Update orders in database
+      await Promise.all([
+        supabase.from('slideshow_images').update({ sort_order: nextSlide.sort_order }).eq('id', currentSlide.id),
+        supabase.from('slideshow_images').update({ sort_order: currentSlide.sort_order }).eq('id', nextSlide.id)
+      ]);
+
       toast.success('Ordre mis à jour');
-    } catch (error) {
+      fetchSlides();
+    } catch (error: any) {
       console.error('Error moving slide down:', error);
-      toast.error('Erreur lors du déplacement');
+      toast.error(`Erreur lors du déplacement: ${error.message}`);
     }
   };
 
@@ -361,17 +246,27 @@ const SlideshowAdminPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Gestion du Diaporama</h1>
           <p className="text-gray-600">Gérer les images du diaporama de la page d'accueil</p>
         </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setEditingSlide(null);
-            setShowForm(true);
-          }}
-          className="btn bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvelle Image
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={fetchSlides}
+            disabled={loading}
+            className="btn bg-gray-100 hover:bg-gray-200 text-gray-700"
+            title="Rafraîchir la liste"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={() => {
+              resetForm();
+              setEditingSlide(null);
+              setShowForm(true);
+            }}
+            className="btn bg-primary-600 hover:bg-primary-700 text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nouvelle Image
+          </button>
+        </div>
       </div>
 
       {/* Preview */}
@@ -719,47 +614,15 @@ const SlideshowAdminPage: React.FC = () => {
         )}
       </div>
 
-      {/* Implementation Guide */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4 text-blue-800">
-          Guide d'Implémentation
-        </h2>
-        <div className="space-y-4 text-blue-700">
-          <div>
-            <h3 className="font-medium">1. Structure de la table</h3>
-            <p className="text-sm mt-1">
-              Pour implémenter cette fonctionnalité en production, créez une table <code>slideshow_images</code> avec les champs suivants :
-            </p>
-            <pre className="bg-blue-100 p-2 rounded text-xs mt-2 overflow-auto">
-{`CREATE TABLE slideshow_images (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  description TEXT,
-  image_url TEXT NOT NULL,
-  link TEXT,
-  sort_order INTEGER DEFAULT 0,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);`}
-            </pre>
-          </div>
-          
-          <div>
-            <h3 className="font-medium">2. Affichage sur la page d'accueil</h3>
-            <p className="text-sm mt-1">
-              Le diaporama est automatiquement affiché sur la page d'accueil, montrant les images marquées comme "Actives" dans l'ordre spécifié.
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="font-medium">3. Recommandations pour les images</h3>
-            <p className="text-sm mt-1">
-              Pour de meilleurs résultats, utilisez des images de dimensions similaires, idéalement 1920x1080 pixels ou un ratio 16:9.
-              Les images trop petites peuvent apparaître pixelisées lorsqu'elles sont agrandies.
-            </p>
-          </div>
-        </div>
+      {/* Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="font-medium text-blue-800 mb-2">Recommandations</h3>
+        <ul className="text-sm text-blue-700 space-y-1 list-disc pl-5">
+          <li>Le diaporama s'affiche automatiquement sur la page d'accueil</li>
+          <li>Seules les images marquées comme "Actives" sont visibles publiquement</li>
+          <li>Utilisez des images de ratio 16:9 (ex: 1920x1080 pixels) pour de meilleurs résultats</li>
+          <li>Les images changent automatiquement toutes les 5 secondes</li>
+        </ul>
       </div>
     </div>
   );

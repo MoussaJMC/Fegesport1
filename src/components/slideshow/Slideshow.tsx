@@ -40,54 +40,28 @@ const Slideshow: React.FC<SlideshowProps> = ({
   const fetchSlides = async () => {
     try {
       setLoading(true);
-      
-      // Try to fetch from Supabase
+
+      // Fetch from Supabase
       const { data, error } = await supabase
         .from('slideshow_images')
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
-      
+
       if (error) {
         console.error('Error fetching slides:', error);
-        // Use mock data if there's an error
-        setSlides(getMockSlides());
-      } else if (data && data.length > 0) {
-        setSlides(data);
+        setSlides([]);
       } else {
-        // No data found, use mock data
-        setSlides(getMockSlides());
+        setSlides(data || []);
       }
     } catch (error) {
       console.error('Error in fetchSlides:', error);
-      setSlides(getMockSlides());
+      setSlides([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getMockSlides = (): SlideImage[] => {
-    return [
-      {
-        id: '1',
-        image_url: 'https://images.pexels.com/photos/735911/pexels-photo-735911.jpeg',
-        title: 'Tournoi National FIFA 25',
-        description: 'Les meilleurs joueurs guinéens s\'affrontent pour le titre de champion national'
-      },
-      {
-        id: '2',
-        image_url: 'https://images.pexels.com/photos/159393/gamepad-video-game-controller-game-controller-controller-159393.jpeg',
-        title: 'Formation des Arbitres Esport',
-        description: 'Programme de certification pour les arbitres officiels de la FEGESPORT'
-      },
-      {
-        id: '3',
-        image_url: 'https://images.pexels.com/photos/7862608/pexels-photo-7862608.jpeg',
-        title: 'Championnat PUBG Mobile',
-        description: 'Les meilleures équipes guinéennes s\'affrontent dans une compétition intense'
-      }
-    ];
-  };
 
   const nextSlide = useCallback(() => {
     setCurrentIndex(prevIndex => 
