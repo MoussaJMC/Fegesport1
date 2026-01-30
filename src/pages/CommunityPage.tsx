@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Trophy, Star, Building } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../lib/supabase';
+import { fetchCommunityStats } from '../lib/communityStats';
 
 interface CommunityStats {
   players: number;
@@ -26,34 +26,10 @@ const CommunityPage: React.FC = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      
-      // Try to get members count
-      const { count: playersCount, error: playersError } = await supabase
-        .from('members')
-        .select('*', { count: 'exact', head: true })
-        .eq('member_type', 'player');
-      
-      // Try to get clubs count
-      const { count: clubsCount, error: clubsError } = await supabase
-        .from('members')
-        .select('*', { count: 'exact', head: true })
-        .eq('member_type', 'club');
-      
-      // Try to get partners count
-      const { count: partnersCount, error: partnersError } = await supabase
-        .from('partners')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-      
-      // Update stats with real data if available
-      setStats({
-        players: playersCount || 200,
-        clubs: clubsCount || 15,
-        partners: partnersCount || 8
-      });
+      const communityStats = await fetchCommunityStats();
+      setStats(communityStats);
     } catch (error) {
       console.error('Error fetching stats:', error);
-      // Keep default stats on error
     } finally {
       setLoading(false);
     }

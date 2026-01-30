@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Trophy, Users, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { fetchCommunityStats } from '../lib/communityStats';
 
 // Components
 import NewsCard from '../components/news/NewsCard';
@@ -158,35 +159,8 @@ const HomePage: React.FC = () => {
   };
 
   const fetchStats = async () => {
-    try {
-      // Try to get members count
-      const { count: playersCount, error: playersError } = await supabase
-        .from('members')
-        .select('*', { count: 'exact', head: true })
-        .eq('member_type', 'player');
-      
-      // Try to get clubs count
-      const { count: clubsCount, error: clubsError } = await supabase
-        .from('members')
-        .select('*', { count: 'exact', head: true })
-        .eq('member_type', 'club');
-      
-      // Try to get partners count
-      const { count: partnersCount, error: partnersError } = await supabase
-        .from('partners')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-      
-      // Update stats with real data if available
-      setStats({
-        players: playersCount || 200,
-        clubs: clubsCount || 15,
-        partners: partnersCount || 8
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      // Keep default stats on error
-    }
+    const communityStats = await fetchCommunityStats();
+    setStats(communityStats);
   };
 
   const formatDate = (dateString: string): string => {
