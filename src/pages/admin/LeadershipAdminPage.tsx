@@ -119,13 +119,17 @@ const LeadershipAdminPage: React.FC = () => {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting leadership member:', error);
+        toast.error(`Erreur lors de la suppression: ${error.message}`);
+        return;
+      }
 
       setMembers(members.filter(member => member.id !== id));
       toast.success('Membre supprimé avec succès');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting leadership member:', error);
-      toast.error('Erreur lors de la suppression');
+      toast.error(`Erreur: ${error?.message || 'Erreur inconnue'}`);
     }
   };
 
@@ -136,7 +140,11 @@ const LeadershipAdminPage: React.FC = () => {
         .update({ is_active: !currentStatus })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating leadership member status:', error);
+        toast.error(`Erreur lors de la mise à jour: ${error.message}`);
+        return;
+      }
 
       setMembers(members.map(member =>
         member.id === id
@@ -145,9 +153,9 @@ const LeadershipAdminPage: React.FC = () => {
       ));
 
       toast.success(`Membre ${!currentStatus ? 'activé' : 'désactivé'} avec succès`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating leadership member status:', error);
-      toast.error('Erreur lors de la mise à jour');
+      toast.error(`Erreur: ${error?.message || 'Erreur inconnue'}`);
     }
   };
 
@@ -167,7 +175,11 @@ const LeadershipAdminPage: React.FC = () => {
           })
           .eq('id', editingMember.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating leadership member:', error);
+          toast.error(`Erreur lors de la mise à jour: ${error.message}`);
+          return;
+        }
       } else {
         const maxOrder = Math.max(...members.map(m => m.order), 0);
         const { error } = await supabase
@@ -181,7 +193,11 @@ const LeadershipAdminPage: React.FC = () => {
             is_active: formData.is_active
           }]);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error inserting leadership member:', error);
+          toast.error(`Erreur lors de la création: ${error.message}`);
+          return;
+        }
       }
 
       toast.success(`Membre ${editingMember ? 'mis à jour' : 'créé'} avec succès`);
@@ -189,9 +205,9 @@ const LeadershipAdminPage: React.FC = () => {
       setEditingMember(null);
       resetForm();
       await fetchLeadershipMembers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving leadership member:', error);
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error(`Erreur: ${error?.message || 'Erreur inconnue'}`);
     }
   };
 
@@ -225,10 +241,18 @@ const LeadershipAdminPage: React.FC = () => {
       const currentMember = members[index];
       const prevMember = members[index - 1];
 
-      await Promise.all([
+      const results = await Promise.all([
         supabase.from('leadership_team').update({ order: prevMember.order }).eq('id', currentMember.id),
         supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', prevMember.id)
       ]);
+
+      const hasError = results.some(r => r.error);
+      if (hasError) {
+        const error = results.find(r => r.error)?.error;
+        console.error('Error moving member up:', error);
+        toast.error(`Erreur lors du déplacement: ${error?.message}`);
+        return;
+      }
 
       const newMembers = [...members];
       newMembers[index] = { ...currentMember, order: prevMember.order };
@@ -237,9 +261,9 @@ const LeadershipAdminPage: React.FC = () => {
       setMembers(newMembers);
 
       toast.success('Ordre mis à jour');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error moving member up:', error);
-      toast.error('Erreur lors du déplacement');
+      toast.error(`Erreur: ${error?.message || 'Erreur inconnue'}`);
     }
   };
 
@@ -251,10 +275,18 @@ const LeadershipAdminPage: React.FC = () => {
       const currentMember = members[index];
       const nextMember = members[index + 1];
 
-      await Promise.all([
+      const results = await Promise.all([
         supabase.from('leadership_team').update({ order: nextMember.order }).eq('id', currentMember.id),
         supabase.from('leadership_team').update({ order: currentMember.order }).eq('id', nextMember.id)
       ]);
+
+      const hasError = results.some(r => r.error);
+      if (hasError) {
+        const error = results.find(r => r.error)?.error;
+        console.error('Error moving member down:', error);
+        toast.error(`Erreur lors du déplacement: ${error?.message}`);
+        return;
+      }
 
       const newMembers = [...members];
       newMembers[index] = { ...currentMember, order: nextMember.order };
@@ -263,9 +295,9 @@ const LeadershipAdminPage: React.FC = () => {
       setMembers(newMembers);
 
       toast.success('Ordre mis à jour');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error moving member down:', error);
-      toast.error('Erreur lors du déplacement');
+      toast.error(`Erreur: ${error?.message || 'Erreur inconnue'}`);
     }
   };
 
