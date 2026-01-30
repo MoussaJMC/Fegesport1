@@ -26,9 +26,9 @@ const HomePage: React.FC = () => {
   const [pageSections, setPageSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    players: 200,
-    clubs: 15,
-    partners: 8
+    players: 0,
+    clubs: 0,
+    partners: 0
   });
 
   // Get settings from database
@@ -170,8 +170,14 @@ const HomePage: React.FC = () => {
   };
 
   const fetchStats = async () => {
-    const communityStats = await fetchCommunityStats();
-    setStats(communityStats);
+    try {
+      console.log('Fetching community stats...');
+      const communityStats = await fetchCommunityStats();
+      console.log('Community stats received:', communityStats);
+      setStats(communityStats);
+    } catch (error) {
+      console.error('Error fetching community stats:', error);
+    }
   };
 
   const formatDate = (dateString: string): string => {
