@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface CommunityStats {
   players: number;
@@ -50,4 +51,36 @@ export async function fetchCommunityStats(): Promise<CommunityStats> {
       partners: 0
     };
   }
+}
+
+export function subscribeToCommunityStats(
+  onUpdate: () => void
+): RealtimeChannel {
+  const channel = supabase
+    .channel('community-stats-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'members'
+      },
+      () => {
+        onUpdate();
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'partners'
+      },
+      () => {
+        onUpdate();
+      }
+    )
+    .subscribe();
+
+  return channel;
 }

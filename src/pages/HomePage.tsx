@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Trophy, Users, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { fetchCommunityStats } from '../lib/communityStats';
+import { fetchCommunityStats, subscribeToCommunityStats } from '../lib/communityStats';
 
 // Components
 import NewsCard from '../components/news/NewsCard';
@@ -45,6 +45,17 @@ const HomePage: React.FC = () => {
     fetchLatestNews();
     fetchUpcomingEvents();
     fetchStats();
+
+    // Subscribe to real-time updates for community stats
+    const channel = subscribeToCommunityStats(() => {
+      console.log('Community stats changed, refreshing...');
+      fetchStats();
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const fetchPageData = async () => {

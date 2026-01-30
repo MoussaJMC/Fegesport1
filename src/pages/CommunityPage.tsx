@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Trophy, Star, Building } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { fetchCommunityStats } from '../lib/communityStats';
+import { fetchCommunityStats, subscribeToCommunityStats } from '../lib/communityStats';
 import { supabase } from '../lib/supabase';
 
 interface CommunityStats {
@@ -46,6 +46,19 @@ const CommunityPage: React.FC = () => {
     fetchStats();
     fetchMembers();
     fetchPartners();
+
+    // Subscribe to real-time updates for community stats
+    const channel = subscribeToCommunityStats(() => {
+      console.log('Community stats changed, refreshing...');
+      fetchStats();
+      fetchMembers();
+      fetchPartners();
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
 
   const fetchStats = async () => {
