@@ -35,6 +35,7 @@ interface MembershipType {
   period: string;
   features: string[];
   is_active: boolean;
+  member_type?: 'player' | 'club' | 'partner';
 }
 
 interface MembershipFormProps {
@@ -83,10 +84,10 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
     try {
       setLoadingTypes(true);
       
-      // Try to fetch from Supabase
+      // Try to fetch from Supabase including member_type
       const { data, error } = await supabase
         .from('membership_types')
-        .select('*')
+        .select('id, name, description, price, period, features, is_active, member_type')
         .eq('is_active', true)
         .order('price', { ascending: true });
 
@@ -124,7 +125,8 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           'Badge digital officiel',
           'Inscription 100% gratuite'
         ],
-        is_active: true
+        is_active: true,
+        member_type: 'player'
       },
       {
         id: 'club',
@@ -139,7 +141,8 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           'Support marketing',
           'Visibilité sur le site FEGESPORT'
         ],
-        is_active: true
+        is_active: true,
+        member_type: 'club'
       },
       {
         id: 'partner',
@@ -154,7 +157,8 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
           'Communication dédiée',
           'Programme personnalisé'
         ],
-        is_active: true
+        is_active: true,
+        member_type: 'partner'
       }
     ];
   };
@@ -178,9 +182,33 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
 
       console.log('Database connection successful');
 
+      // Get the selected membership type to determine member_type
+      const selectedType = membershipTypes.find(type => type.id === data.type);
+      if (!selectedType) {
+        toast.error('Type d\'adhésion invalide');
+        return;
+      }
+
+      // Use the member_type from the membership type, or fallback to name parsing
+      let memberType: 'player' | 'club' | 'partner';
+      if (selectedType.member_type) {
+        memberType = selectedType.member_type;
+      } else {
+        // Fallback to name parsing if member_type is not set
+        if (selectedType.name.toLowerCase().includes('joueur') || selectedType.name.toLowerCase().includes('player')) {
+          memberType = 'player';
+        } else if (selectedType.name.toLowerCase().includes('club')) {
+          memberType = 'club';
+        } else if (selectedType.name.toLowerCase().includes('partenaire') || selectedType.name.toLowerCase().includes('partner')) {
+          memberType = 'partner';
+        } else {
+          memberType = 'player';
+        }
+      }
+
       // For individual players, registration is free with optional contribution
       // For clubs and partners, payment is required
-      const isPlayerType = data.type === 'player';
+      const isPlayerType = memberType === 'player';
 
       // Prepare member data for database insertion
       const memberData: any = {
@@ -190,7 +218,7 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
         phone: data.phone,
         address: data.address,
         city: data.city,
-        member_type: data.type as 'player' | 'club' | 'partner',
+        member_type: memberType,
         status: (isPlayerType ? 'active' : 'pending') as 'active' | 'pending',
         membership_start: new Date().toISOString().split('T')[0],
         membership_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
