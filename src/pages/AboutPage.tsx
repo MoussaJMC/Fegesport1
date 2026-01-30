@@ -273,7 +273,7 @@ const AboutPage: React.FC = () => {
                   <div className="p-6">
                     <h3 className="text-xl font-bold mb-1 card-title">{member.name}</h3>
                     <p className="text-primary-600 font-medium mb-4">{member.position}</p>
-                    <p className="text-gray-600 card-description text-sm">
+                    <p className="text-gray-600 card-description text-sm text-justify">
                       {expandedBios[member.id]
                         ? member.bio
                         : truncateBio(member.bio, 300)}
