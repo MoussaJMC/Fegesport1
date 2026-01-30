@@ -25,6 +25,7 @@ const HomePage: React.FC = () => {
   const [events, setEvents] = useState(upcomingEvents);
   const [pageSections, setPageSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
     players: 0,
     clubs: 0,
@@ -41,10 +42,27 @@ const HomePage: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchPageData();
-    fetchLatestNews();
-    fetchUpcomingEvents();
-    fetchStats();
+    const initializeData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Load data in parallel for better performance
+        await Promise.all([
+          fetchPageData(),
+          fetchLatestNews(),
+          fetchUpcomingEvents(),
+          fetchStats()
+        ]);
+      } catch (err) {
+        console.error('Error initializing data:', err);
+        setError('Une erreur est survenue lors du chargement des données');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeData();
 
     // Subscribe to real-time updates for community stats
     const channel = subscribeToCommunityStats(() => {
@@ -197,6 +215,37 @@ const HomePage: React.FC = () => {
   const heroSection = getSection('hero');
   const aboutSection = getSection('about');
   const statsSection = getSection('stats');
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary-900">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-primary-500 border-t-transparent"></div>
+          <p className="mt-4 text-white text-lg">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary-900">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="text-red-500 text-6xl mb-4">⚠</div>
+          <h1 className="text-2xl font-bold text-white mb-2">Erreur de chargement</h1>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md"
+          >
+            Recharger la page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -377,11 +426,17 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {news.slice(0, 3).map((newsItem) => (
-              <NewsCard key={newsItem.id} news={newsItem} />
-            ))}
-          </div>
+          {news && news.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {news.slice(0, 3).map((newsItem) => (
+                <NewsCard key={newsItem.id} news={newsItem} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-12">
+              <p>Aucune actualité disponible pour le moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -395,11 +450,17 @@ const HomePage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {events.slice(0, 4).map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          {events && events.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {events.slice(0, 4).map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-12">
+              <p>Aucun événement à venir pour le moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
