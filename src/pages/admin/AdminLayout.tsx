@@ -191,6 +191,7 @@ const AdminLayout: React.FC = () => {
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
+    { icon: Mail, label: 'Emails', path: '/admin/emails' },
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
     { icon: Book, label: 'Ressources', path: '/admin/resources' },
     { icon: Layers, label: 'Cartes', path: '/admin/cards' },

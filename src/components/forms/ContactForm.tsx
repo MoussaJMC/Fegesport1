@@ -7,6 +7,7 @@ import { FormField, FormTextarea, FormSelect, FormSubmitButton } from '../ui/For
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { contactFormLimiter, sanitizeInput, validate, secureSubmit } from '../../lib/security';
+import { emailService } from '../../lib/emailService';
 
 const contactSchema = z.object({
   subject: z.string().min(1, 'Veuillez sélectionner un sujet'),
@@ -60,10 +61,12 @@ const ContactForm: React.FC = () => {
       await secureSubmit(
         sanitizedData,
         async (secureData) => {
+          const fullName = `${secureData.firstName} ${secureData.lastName}`;
+
           const { error } = await supabase
             .from('contact_messages')
             .insert([{
-              name: `${secureData.firstName} ${secureData.lastName}`,
+              name: fullName,
               email: secureData.email,
               subject: secureData.subject,
               message: secureData.message,
@@ -71,6 +74,21 @@ const ContactForm: React.FC = () => {
             }]);
 
           if (error) throw error;
+
+          await Promise.all([
+            emailService.sendContactConfirmation({
+              name: fullName,
+              email: secureData.email,
+              subject: secureData.subject,
+              message: secureData.message,
+            }),
+            emailService.sendContactNotification({
+              name: fullName,
+              email: secureData.email,
+              subject: secureData.subject,
+              message: secureData.message,
+            }),
+          ]);
         },
         {
           rateLimiter: contactFormLimiter,
@@ -79,7 +97,7 @@ const ContactForm: React.FC = () => {
         }
       );
 
-      toast.success('Message envoyé avec succès!');
+      toast.success('Message envoyé avec succès! Vous recevrez une confirmation par email.');
       methods.reset();
     } catch (error: any) {
       console.error('Error submitting contact form:', error);

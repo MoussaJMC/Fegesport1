@@ -43,6 +43,7 @@ import StreamsAdminPage from './pages/admin/StreamsAdminPage';
 import NewsletterAdminPage from './pages/admin/NewsletterAdminPage';
 import EventRegistrationsAdminPage from './pages/admin/EventRegistrationsAdminPage';
 import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
+import EmailAdminPage from './pages/admin/EmailAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -80,6 +81,7 @@ function App() {
             <Route path="newsletter" element={<NewsletterAdminPage />} />
             <Route path="registrations" element={<EventRegistrationsAdminPage />} />
             <Route path="settings" element={<SiteSettingsAdminPage />} />
+            <Route path="emails" element={<EmailAdminPage />} />
           </Route>
 
           {/* Public routes */}

@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { FormField, FormTextarea, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/Form';
 import PayPalButton from '../payment/PayPalButton';
 import { useTranslation } from 'react-i18next';
+import { emailService } from '../../lib/emailService';
 
 const membershipSchema = z.object({
   type: z.string().min(1, 'Veuillez sélectionner un type d\'adhésion'),
@@ -259,11 +260,18 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
       console.log('Member successfully inserted with ID:', insertedMemberId);
 
       if (isPlayerType) {
-        // For players, registration is complete and free
-        toast.success('Inscription réussie ! Votre adhésion en tant que joueur individuel est maintenant active.');
+        emailService.sendMembershipConfirmation({
+          name: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          membershipType: selectedType.name,
+          memberNumber: insertedMemberId || 'En cours d\'attribution',
+        }).catch(error => {
+          console.error('Failed to send confirmation email:', error);
+        });
+
+        toast.success('Inscription réussie ! Votre adhésion en tant que joueur individuel est maintenant active. Un email de confirmation vous a été envoyé.');
         methods.reset();
       } else {
-        // For clubs and partners, store form data and proceed to payment
         setFormData(data);
         toast.success('Données d\'inscription enregistrées avec succès!');
         setShowPayment(true);
@@ -295,7 +303,18 @@ const MembershipForm: React.FC<MembershipFormProps> = ({ selectedType }) => {
         }
 
         console.log('Member status updated to active');
-        toast.success(t('membership.form.success'));
+
+        const selectedType = membershipTypes.find(type => type.id === formData.type);
+        emailService.sendMembershipConfirmation({
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          membershipType: selectedType?.name || 'Standard',
+          memberNumber: 'En cours d\'attribution',
+        }).catch(error => {
+          console.error('Failed to send confirmation email:', error);
+        });
+
+        toast.success(t('membership.form.success') + ' Un email de confirmation vous a été envoyé.');
         methods.reset();
         setShowPayment(false);
         setFormData(null);
