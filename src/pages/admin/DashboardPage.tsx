@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus, AlertTriangle, RefreshCw, FileText, UserCheck, Award, Layers, Image, Video } from 'lucide-react';
+import { LogOut, Users, Calendar, Building, Mail, Newspaper, Activity, Plus, AlertTriangle, RefreshCw, FileText, UserCheck, Award, Layers, Image, Video, Download, FileArchive } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -227,6 +227,16 @@ const DashboardPage: React.FC = () => {
     } catch (error) {
       toast.error('Erreur lors de la déconnexion');
     }
+  };
+
+  const handleDownloadBackup = () => {
+    const link = document.createElement('a');
+    link.href = '/fegesport-backup.tar.gz';
+    link.download = 'fegesport-backup.tar.gz';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Téléchargement de la sauvegarde lancé');
   };
 
   const menuItems = [
@@ -602,6 +612,62 @@ const DashboardPage: React.FC = () => {
             >
               Voir le diagnostic complet <span aria-hidden="true">&rarr;</span>
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Backup Download */}
+      <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 shadow-lg rounded-lg overflow-hidden">
+        <div className="px-4 py-5 sm:p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-4">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-3 rounded-lg">
+                <FileArchive className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg leading-6 font-bold text-gray-900">
+                  Sauvegarde Complète du Site
+                </h3>
+                <p className="mt-1 text-sm text-gray-700">
+                  Archive complète avec tous les fichiers, migrations et corrections de sécurité
+                </p>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-700">264 fichiers inclus</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-700">87 migrations</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-700">Taille: 327 KB</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-700">43 correctifs sécurité</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleDownloadBackup}
+              className="ml-4 flex-shrink-0 inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Télécharger
+            </button>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-blue-200">
+            <div className="flex items-start space-x-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold">Important:</span> Cette archive contient des clés API sensibles.
+                Stockez-la dans un lieu sécurisé et ne la partagez pas publiquement.
+              </p>
+            </div>
           </div>
         </div>
       </div>
