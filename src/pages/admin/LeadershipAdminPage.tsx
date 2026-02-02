@@ -10,6 +10,10 @@ interface LeadershipMember {
   position: string;
   bio: string;
   image_url: string;
+  email?: string;
+  official_email?: string;
+  email_forward_enabled?: boolean;
+  email_signature?: string;
   order: number;
   is_active: boolean;
   created_at: string;
@@ -29,12 +33,20 @@ const LeadershipAdminPage: React.FC = () => {
     position: string;
     bio: string;
     image_url: string;
+    email: string;
+    official_email: string;
+    email_forward_enabled: boolean;
+    email_signature: string;
     is_active: boolean;
   }>({
     name: '',
     position: '',
     bio: '',
     image_url: '',
+    email: '',
+    official_email: '',
+    email_forward_enabled: true,
+    email_signature: '',
     is_active: true
   });
 
@@ -171,6 +183,10 @@ const LeadershipAdminPage: React.FC = () => {
             position: formData.position,
             bio: formData.bio,
             image_url: formData.image_url,
+            email: formData.email || null,
+            official_email: formData.official_email || null,
+            email_forward_enabled: formData.email_forward_enabled,
+            email_signature: formData.email_signature || null,
             is_active: formData.is_active
           })
           .eq('id', editingMember.id);
@@ -189,6 +205,10 @@ const LeadershipAdminPage: React.FC = () => {
             position: formData.position,
             bio: formData.bio,
             image_url: formData.image_url,
+            email: formData.email || null,
+            official_email: formData.official_email || null,
+            email_forward_enabled: formData.email_forward_enabled,
+            email_signature: formData.email_signature || null,
             order: maxOrder + 1,
             is_active: formData.is_active
           }]);
@@ -217,6 +237,10 @@ const LeadershipAdminPage: React.FC = () => {
       position: member.position,
       bio: member.bio,
       image_url: member.image_url,
+      email: member.email || '',
+      official_email: member.official_email || '',
+      email_forward_enabled: member.email_forward_enabled ?? true,
+      email_signature: member.email_signature || '',
       is_active: member.is_active
     });
     setEditingMember(member);
@@ -229,6 +253,10 @@ const LeadershipAdminPage: React.FC = () => {
       position: '',
       bio: '',
       image_url: '',
+      email: '',
+      official_email: '',
+      email_forward_enabled: true,
+      email_signature: '',
       is_active: true
     });
   };
@@ -432,9 +460,9 @@ const LeadershipAdminPage: React.FC = () => {
                   />
                   {formData.image_url && (
                     <div className="mt-2">
-                      <img 
-                        src={formData.image_url} 
-                        alt="Aperçu" 
+                      <img
+                        src={formData.image_url}
+                        alt="Aperçu"
                         className="h-20 w-20 object-cover rounded-full"
                         onError={(e) => {
                           e.currentTarget.src = 'https://via.placeholder.com/150';
@@ -444,7 +472,77 @@ const LeadershipAdminPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center">
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-md font-semibold text-gray-900 mb-3">Configuration Email</h3>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email personnel
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="exemple@email.com"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Email personnel du membre (visible publiquement)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email officiel
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.official_email}
+                        onChange={(e) => setFormData({ ...formData, official_email: e.target.value })}
+                        placeholder="president@fegesport.org"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Email officiel avec le domaine de l'organisation
+                      </p>
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="email_forward_enabled"
+                        checked={formData.email_forward_enabled}
+                        onChange={(e) => setFormData({ ...formData, email_forward_enabled: e.target.checked })}
+                        className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                      />
+                      <label htmlFor="email_forward_enabled" className="ml-2 text-sm text-gray-700">
+                        Activer le transfert d'emails
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 -mt-2 ml-6">
+                      Transférer automatiquement les emails de l'adresse officielle vers l'email personnel
+                    </p>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Signature email
+                      </label>
+                      <textarea
+                        value={formData.email_signature}
+                        onChange={(e) => setFormData({ ...formData, email_signature: e.target.value })}
+                        rows={3}
+                        placeholder="Signature personnalisée pour les emails..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Signature HTML personnalisée (optionnelle)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center border-t pt-4 mt-4">
                   <input
                     type="checkbox"
                     id="is_active"
@@ -513,6 +611,16 @@ const LeadershipAdminPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-bold">{member.name}</h3>
                   <p className="text-primary-600 font-medium">{member.position}</p>
+                  {member.official_email && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      <span className="font-semibold">Email officiel:</span> {member.official_email}
+                    </p>
+                  )}
+                  {member.email && (
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      <span className="font-semibold">Email perso:</span> {member.email}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col space-y-1">
                   <button
@@ -613,7 +721,7 @@ const LeadershipAdminPage: React.FC = () => {
               Seuls les membres marqués comme "Actifs" sont visibles sur le site public.
             </p>
           </div>
-          
+
           <div>
             <h3 className="font-medium">2. Ordre d'affichage</h3>
             <p className="text-sm mt-1">
@@ -621,13 +729,26 @@ const LeadershipAdminPage: React.FC = () => {
               Le président est généralement affiché en premier, suivi des autres membres de la direction.
             </p>
           </div>
-          
+
           <div>
             <h3 className="font-medium">3. Images</h3>
             <p className="text-sm mt-1">
               Pour de meilleurs résultats, utilisez des images carrées ou au format portrait, de préférence avec un fond neutre.
               Dimensions recommandées : 600x600 pixels minimum.
             </p>
+          </div>
+
+          <div>
+            <h3 className="font-medium">4. Configuration des emails</h3>
+            <p className="text-sm mt-1">
+              Vous pouvez configurer deux types d'emails pour chaque membre :
+            </p>
+            <ul className="text-sm mt-2 ml-4 list-disc space-y-1">
+              <li><strong>Email personnel :</strong> L'adresse email personnelle du membre (visible publiquement)</li>
+              <li><strong>Email officiel :</strong> Une adresse avec le domaine de l'organisation (ex: president@fegesport.org)</li>
+              <li><strong>Transfert automatique :</strong> Les emails envoyés à l'adresse officielle peuvent être automatiquement transférés vers l'email personnel</li>
+              <li><strong>Signature email :</strong> Configurez une signature personnalisée en HTML pour les communications officielles</li>
+            </ul>
           </div>
         </div>
       </div>
