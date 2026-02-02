@@ -24,6 +24,10 @@ const MessagesAdminPage = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyMessage, setReplyMessage] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -106,9 +110,68 @@ const MessagesAdminPage = () => {
     }
   };
 
-  const handleReply = (email: string, subject: string) => {
-    const mailtoLink = `mailto:${email}?subject=Re: ${subject}`;
-    window.open(mailtoLink, '_blank');
+  const handleReply = (message: ContactMessage) => {
+    setSelectedMessage(message);
+    setReplySubject(`Re: ${message.subject}`);
+    setReplyMessage(`\n\n---\nEn réponse à votre message du ${format(new Date(message.created_at), 'PPP à HH:mm', { locale: fr })}:\n\n${message.message}`);
+    setShowReplyModal(true);
+  };
+
+  const sendReply = async () => {
+    if (!selectedMessage) return;
+
+    try {
+      setSendingReply(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            to: selectedMessage.email,
+            toName: selectedMessage.name,
+            subject: replySubject,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                  <h2 style="color: #333; margin-bottom: 20px;">FEGESPORT</h2>
+                  <div style="background-color: white; padding: 20px; border-radius: 4px;">
+                    ${replyMessage.replace(/\n/g, '<br>')}
+                  </div>
+                  <div style="margin-top: 20px; font-size: 12px; color: #666;">
+                    <p>Cordialement,<br>L'équipe FEGESPORT</p>
+                  </div>
+                </div>
+              </div>
+            `,
+            text: replyMessage,
+            replyTo: 'noreply@fegesport.org',
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || result.message || 'Erreur lors de l\'envoi');
+      }
+
+      await markAsReplied(selectedMessage.id);
+
+      toast.success('Réponse envoyée avec succès');
+      setShowReplyModal(false);
+      setReplySubject('');
+      setReplyMessage('');
+    } catch (error) {
+      console.error('Error sending reply:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'envoi de la réponse');
+    } finally {
+      setSendingReply(false);
+    }
   };
 
   const filteredMessages = messages.filter(message => {
@@ -204,6 +267,98 @@ const MessagesAdminPage = () => {
         </div>
       </div>
 
+      {/* Reply Modal */}
+      {showReplyModal && selectedMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-xl font-bold">Répondre à {selectedMessage.name}</h2>
+                <button
+                  onClick={() => {
+                    setShowReplyModal(false);
+                    setReplySubject('');
+                    setReplyMessage('');
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                  disabled={sendingReply}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg text-sm">
+                  <div><span className="font-medium">À:</span> {selectedMessage.email}</div>
+                  <div><span className="font-medium">Message original:</span> {selectedMessage.subject}</div>
+                </div>
+
+                <div>
+                  <label htmlFor="reply-subject" className="block text-sm font-medium text-gray-700 mb-2">
+                    Sujet
+                  </label>
+                  <input
+                    id="reply-subject"
+                    type="text"
+                    value={replySubject}
+                    onChange={(e) => setReplySubject(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    disabled={sendingReply}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="reply-message" className="block text-sm font-medium text-gray-700 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    id="reply-message"
+                    value={replyMessage}
+                    onChange={(e) => setReplyMessage(e.target.value)}
+                    rows={12}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="Écrivez votre réponse ici..."
+                    disabled={sendingReply}
+                  />
+                </div>
+
+                <div className="flex space-x-2 pt-4">
+                  <button
+                    onClick={sendReply}
+                    disabled={sendingReply || !replySubject.trim() || !replyMessage.trim()}
+                    className="btn bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {sendingReply ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Reply className="w-4 h-4 mr-2" />
+                        Envoyer la réponse
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowReplyModal(false);
+                      setReplySubject('');
+                      setReplyMessage('');
+                    }}
+                    disabled={sendingReply}
+                    className="btn bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-50"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Message Modal */}
       {showMessageModal && selectedMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -250,8 +405,8 @@ const MessagesAdminPage = () => {
                 <div className="flex space-x-2 pt-4">
                   <button
                     onClick={() => {
-                      handleReply(selectedMessage.email, selectedMessage.subject);
-                      markAsReplied(selectedMessage.id);
+                      setShowMessageModal(false);
+                      handleReply(selectedMessage);
                     }}
                     className="btn bg-primary-600 hover:bg-primary-700 text-white"
                   >
@@ -366,10 +521,10 @@ const MessagesAdminPage = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleReply(message.email, message.subject);
+                          handleReply(message);
                         }}
                         className="text-green-600 hover:text-green-900"
                         title="Répondre"
