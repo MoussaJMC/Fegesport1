@@ -33,6 +33,13 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseServiceKey,
+      hasResendKey: !!resendApiKey,
+      resendKeyLength: resendApiKey?.length || 0,
+    });
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     if (req.method === 'POST') {
@@ -173,6 +180,25 @@ Deno.serve(async (req: Request) => {
     if (req.method === 'GET') {
       const url = new URL(req.url);
       const action = url.searchParams.get('action');
+
+      if (action === 'status') {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Email function is running',
+            hasResendKey: !!resendApiKey,
+            resendKeyLength: resendApiKey?.length || 0,
+            environment: {
+              hasSupabaseUrl: !!supabaseUrl,
+              hasSupabaseKey: !!supabaseServiceKey,
+            }
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
 
       if (action === 'process') {
         const resendApiKey = Deno.env.get('RESEND_API_KEY');

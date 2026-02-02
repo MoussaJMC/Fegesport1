@@ -44,6 +44,7 @@ import NewsletterAdminPage from './pages/admin/NewsletterAdminPage';
 import EventRegistrationsAdminPage from './pages/admin/EventRegistrationsAdminPage';
 import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
 import EmailAdminPage from './pages/admin/EmailAdminPage';
+import EmailTestDiagnosticPage from './pages/admin/EmailTestDiagnosticPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -82,6 +83,7 @@ function App() {
             <Route path="registrations" element={<EventRegistrationsAdminPage />} />
             <Route path="settings" element={<SiteSettingsAdminPage />} />
             <Route path="emails" element={<EmailAdminPage />} />
+            <Route path="email-test" element={<EmailTestDiagnosticPage />} />
           </Route>
 
           {/* Public routes */}

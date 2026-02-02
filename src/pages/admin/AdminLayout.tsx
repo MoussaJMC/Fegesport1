@@ -192,6 +192,7 @@ const AdminLayout: React.FC = () => {
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
     { icon: Mail, label: 'Emails', path: '/admin/emails' },
+    { icon: Mail, label: 'Test Email', path: '/admin/email-test' },
     { icon: FolderOpen, label: 'Fichiers', path: '/admin/files' },
     { icon: Book, label: 'Ressources', path: '/admin/resources' },
     { icon: Layers, label: 'Cartes', path: '/admin/cards' },
