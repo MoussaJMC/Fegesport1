@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
       const {
         to,
         toName,
-        from = 'noreply@contact.fegesport224.org',
+        from = 'noreply@fegesport224.org',
         fromName = 'FEGESPORT',
         replyTo,
         subject,
