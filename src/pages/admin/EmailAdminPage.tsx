@@ -37,11 +37,30 @@ const EmailAdminPage: React.FC = () => {
     pending: 0,
     sent: 0,
     failed: 0,
+    resent: 0,
   });
 
   useEffect(() => {
     fetchEmails();
+    fetchStats();
   }, [statusFilter]);
+
+  const fetchStats = async () => {
+    try {
+      // Récupérer TOUS les emails pour les statistiques globales
+      const allEmails = await emailService.getEmailQueue();
+      const statsData = {
+        total: allEmails.length,
+        pending: allEmails.filter((e: EmailQueueItem) => e.status === 'pending').length,
+        sent: allEmails.filter((e: EmailQueueItem) => e.status === 'sent').length,
+        failed: allEmails.filter((e: EmailQueueItem) => e.status === 'failed').length,
+        resent: allEmails.filter((e: EmailQueueItem) => e.attempts > 1).length,
+      };
+      setStats(statsData);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
   const fetchEmails = async () => {
     try {
@@ -49,14 +68,6 @@ const EmailAdminPage: React.FC = () => {
       const filter = statusFilter === 'all' ? undefined : statusFilter;
       const data = await emailService.getEmailQueue(filter);
       setEmails(data);
-
-      const statsData = {
-        total: data.length,
-        pending: data.filter((e: EmailQueueItem) => e.status === 'pending').length,
-        sent: data.filter((e: EmailQueueItem) => e.status === 'sent').length,
-        failed: data.filter((e: EmailQueueItem) => e.status === 'failed').length,
-      };
-      setStats(statsData);
     } catch (error) {
       console.error('Error fetching emails:', error);
       toast.error('Erreur lors du chargement des emails');
@@ -73,6 +84,7 @@ const EmailAdminPage: React.FC = () => {
       if (result.success) {
         toast.success(result.message || 'File d\'attente traitée avec succès');
         fetchEmails();
+        fetchStats();
       } else {
         toast.error(result.error || 'Erreur lors du traitement');
       }
@@ -124,6 +136,7 @@ const EmailAdminPage: React.FC = () => {
         setTestName('');
         setShowTestModal(false);
         fetchEmails();
+        fetchStats();
       } else {
         toast.error(`Erreur : ${result.error}`);
       }
@@ -215,7 +228,7 @@ const EmailAdminPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -243,6 +256,16 @@ const EmailAdminPage: React.FC = () => {
               <p className="text-2xl font-bold text-green-600">{stats.sent}</p>
             </div>
             <CheckCircle size={32} className="text-green-400" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Réessayés</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.resent}</p>
+            </div>
+            <RefreshCw size={32} className="text-blue-400" />
           </div>
         </div>
 
