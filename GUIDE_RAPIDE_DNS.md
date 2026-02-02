@@ -1,4 +1,4 @@
-# Guide Rapide : Configurer les DNS pour fegesport.org
+# Guide Rapide : Configurer les DNS pour contact.fegesport224.org
 
 ## Étapes Rapides
 
@@ -6,7 +6,7 @@
 
 1. Allez sur https://resend.com/domains
 2. Cliquez sur **"Add Domain"**
-3. Entrez : `fegesport.org`
+3. Entrez : `contact.fegesport224.org`
 4. Cliquez sur **"Add"**
 5. **Copiez tous les enregistrements affichés**
 
@@ -37,13 +37,13 @@ v=spf1 include:_spf.resend.com ~all
 ```
 Type: TXT
 Nom: _dmarc
-Valeur: v=DMARC1; p=none; rua=mailto:postmaster@fegesport.org
+Valeur: v=DMARC1; p=none; rua=mailto:postmaster@contact.fegesport224.org
 TTL: 3600
 ```
 
 **Copier-coller la valeur :**
 ```
-v=DMARC1; p=none; rua=mailto:postmaster@fegesport.org
+v=DMARC1; p=none; rua=mailto:postmaster@contact.fegesport224.org
 ```
 
 ---
@@ -94,7 +94,7 @@ TTL: 3600
 **Attendre :** 15 minutes à 4 heures
 
 **Vérifier sur :**
-- https://dnschecker.org/ (entrez `fegesport.org`)
+- https://dnschecker.org/ (entrez `contact.fegesport224.org`)
 - https://resend.com/domains (cliquez sur "Verify")
 
 ---
@@ -108,7 +108,7 @@ Une fois **"Verified" ✓** dans Resend :
 3. Soumettez
 4. Vérifiez votre email
 
-L'email doit provenir de **noreply@fegesport.org** ✅
+L'email doit provenir de **noreply@contact.fegesport224.org** ✅
 
 ---
 
@@ -170,7 +170,7 @@ v=spf1 include:_spf.resend.com ~all
 
 ### Pour DMARC (TXT) :
 ```
-v=DMARC1; p=none; rua=mailto:postmaster@fegesport.org
+v=DMARC1; p=none; rua=mailto:postmaster@contact.fegesport224.org
 ```
 
 ### Pour DKIM 1 (CNAME) :
@@ -195,7 +195,7 @@ resend3._domainkey.resend.com
 ### ⚠️ "Domain not verified" après 4h
 
 1. Vérifiez avec https://dnschecker.org/
-2. Entrez `_dmarc.fegesport.org` et `resend._domainkey.fegesport.org`
+2. Entrez `_dmarc.contact.fegesport224.org` et `resend._domainkey.contact.fegesport224.org`
 3. Si les enregistrements n'apparaissent pas, vérifiez votre configuration DNS
 
 ### ⚠️ Enregistrements non trouvés

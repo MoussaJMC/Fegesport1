@@ -2,7 +2,7 @@
 
 ## Objectif
 
-Configurer le domaine **fegesport.org** pour envoyer des emails professionnels depuis votre propre domaine (ex: `noreply@fegesport.org`, `contact@fegesport.org`) au lieu d'utiliser un domaine Resend par défaut.
+Configurer le domaine **contact.fegesport224.org** pour envoyer des emails professionnels depuis votre propre domaine (ex: `noreply@contact.fegesport224.org`, `contact@contact.fegesport224.org`) au lieu d'utiliser un domaine Resend par défaut.
 
 ## Étape 1 : Ajouter votre domaine dans Resend
 
@@ -14,7 +14,7 @@ Configurer le domaine **fegesport.org** pour envoyer des emails professionnels d
 
 ### 1.2 Ajouter le domaine
 
-1. Entrez votre domaine : `fegesport.org`
+1. Entrez votre domaine : `contact.fegesport224.org`
 2. Choisissez la région : **Europe (recommandé pour la Guinée)**
 3. Cliquez sur **"Add"**
 
@@ -39,7 +39,7 @@ Selon votre hébergeur de domaine :
 
 ```
 Type: TXT
-Nom/Host: @  (ou fegesport.org)
+Nom/Host: @  (ou contact.fegesport224.org)
 Valeur: v=spf1 include:_spf.resend.com ~all
 TTL: 3600 (ou Auto)
 ```
@@ -88,7 +88,7 @@ TTL: 3600
 ```
 Type: TXT
 Nom/Host: _dmarc
-Valeur: v=DMARC1; p=none; rua=mailto:postmaster@fegesport.org
+Valeur: v=DMARC1; p=none; rua=mailto:postmaster@contact.fegesport224.org
 TTL: 3600
 ```
 
@@ -141,7 +141,7 @@ Entrez votre domaine et vérifiez que les enregistrements apparaissent dans plus
 ## Étape 5 : Vérifier le Domaine dans Resend
 
 1. Retournez sur [Resend Dashboard](https://resend.com/domains)
-2. Cliquez sur votre domaine `fegesport.org`
+2. Cliquez sur votre domaine `contact.fegesport224.org`
 3. Cliquez sur **"Verify Domain"**
 4. Si tout est configuré correctement, vous verrez un statut **"Verified" ✓**
 
@@ -158,7 +158,7 @@ Une fois le domaine vérifié, testez l'envoi :
 ### 6.1 Test depuis Resend Dashboard
 
 1. Dans Resend, allez dans **"Send Test Email"**
-2. Utilisez `noreply@fegesport.org` comme expéditeur
+2. Utilisez `noreply@contact.fegesport224.org` comme expéditeur
 3. Envoyez à votre adresse email personnelle
 4. Vérifiez la réception
 
@@ -173,11 +173,11 @@ Une fois le domaine vérifié, testez l'envoi :
 
 Vous pouvez maintenant utiliser plusieurs adresses :
 
-- `noreply@fegesport.org` : Emails automatiques (confirmations, notifications)
-- `contact@fegesport.org` : Contact général
-- `info@fegesport.org` : Informations
-- `admin@fegesport.org` : Administration
-- `support@fegesport.org` : Support technique
+- `noreply@contact.fegesport224.org` : Emails automatiques (confirmations, notifications)
+- `contact@contact.fegesport224.org` : Contact général
+- `info@contact.fegesport224.org` : Informations
+- `admin@contact.fegesport224.org` : Administration
+- `support@contact.fegesport224.org` : Support technique
 
 **Note :** Ces adresses n'ont pas besoin d'exister réellement pour **envoyer** des emails, mais vous devriez créer des boîtes mail pour recevoir les réponses si vous utilisez `reply_to`.
 

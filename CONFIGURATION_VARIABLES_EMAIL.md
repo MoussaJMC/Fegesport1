@@ -48,11 +48,11 @@ Ces variables sont automatiquement disponibles dans les Edge Functions :
 Le système utilise maintenant les adresses suivantes :
 
 **Expéditeur par défaut :**
-- Email : `noreply@fegesport.org`
+- Email : `noreply@contact.fegesport224.org`
 - Nom : `FEGESPORT`
 
 **Adresse de réponse :**
-- Email : `contact@fegesport.org`
+- Email : `contact@contact.fegesport224.org`
 
 ### Personnalisation
 
@@ -61,9 +61,9 @@ Pour utiliser d'autres adresses, vous pouvez les spécifier lors de l'envoi :
 ```typescript
 await emailService.sendEmail({
   to: 'destinataire@example.com',
-  from: 'info@fegesport.org',      // Adresse personnalisée
+  from: 'info@contact.fegesport224.org',      // Adresse personnalisée
   fromName: 'Info FEGESPORT',        // Nom personnalisé
-  replyTo: 'support@fegesport.org',  // Réponse personnalisée
+  replyTo: 'support@contact.fegesport224.org',  // Réponse personnalisée
   subject: 'Votre sujet',
   html: '<p>Votre contenu</p>'
 });
@@ -86,30 +86,30 @@ await emailService.sendEmail({
 
 **Dans Resend Dashboard :**
 1. Allez sur https://resend.com/domains
-2. Vérifiez que `fegesport.org` apparaît avec un statut "Verified" ✓
+2. Vérifiez que `contact.fegesport224.org` apparaît avec un statut "Verified" ✓
 3. Si le statut est "Pending" ou "Failed", suivez les instructions DNS
 
 **Test d'envoi :**
 1. Allez sur votre site : `/contact`
 2. Remplissez et soumettez le formulaire
 3. Vérifiez votre boîte email
-4. L'email doit provenir de `noreply@fegesport.org`
+4. L'email doit provenir de `noreply@contact.fegesport224.org`
 
 ## Adresses Email Disponibles
 
-Une fois le domaine vérifié, vous pouvez utiliser n'importe quelle adresse @fegesport.org :
+Une fois le domaine vérifié, vous pouvez utiliser n'importe quelle adresse @contact.fegesport224.org :
 
 ### Adresses Recommandées
 
 | Adresse | Usage | Configuré |
 |---------|-------|-----------|
-| `noreply@fegesport.org` | Emails automatiques sans réponse | ✅ |
-| `contact@fegesport.org` | Contact général, réponses | ✅ |
-| `info@fegesport.org` | Informations générales | ⬜ |
-| `admin@fegesport.org` | Administration | ⬜ |
-| `support@fegesport.org` | Support technique | ⬜ |
-| `notification@fegesport.org` | Notifications système | ⬜ |
-| `events@fegesport.org` | Événements et inscriptions | ⬜ |
+| `noreply@contact.fegesport224.org` | Emails automatiques sans réponse | ✅ |
+| `contact@contact.fegesport224.org` | Contact général, réponses | ✅ |
+| `info@contact.fegesport224.org` | Informations générales | ⬜ |
+| `admin@contact.fegesport224.org` | Administration | ⬜ |
+| `support@contact.fegesport224.org` | Support technique | ⬜ |
+| `notification@contact.fegesport224.org` | Notifications système | ⬜ |
+| `events@contact.fegesport224.org` | Événements et inscriptions | ⬜ |
 
 **Note :** Ces adresses n'ont pas besoin d'exister comme vraies boîtes mail pour **envoyer** des emails. Cependant, si vous voulez **recevoir** des réponses, vous devez créer ces boîtes mail chez votre hébergeur.
 

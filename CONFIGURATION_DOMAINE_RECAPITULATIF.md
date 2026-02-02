@@ -3,9 +3,10 @@
 ## ✅ Ce qui a été fait
 
 ### 1. Base de données mise à jour
-- ✅ Adresse d'expéditeur par défaut : `noreply@fegesport.org`
-- ✅ Adresse de réponse par défaut : `contact@fegesport.org`
+- ✅ Adresse d'expéditeur par défaut : `noreply@contact.fegesport224.org`
+- ✅ Adresse de réponse par défaut : `contact@contact.fegesport224.org`
 - ✅ Nom d'expéditeur par défaut : `FEGESPORT`
+- ✅ **Domaine configuré : contact.fegesport224.org**
 
 ### 2. Documentation créée
 
@@ -18,7 +19,7 @@
 | `CONFIGURATION_VARIABLES_EMAIL.md` | Configuration des variables | Après la config DNS |
 
 ### 3. Code mis à jour
-- ✅ Edge Function configurée pour `fegesport.org`
+- ✅ Edge Function configurée pour `contact.fegesport224.org`
 - ✅ Templates d'emails mis à jour
 - ✅ Service email prêt à l'emploi
 
@@ -32,7 +33,7 @@
 
 **En résumé :**
 1. Allez sur https://resend.com/domains
-2. Ajoutez `fegesport.org`
+2. Ajoutez `contact.fegesport224.org`
 3. Copiez les 6 enregistrements DNS
 4. Ajoutez-les chez votre hébergeur de domaine
 5. Attendez 1-4 heures (propagation DNS)
@@ -52,7 +53,7 @@
    - Allez sur `/contact`
    - Remplissez le formulaire
    - Soumettez
-   - Vérifiez que vous recevez un email de `noreply@fegesport.org`
+   - Vérifiez que vous recevez un email de `noreply@contact.fegesport224.org`
 
 2. **Test de score email :**
    - Allez sur https://www.mail-tester.com/
@@ -87,9 +88,9 @@
 
 | Type | Adresse | Usage |
 |------|---------|-------|
-| Expéditeur | `noreply@fegesport.org` | Tous les emails automatiques |
+| Expéditeur | `noreply@contact.fegesport224.org` | Tous les emails automatiques |
 | Nom | `FEGESPORT` | Nom affiché |
-| Réponse | `contact@fegesport.org` | Où les utilisateurs peuvent répondre |
+| Réponse | `contact@contact.fegesport224.org` | Où les utilisateurs peuvent répondre |
 
 ### Templates Configurés
 
@@ -105,11 +106,11 @@
 
 ### Changer l'Expéditeur
 
-Pour utiliser une autre adresse (ex: `info@fegesport.org`) :
+Pour utiliser une autre adresse (ex: `info@contact.fegesport224.org`) :
 
 ```typescript
 await emailService.sendEmail({
-  from: 'info@fegesport.org',
+  from: 'info@contact.fegesport224.org',
   fromName: 'Info FEGESPORT',
   // ... reste des options
 });
@@ -242,7 +243,7 @@ await emailService.sendEmailFromTemplate(
 - [ ] Compte Resend créé
 - [ ] Clé API obtenue
 - [ ] Clé API ajoutée dans Supabase Secrets
-- [ ] Domaine `fegesport.org` ajouté dans Resend
+- [ ] Domaine `contact.fegesport224.org` ajouté dans Resend
 
 ### Configuration DNS
 - [ ] 1 enregistrement TXT pour SPF ajouté
@@ -254,7 +255,7 @@ await emailService.sendEmailFromTemplate(
 
 ### Tests
 - [ ] Test formulaire de contact réussi
-- [ ] Email reçu depuis `noreply@fegesport.org`
+- [ ] Email reçu depuis `noreply@contact.fegesport224.org`
 - [ ] Score mail-tester ≥ 9/10
 - [ ] Vérification dans `/admin/emails` : statut "sent"
 - [ ] Logs consultés et aucune erreur
