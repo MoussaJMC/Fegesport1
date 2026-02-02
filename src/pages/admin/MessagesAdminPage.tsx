@@ -29,6 +29,17 @@ const MessagesAdminPage = () => {
   const [replyMessage, setReplyMessage] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
 
+  // Utility function to escape HTML and prevent XSS
+  const escapeHtml = (unsafe: string): string => {
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      .replace(/\//g, '&#x2F;');
+  };
+
   useEffect(() => {
     fetchMessages();
   }, []);
@@ -140,7 +151,7 @@ const MessagesAdminPage = () => {
                 <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
                   <h2 style="color: #333; margin-bottom: 20px;">FEGESPORT</h2>
                   <div style="background-color: white; padding: 20px; border-radius: 4px;">
-                    ${replyMessage.replace(/\n/g, '<br>')}
+                    ${escapeHtml(replyMessage).replace(/\n/g, '<br>')}
                   </div>
                   <div style="margin-top: 20px; font-size: 12px; color: #666;">
                     <p>Cordialement,<br>L'équipe FEGESPORT</p>

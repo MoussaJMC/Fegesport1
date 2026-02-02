@@ -1,6 +1,15 @@
 // Simple fetch-based API client for Strapi
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+const API_URL = import.meta.env.VITE_STRAPI_API_URL;
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN;
+
+if (!API_URL) {
+  throw new Error('VITE_STRAPI_API_URL environment variable is required');
+}
+
+// Enforce HTTPS in production
+if (import.meta.env.PROD && !API_URL.startsWith('https://')) {
+  throw new Error('API URL must use HTTPS in production');
+}
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -11,7 +20,7 @@ export const fetchAPI = async (path: string, urlParamsObject = {}, options: Requ
     const mergedOptions = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_TOKEN}`,
+        ...(API_TOKEN && { Authorization: `Bearer ${API_TOKEN}` }),
         ...options.headers,
       },
       ...options,

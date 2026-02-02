@@ -9,19 +9,12 @@ export interface CommunityStats {
 
 export async function fetchCommunityStats(): Promise<CommunityStats> {
   try {
-    console.log('[fetchCommunityStats] Starting fetch...');
-
     // Get active players count
     const playersResult = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
       .eq('member_type', 'player')
       .eq('status', 'active');
-
-    console.log('[fetchCommunityStats] Players result:', playersResult);
-    if (playersResult.error) {
-      console.error('[fetchCommunityStats] Players error:', playersResult.error);
-    }
 
     // Get active clubs count
     const clubsResult = await supabase
@@ -30,11 +23,6 @@ export async function fetchCommunityStats(): Promise<CommunityStats> {
       .eq('member_type', 'club')
       .eq('status', 'active');
 
-    console.log('[fetchCommunityStats] Clubs result:', clubsResult);
-    if (clubsResult.error) {
-      console.error('[fetchCommunityStats] Clubs error:', clubsResult.error);
-    }
-
     // Get partners count from both members table and partners table
     const memberPartnersResult = await supabase
       .from('members')
@@ -42,20 +30,10 @@ export async function fetchCommunityStats(): Promise<CommunityStats> {
       .eq('member_type', 'partner')
       .eq('status', 'active');
 
-    console.log('[fetchCommunityStats] Member partners result:', memberPartnersResult);
-    if (memberPartnersResult.error) {
-      console.error('[fetchCommunityStats] Member partners error:', memberPartnersResult.error);
-    }
-
     const directPartnersResult = await supabase
       .from('partners')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active');
-
-    console.log('[fetchCommunityStats] Direct partners result:', directPartnersResult);
-    if (directPartnersResult.error) {
-      console.error('[fetchCommunityStats] Direct partners error:', directPartnersResult.error);
-    }
 
     // Combine partner counts
     const totalPartners = (memberPartnersResult.count || 0) + (directPartnersResult.count || 0);
@@ -66,10 +44,9 @@ export async function fetchCommunityStats(): Promise<CommunityStats> {
       partners: totalPartners || 0
     };
 
-    console.log('[fetchCommunityStats] Final stats:', stats);
     return stats;
   } catch (error) {
-    console.error('[fetchCommunityStats] Exception:', error);
+    // Return default values on error
     return {
       players: 0,
       clubs: 0,

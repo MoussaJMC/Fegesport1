@@ -55,29 +55,26 @@ const LoginPage: React.FC = () => {
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
+
       if (!supabaseUrl || !supabaseKey) {
         tests[0] = {
-          name: 'Configuration Supabase',
+          name: 'Configuration',
           status: 'error',
-          message: 'Variables d\'environnement manquantes',
-          details: { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey }
+          message: 'Configuration manquante'
         };
       } else {
         tests[0] = {
-          name: 'Configuration Supabase',
+          name: 'Configuration',
           status: 'success',
-          message: 'Configuration OK',
-          details: { url: supabaseUrl.substring(0, 30) + '...', keyLength: supabaseKey.length }
+          message: 'Configuration OK'
         };
       }
       setConnectionTests([...tests]);
     } catch (error) {
       tests[0] = {
-        name: 'Configuration Supabase',
+        name: 'Configuration',
         status: 'error',
-        message: 'Erreur de configuration',
-        details: error
+        message: 'Erreur de configuration'
       };
       setConnectionTests([...tests]);
     }

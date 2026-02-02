@@ -32,6 +32,19 @@ class EmailService {
     this.supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
   }
 
+  private escapeHtml(unsafe: string): string {
+    if (typeof unsafe !== 'string') {
+      return String(unsafe);
+    }
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      .replace(/\//g, '&#x2F;');
+  }
+
   private async callEmailFunction(options: SendEmailOptions): Promise<any> {
     const functionUrl = `${this.supabaseUrl}/functions/v1/send-email`;
 
@@ -90,11 +103,13 @@ class EmailService {
       let textContent = template.text_content || '';
       let subject = template.subject;
 
+      // Sanitize template data to prevent XSS attacks
       Object.keys(templateData).forEach((key) => {
         const value = templateData[key];
-        htmlContent = htmlContent.replace(new RegExp(`{{${key}}}`, 'g'), value);
-        textContent = textContent.replace(new RegExp(`{{${key}}}`, 'g'), value);
-        subject = subject.replace(new RegExp(`{{${key}}}`, 'g'), value);
+        const escapedValue = this.escapeHtml(String(value));
+        htmlContent = htmlContent.replace(new RegExp(`{{${key}}}`, 'g'), escapedValue);
+        textContent = textContent.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
+        subject = subject.replace(new RegExp(`{{${key}}}`, 'g'), this.escapeHtml(String(value)));
       });
 
       return await this.sendEmail({
