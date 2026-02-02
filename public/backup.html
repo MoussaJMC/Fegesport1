@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauvegarde FEGESPORT - Téléchargement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+        }
+
+        .feature::before {
+            content: "✓";
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            text-align: left;
+            color: #856404;
+        }
+
+        .warning strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📦</div>
+
+        <h1>Sauvegarde FEGESPORT</h1>
+        <p class="subtitle">Archive complète du site avec toutes les corrections de sécurité</p>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">Date de création</span>
+                <span class="info-value">2 février 2026</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Taille du fichier</span>
+                <span class="info-value">327 KB</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Fichiers inclus</span>
+                <span class="info-value">264 fichiers</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Format</span>
+                <span class="info-value">.tar.gz</span>
+            </div>
+        </div>
+
+        <a href="/fegesport-backup.tar.gz" download="fegesport-backup.tar.gz" class="download-btn">
+            ⬇ Télécharger la Sauvegarde
+        </a>
+
+        <div class="features">
+            <div class="feature">Code source complet (TypeScript/React)</div>
+            <div class="feature">87 migrations Supabase</div>
+            <div class="feature">Edge Functions</div>
+            <div class="feature">Configuration complète</div>
+            <div class="feature">43 corrections de sécurité appliquées</div>
+            <div class="feature">Documentation incluse</div>
+        </div>
+
+        <div class="warning">
+            <strong>⚠ Attention</strong>
+            Cette archive contient des informations sensibles (clés API). Stockez-la dans un lieu sécurisé et ne la partagez pas publiquement.
+        </div>
+    </div>
+</body>
+</html>
