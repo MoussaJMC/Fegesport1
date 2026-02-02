@@ -20,6 +20,7 @@ import DirectPage from './pages/DirectPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import DownloadBackupPage from './pages/DownloadBackupPage';
 
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -101,6 +102,7 @@ function App() {
           <Route path="/direct" element={<PublicLayout><DirectPage /></PublicLayout>} />
           <Route path="/privacy" element={<PublicLayout><PrivacyPage /></PublicLayout>} />
           <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
+          <Route path="/download-backup" element={<DownloadBackupPage />} />
           <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
         </Routes>
       </div>
