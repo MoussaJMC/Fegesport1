@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
       const {
         to,
         toName,
-        from = 'onboarding@resend.dev', // Domaine de test Resend (changez vers votre domaine vérifié)
+        from = 'noreply@contact.fegesport224.org',
         fromName = 'FEGESPORT',
         replyTo,
         subject,
