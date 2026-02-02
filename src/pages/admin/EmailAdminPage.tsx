@@ -28,6 +28,10 @@ const EmailAdminPage: React.FC = () => {
   const [processing, setProcessing] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<EmailQueueItem | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showTestModal, setShowTestModal] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
+  const [testName, setTestName] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -77,6 +81,57 @@ const EmailAdminPage: React.FC = () => {
       toast.error('Erreur lors du traitement de la file d\'attente');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const sendTestEmail = async () => {
+    if (!testEmail || !testName) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
+    try {
+      setSendingTest(true);
+
+      const result = await emailService.sendEmail({
+        to: testEmail,
+        toName: testName,
+        subject: 'Email de test FEGESPORT',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+              <h2 style="color: #333; margin-bottom: 20px;">Test d'envoi d'email</h2>
+              <div style="background-color: white; padding: 20px; border-radius: 4px;">
+                <p>Bonjour ${testName},</p>
+                <p>Ceci est un email de test envoyé depuis le système FEGESPORT.</p>
+                <p>Si vous recevez cet email, cela signifie que l'intégration avec Resend fonctionne correctement !</p>
+                <p style="margin-top: 20px;">
+                  <strong>Date d'envoi :</strong> ${new Date().toLocaleString('fr-FR')}
+                </p>
+              </div>
+              <div style="margin-top: 20px; font-size: 12px; color: #666;">
+                <p>Cordialement,<br>L'équipe FEGESPORT</p>
+              </div>
+            </div>
+          </div>
+        `,
+        text: `Bonjour ${testName},\n\nCeci est un email de test envoyé depuis le système FEGESPORT.\n\nSi vous recevez cet email, cela signifie que l'intégration avec Resend fonctionne correctement !\n\nDate d'envoi : ${new Date().toLocaleString('fr-FR')}\n\nCordialement,\nL'équipe FEGESPORT`,
+      });
+
+      if (result.success) {
+        toast.success('Email de test envoyé avec succès ! Vérifiez votre boîte de réception.');
+        setTestEmail('');
+        setTestName('');
+        setShowTestModal(false);
+        fetchEmails();
+      } else {
+        toast.error(`Erreur : ${result.error}`);
+      }
+    } catch (error: any) {
+      console.error('Error sending test email:', error);
+      toast.error(`Erreur : ${error.message}`);
+    } finally {
+      setSendingTest(false);
     }
   };
 
@@ -132,23 +187,32 @@ const EmailAdminPage: React.FC = () => {
             Suivez et gérez tous les emails envoyés par la plateforme
           </p>
         </div>
-        <button
-          onClick={handleProcessQueue}
-          disabled={processing}
-          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {processing ? (
-            <>
-              <RefreshCw size={18} className="mr-2 animate-spin" />
-              Traitement en cours...
-            </>
-          ) : (
-            <>
-              <Send size={18} className="mr-2" />
-              Traiter la file d'attente
-            </>
-          )}
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => setShowTestModal(true)}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Mail size={18} className="mr-2" />
+            Test d'envoi
+          </button>
+          <button
+            onClick={handleProcessQueue}
+            disabled={processing}
+            className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {processing ? (
+              <>
+                <RefreshCw size={18} className="mr-2 animate-spin" />
+                Traitement en cours...
+              </>
+            ) : (
+              <>
+                <Send size={18} className="mr-2" />
+                Traiter la file d'attente
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -298,6 +362,92 @@ const EmailAdminPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {showTestModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-lg w-full">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-secondary-900">Envoyer un email de test</h2>
+              <button
+                onClick={() => {
+                  setShowTestModal(false);
+                  setTestEmail('');
+                  setTestName('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+                disabled={sendingTest}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nom du destinataire
+                </label>
+                <input
+                  type="text"
+                  value={testName}
+                  onChange={(e) => setTestName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="Jean Dupont"
+                  disabled={sendingTest}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email du destinataire
+                </label>
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="jean.dupont@example.com"
+                  disabled={sendingTest}
+                />
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  Un email de test sera envoyé à cette adresse. Vérifiez votre boîte de réception et vos spams pour confirmer la réception.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowTestModal(false);
+                  setTestEmail('');
+                  setTestName('');
+                }}
+                disabled={sendingTest}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={sendTestEmail}
+                disabled={sendingTest || !testEmail || !testName}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              >
+                {sendingTest ? (
+                  <>
+                    <RefreshCw size={18} className="mr-2 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} className="mr-2" />
+                    Envoyer
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedEmail && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
