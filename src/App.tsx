@@ -47,6 +47,7 @@ import EventRegistrationsAdminPage from './pages/admin/EventRegistrationsAdminPa
 import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
 import EmailAdminPage from './pages/admin/EmailAdminPage';
 import EmailTestDiagnosticPage from './pages/admin/EmailTestDiagnosticPage';
+import LEGAdminPage from './pages/admin/LEGAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -71,6 +72,7 @@ function App() {
             <Route path="pages" element={<PagesAdminPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
+            <Route path="leg" element={<LEGAdminPage />} />
             <Route path="members" element={<MembersAdminPage />} />
             <Route path="membership-types" element={<MembershipTypesAdminPage />} />
             <Route path="leadership" element={<LeadershipAdminPage />} />
