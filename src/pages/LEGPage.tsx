@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown } from 'lucide-react';
+import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown, X } from 'lucide-react';
 import { clubs, disciplines, getClubsByDisciplineRanking, Club, Discipline } from '../data/legData';
 import GuineaMap from '../components/leg/GuineaMap';
+import TournamentForm from '../components/forms/TournamentForm';
 
 const LEGPage: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'clubs' | 'rankings' | 'tournaments'>('clubs');
+  const [showTournamentModal, setShowTournamentModal] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -576,7 +579,10 @@ const LEGPage: React.FC = () => {
                   </div>
                 </div>
 
-                <button className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50">
+                <button
+                  onClick={() => setShowTournamentModal(true)}
+                  className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
+                >
                   <Award className="w-5 h-5 inline mr-2" />
                   S'inscrire Maintenant
                 </button>
@@ -616,18 +622,24 @@ const LEGPage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors">
+                      <Link
+                        to="/direct"
+                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors flex items-center justify-center"
+                      >
                         <Twitch className="w-5 h-5" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <button className="w-full mt-6 py-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50">
+              <Link
+                to="/direct"
+                className="w-full mt-6 py-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center"
+              >
                 <Twitch className="w-5 h-5 inline mr-2" />
                 Voir Tous les Streams
-              </button>
+              </Link>
             </motion.div>
           </div>
         </div>
@@ -679,6 +691,40 @@ const LEGPage: React.FC = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Tournament Registration Modal */}
+      {showTournamentModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setShowTournamentModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 50 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: 50 }}
+            className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-500 rounded-2xl p-8 max-w-2xl w-full my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-4xl font-black text-white mb-2">Inscription au Tournoi</h3>
+                <p className="text-gray-400">CS:GO - National Cup</p>
+              </div>
+              <button
+                onClick={() => setShowTournamentModal(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+
+            <TournamentForm />
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* Club Modal */}
       {selectedClub && (
