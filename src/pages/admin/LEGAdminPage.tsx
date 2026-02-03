@@ -90,10 +90,19 @@ export default function LEGAdminPage() {
   const [showClubDisciplineForm, setShowClubDisciplineForm] = useState(false);
   const [showTournamentForm, setShowTournamentForm] = useState(false);
   const [showStreamForm, setShowStreamForm] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
     fetchData();
+    checkUserEmail();
   }, []);
+
+  const checkUserEmail = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      setUserEmail(user.email);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -143,8 +152,12 @@ export default function LEGAdminPage() {
       setEditingDiscipline(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de l\'enregistrement');
-      console.error(error);
+      console.error('Erreur discipline:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de l\'enregistrement'}`);
+      }
     }
   };
 
@@ -160,8 +173,12 @@ export default function LEGAdminPage() {
       toast.success('Discipline supprimée');
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de la suppression');
-      console.error(error);
+      console.error('Erreur suppression discipline:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+      }
     }
   };
 
@@ -185,8 +202,12 @@ export default function LEGAdminPage() {
       setEditingClub(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de l\'enregistrement');
-      console.error(error);
+      console.error('Erreur club:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de l\'enregistrement'}`);
+      }
     }
   };
 
@@ -202,8 +223,12 @@ export default function LEGAdminPage() {
       toast.success('Club supprimé');
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de la suppression');
-      console.error(error);
+      console.error('Erreur suppression club:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+      }
     }
   };
 
@@ -237,8 +262,14 @@ export default function LEGAdminPage() {
       setEditingClubDiscipline(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de l\'enregistrement');
-      console.error(error);
+      console.error('Erreur club discipline:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else if (error.code === '23505') {
+        toast.error('Cette association club-discipline existe déjà');
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de l\'enregistrement'}`);
+      }
     }
   };
 
@@ -254,8 +285,12 @@ export default function LEGAdminPage() {
       toast.success('Association supprimée');
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de la suppression');
-      console.error(error);
+      console.error('Erreur suppression club discipline:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+      }
     }
   };
 
@@ -298,8 +333,12 @@ export default function LEGAdminPage() {
       setEditingTournament(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de l\'enregistrement');
-      console.error(error);
+      console.error('Erreur tournoi:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de l\'enregistrement'}`);
+      }
     }
   };
 
@@ -311,8 +350,12 @@ export default function LEGAdminPage() {
       toast.success('Tournoi supprimé');
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de la suppression');
-      console.error(error);
+      console.error('Erreur suppression tournoi:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+      }
     }
   };
 
@@ -336,8 +379,12 @@ export default function LEGAdminPage() {
       setEditingStream(null);
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de l\'enregistrement');
-      console.error(error);
+      console.error('Erreur stream:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de l\'enregistrement'}`);
+      }
     }
   };
 
@@ -349,8 +396,12 @@ export default function LEGAdminPage() {
       toast.success('Stream supprimé');
       fetchData();
     } catch (error: any) {
-      toast.error('Erreur lors de la suppression');
-      console.error(error);
+      console.error('Erreur suppression stream:', error);
+      if (error.code === '42501' || error.message?.includes('policy')) {
+        toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
+      } else {
+        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+      }
     }
   };
 
@@ -362,6 +413,26 @@ export default function LEGAdminPage() {
           <p className="text-gray-600 mt-1">League eSport de Guinée - 8 Clubs, 5 Disciplines</p>
         </div>
       </div>
+
+      {userEmail && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <Users className="w-5 h-5 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900">Utilisateur connecté</h3>
+              <p className="text-sm text-blue-700 mt-1">
+                Email: <span className="font-mono font-semibold">{userEmail}</span>
+              </p>
+              <p className="text-xs text-blue-600 mt-2">
+                Les droits de modification sont réservés aux emails admin autorisés:
+                test@example.com, admin@fegesport.org, contact@fegesport.org
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow">
         <div className="border-b border-gray-200">
