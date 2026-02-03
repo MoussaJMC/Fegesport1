@@ -15,6 +15,7 @@ interface NavItem {
   label: string;
   path: string;
   order: number;
+  enabled?: boolean;
   submenu?: SubNavItem[];
 }
 
@@ -111,19 +112,22 @@ const Navbar: React.FC = () => {
       });
     }
 
+    // Filter only enabled items (default to true if enabled field doesn't exist)
+    const enabledItems = items.filter(item => item.enabled !== false);
+
     // Sort by order
-    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+    enabledItems.sort((a, b) => (a.order || 0) - (b.order || 0));
 
     // Add admin link if authenticated
     if (isAuthenticated) {
-      items.push({
+      enabledItems.push({
         label: 'Administration',
         path: '/admin',
         order: 999
       });
     }
 
-    return items;
+    return enabledItems;
   }, [navigationSettings.items, isAuthenticated]);
 
   // Get translated label for navigation items
