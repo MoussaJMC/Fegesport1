@@ -21,6 +21,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DownloadBackupPage from './pages/DownloadBackupPage';
+import LEGPage from './pages/LEGPage';
 
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -100,6 +101,7 @@ function App() {
           <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
           <Route path="/card/:id" element={<PublicLayout><CardPage /></PublicLayout>} />
           <Route path="/direct" element={<PublicLayout><DirectPage /></PublicLayout>} />
+          <Route path="/leg" element={<LEGPage />} />
           <Route path="/privacy" element={<PublicLayout><PrivacyPage /></PublicLayout>} />
           <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
           <Route path="/download-backup" element={<DownloadBackupPage />} />

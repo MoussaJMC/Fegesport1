@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
   // Build navigation items from database settings
   const navItems = React.useMemo(() => {
     const items = [...(navigationSettings.items || [])];
-    
+
     // Add DIRECT link if it doesn't exist
     if (!items.find(item => item.path === '/direct')) {
       items.push({
@@ -100,26 +100,36 @@ const Navbar: React.FC = () => {
         order: items.length + 1
       });
     }
-    
-    // Sort by order
-    items.sort((a, b) => (a.order || 0) - (b.order || 0));
-    
-    // Add admin link if authenticated
-    if (isAuthenticated) {
-      items.push({ 
-        label: 'Administration', 
-        path: '/admin', 
-        order: 999 
+
+    // Add LEG link if it doesn't exist
+    if (!items.find(item => item.path === '/leg')) {
+      items.push({
+        label: 'LEG',
+        path: '/leg',
+        order: items.length + 1
       });
     }
-    
+
+    // Sort by order
+    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    // Add admin link if authenticated
+    if (isAuthenticated) {
+      items.push({
+        label: 'Administration',
+        path: '/admin',
+        order: 999
+      });
+    }
+
     return items;
   }, [navigationSettings.items, isAuthenticated]);
 
   // Get translated label for navigation items
   const getTranslatedLabel = (label: string): string => {
-    // Special case for DIRECT which should always be uppercase
+    // Special case for DIRECT and LEG which should always be uppercase
     if (label === 'DIRECT') return 'DIRECT';
+    if (label === 'LEG') return 'LEG';
 
     // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
