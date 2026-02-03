@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown } from 'lucide-react';
 import { clubs, disciplines, getClubsByDisciplineRanking, Club, Discipline } from '../data/legData';
+import GuineaMap from '../components/leg/GuineaMap';
 
 const LEGPage: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
@@ -244,59 +245,7 @@ const LEGPage: React.FC = () => {
           </motion.h2>
 
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border-2 border-green-500 shadow-2xl shadow-green-500/20">
-            {/* Map Placeholder - In production, integrate Leaflet here */}
-            <div className="relative aspect-video bg-gradient-to-br from-green-900/20 to-black rounded-xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30"></div>
-
-              {/* Club Pins */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-full h-full max-w-4xl max-h-[600px]">
-                  {clubs.map((club, index) => {
-                    const posX = (index % 4) * 25 + 10;
-                    const posY = Math.floor(index / 4) * 40 + 20;
-
-                    return (
-                      <motion.div
-                        key={club.id}
-                        className="absolute cursor-pointer group"
-                        style={{ left: `${posX}%`, top: `${posY}%` }}
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        whileHover={{ scale: 1.5, zIndex: 50 }}
-                        onClick={() => setSelectedClub(club)}
-                      >
-                        <div className="relative">
-                          <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ repeat: Infinity, duration: 2 }}
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: club.color }}
-                          ></motion.div>
-                          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-black/90 px-3 py-2 rounded-lg border border-green-500 pointer-events-none">
-                            <p className="font-bold text-sm" style={{ color: club.color }}>
-                              {club.name}
-                            </p>
-                            <p className="text-xs text-gray-400">{club.city}</p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-green-500">
-                <p className="text-sm text-gray-300 mb-2">Cliquez sur un point pour explorer le club</p>
-                <div className="flex gap-2 flex-wrap">
-                  {clubs.slice(0, 4).map(club => (
-                    <div key={club.id} className="flex items-center gap-1 text-xs">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: club.color }}></div>
-                      <span className="text-gray-400">{club.city}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <GuineaMap clubs={clubs} onClubClick={setSelectedClub} />
           </div>
         </div>
       </section>

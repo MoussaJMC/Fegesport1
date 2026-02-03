@@ -131,8 +131,21 @@ https://fegesport224.org/leg
 3. **Modals interactifs** pour détails des clubs
 4. **Animations Framer Motion** partout
 5. **Données facilement modifiables** dans legData.ts
+6. **Carte Google Maps interactive** avec 8 markers colorés aux vraies coordonnées GPS
 
 ## Prochaines Étapes pour Déployer
+
+### Important: Configuration Google Maps
+
+**AVANT de déployer**, vous devez obtenir votre propre clé API Google Maps:
+
+1. Suivre le guide: `GOOGLE_MAPS_SETUP.md`
+2. Créer une clé sur [Google Cloud Console](https://console.cloud.google.com/)
+3. Ajouter la clé dans Netlify (Environment variables):
+   - Key: `VITE_GOOGLE_MAPS_API_KEY`
+   - Value: Votre clé API
+
+**Note**: La clé incluse est une clé de démo. Créez votre propre clé pour production!
 
 ### Option 1: Netlify (Recommandé)
 
@@ -148,6 +161,10 @@ git push -u origin master
 # → New site from Git
 # → Choisir votre repo
 # → Deploy site (automatique grâce à netlify.toml)
+
+# 4. Configurer Google Maps API Key
+# → Site settings → Environment variables
+# → Add: VITE_GOOGLE_MAPS_API_KEY = VOTRE_CLE
 ```
 
 ### Option 2: Netlify CLI
@@ -171,10 +188,12 @@ netlify deploy --prod --dir=dist
 
 ## Statistiques
 
-**Fichiers créés:** 3 fichiers principaux
-- LEGPage.tsx: 2000+ lignes
-- legData.ts: 500+ lignes
-- Documentation: 3 fichiers
+**Fichiers créés:** 5 fichiers principaux
+- LEGPage.tsx: 2000+ lignes (page principale)
+- legData.ts: 500+ lignes (données clubs/disciplines)
+- GuineaMap.tsx: 200+ lignes (composant Google Maps)
+- GOOGLE_MAPS_SETUP.md: Guide complet Google Maps API
+- Documentation: 3 fichiers MD
 
 **Composants:** 10+ sections
 - Hero, Map, Clubs, Rankings, Tournaments, Community, Footer
