@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit2, Trash2, Save, X, Trophy, Users, Target } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, Trophy, Users, Target, Link as LinkIcon } from 'lucide-react';
 
 interface Discipline {
   id: string;
@@ -36,15 +36,29 @@ interface Club {
   is_active: boolean;
 }
 
+interface ClubDiscipline {
+  id: string;
+  club_id: string;
+  discipline_id: string;
+  roster: string[];
+  achievements: string[];
+  stats: any;
+  club?: Club;
+  discipline?: Discipline;
+}
+
 export default function LEGAdminPage() {
-  const [activeTab, setActiveTab] = useState<'disciplines' | 'clubs'>('disciplines');
+  const [activeTab, setActiveTab] = useState<'disciplines' | 'clubs' | 'club-disciplines'>('disciplines');
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [clubDisciplines, setClubDisciplines] = useState<ClubDiscipline[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingDiscipline, setEditingDiscipline] = useState<Discipline | null>(null);
   const [editingClub, setEditingClub] = useState<Club | null>(null);
+  const [editingClubDiscipline, setEditingClubDiscipline] = useState<ClubDiscipline | null>(null);
   const [showDisciplineForm, setShowDisciplineForm] = useState(false);
   const [showClubForm, setShowClubForm] = useState(false);
+  const [showClubDisciplineForm, setShowClubDisciplineForm] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -53,16 +67,19 @@ export default function LEGAdminPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [disciplinesRes, clubsRes] = await Promise.all([
+      const [disciplinesRes, clubsRes, clubDisciplinesRes] = await Promise.all([
         supabase.from('leg_disciplines').select('*').order('sort_order'),
-        supabase.from('leg_clubs').select('*').order('rank')
+        supabase.from('leg_clubs').select('*').order('rank'),
+        supabase.from('leg_club_disciplines').select('*, club:leg_clubs(*), discipline:leg_disciplines(*)')
       ]);
 
       if (disciplinesRes.error) throw disciplinesRes.error;
       if (clubsRes.error) throw clubsRes.error;
+      if (clubDisciplinesRes.error) throw clubDisciplinesRes.error;
 
       setDisciplines(disciplinesRes.data || []);
       setClubs(clubsRes.data || []);
+      setClubDisciplines(clubDisciplinesRes.data || []);
     } catch (error: any) {
       toast.error('Erreur lors du chargement des données');
       console.error(error);
@@ -155,6 +172,58 @@ export default function LEGAdminPage() {
     }
   };
 
+  const handleSaveClubDiscipline = async (clubDiscipline: Partial<ClubDiscipline>) => {
+    try {
+      if (clubDiscipline.id) {
+        const { error } = await supabase
+          .from('leg_club_disciplines')
+          .update({
+            roster: clubDiscipline.roster,
+            achievements: clubDiscipline.achievements,
+            stats: clubDiscipline.stats
+          })
+          .eq('id', clubDiscipline.id);
+        if (error) throw error;
+        toast.success('Discipline du club mise à jour');
+      } else {
+        const { error } = await supabase
+          .from('leg_club_disciplines')
+          .insert([{
+            club_id: clubDiscipline.club_id,
+            discipline_id: clubDiscipline.discipline_id,
+            roster: clubDiscipline.roster || [],
+            achievements: clubDiscipline.achievements || [],
+            stats: clubDiscipline.stats || {}
+          }]);
+        if (error) throw error;
+        toast.success('Discipline du club créée');
+      }
+      setShowClubDisciplineForm(false);
+      setEditingClubDiscipline(null);
+      fetchData();
+    } catch (error: any) {
+      toast.error('Erreur lors de l\'enregistrement');
+      console.error(error);
+    }
+  };
+
+  const handleDeleteClubDiscipline = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette association ?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('leg_club_disciplines')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      toast.success('Association supprimée');
+      fetchData();
+    } catch (error: any) {
+      toast.error('Erreur lors de la suppression');
+      console.error(error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -194,6 +263,17 @@ export default function LEGAdminPage() {
               <Users className="inline-block w-5 h-5 mr-2" />
               Clubs
             </button>
+            <button
+              onClick={() => setActiveTab('club-disciplines')}
+              className={`px-6 py-3 text-sm font-medium ${
+                activeTab === 'club-disciplines'
+                  ? 'border-b-2 border-primary-500 text-primary-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <LinkIcon className="inline-block w-5 h-5 mr-2" />
+              Disciplines par Club
+            </button>
           </nav>
         </div>
 
@@ -219,6 +299,20 @@ export default function LEGAdminPage() {
               setEditing={setEditingClub}
               onSave={handleSaveClub}
               onDelete={handleDeleteClub}
+            />
+          )}
+
+          {activeTab === 'club-disciplines' && (
+            <ClubDisciplinesTab
+              clubDisciplines={clubDisciplines}
+              clubs={clubs}
+              disciplines={disciplines}
+              showForm={showClubDisciplineForm}
+              setShowForm={setShowClubDisciplineForm}
+              editing={editingClubDiscipline}
+              setEditing={setEditingClubDiscipline}
+              onSave={handleSaveClubDiscipline}
+              onDelete={handleDeleteClubDiscipline}
             />
           )}
         </div>
@@ -675,6 +769,17 @@ function ClubsTab({
               rows={2}
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Photo du leader (URL)
+            </label>
+            <input
+              type="url"
+              value={formData.leader_photo}
+              onChange={(e) => setFormData({ ...formData, leader_photo: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -737,6 +842,247 @@ function ClubsTab({
                 </button>
                 <button
                   onClick={() => onDelete(club.id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ClubDisciplinesTab({
+  clubDisciplines,
+  clubs,
+  disciplines,
+  showForm,
+  setShowForm,
+  editing,
+  setEditing,
+  onSave,
+  onDelete
+}: any) {
+  const [formData, setFormData] = useState<Partial<ClubDiscipline>>({
+    club_id: '',
+    discipline_id: '',
+    roster: [],
+    achievements: [],
+    stats: {}
+  });
+
+  const [rosterInput, setRosterInput] = useState('');
+  const [achievementsInput, setAchievementsInput] = useState('');
+  const [statsInput, setStatsInput] = useState('{}');
+
+  useEffect(() => {
+    if (editing) {
+      setFormData(editing);
+      setRosterInput(editing.roster?.join('\n') || '');
+      setAchievementsInput(editing.achievements?.join('\n') || '');
+      setStatsInput(JSON.stringify(editing.stats || {}, null, 2));
+    } else {
+      setFormData({
+        club_id: '',
+        discipline_id: '',
+        roster: [],
+        achievements: [],
+        stats: {}
+      });
+      setRosterInput('');
+      setAchievementsInput('');
+      setStatsInput('{}');
+    }
+  }, [editing]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const statsObj = JSON.parse(statsInput);
+      onSave({
+        ...formData,
+        roster: rosterInput.split('\n').filter(s => s.trim()),
+        achievements: achievementsInput.split('\n').filter(s => s.trim()),
+        stats: statsObj
+      });
+    } catch (error) {
+      toast.error('Format JSON invalide pour les statistiques');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Disciplines par Club</h2>
+        <button
+          onClick={() => {
+            setEditing(null);
+            setShowForm(true);
+          }}
+          className="btn-primary"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nouvelle association
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Club *
+              </label>
+              <select
+                value={formData.club_id}
+                onChange={(e) => setFormData({ ...formData, club_id: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+                required
+                disabled={!!editing}
+              >
+                <option value="">Sélectionner un club</option>
+                {clubs.map((club: Club) => (
+                  <option key={club.id} value={club.id}>{club.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Discipline *
+              </label>
+              <select
+                value={formData.discipline_id}
+                onChange={(e) => setFormData({ ...formData, discipline_id: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+                required
+                disabled={!!editing}
+              >
+                <option value="">Sélectionner une discipline</option>
+                {disciplines.map((discipline: Discipline) => (
+                  <option key={discipline.id} value={discipline.id}>
+                    {discipline.icon} {discipline.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Roster (un joueur par ligne)
+            </label>
+            <textarea
+              value={rosterInput}
+              onChange={(e) => setRosterInput(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg font-mono text-sm"
+              rows={5}
+              placeholder="ProGamer_GN&#10;StratMaster&#10;LegendKry"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Achievements (un par ligne)
+            </label>
+            <textarea
+              value={achievementsInput}
+              onChange={(e) => setAchievementsInput(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg font-mono text-sm"
+              rows={5}
+              placeholder="Champion National 2024&#10;Top 3 West Africa"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Statistiques (format JSON)
+            </label>
+            <textarea
+              value={statsInput}
+              onChange={(e) => setStatsInput(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg font-mono text-sm"
+              rows={6}
+              placeholder='{"winRate": 78, "matches": 45}'
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Exemple: {JSON.stringify({ winRate: 78, matches: 45, kd: 1.8 })}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-primary">
+              <Save className="w-4 h-4 mr-2" />
+              Enregistrer
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(false);
+                setEditing(null);
+              }}
+              className="btn-secondary"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Annuler
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="grid gap-4">
+        {clubDisciplines.map((cd: ClubDiscipline) => (
+          <div key={cd.id} className="border rounded-lg p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="font-semibold text-lg">
+                    {cd.club?.name || 'Club inconnu'}
+                  </h3>
+                  <span className="text-2xl">{cd.discipline?.icon}</span>
+                  <span className="text-gray-600">{cd.discipline?.name}</span>
+                </div>
+                <div className="space-y-2">
+                  {cd.roster && cd.roster.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Roster:</p>
+                      <p className="text-sm text-gray-600">{cd.roster.join(', ')}</p>
+                    </div>
+                  )}
+                  {cd.achievements && cd.achievements.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Achievements:</p>
+                      <ul className="text-sm text-gray-600 list-disc list-inside">
+                        {cd.achievements.map((achievement, idx) => (
+                          <li key={idx}>{achievement}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {cd.stats && Object.keys(cd.stats).length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Stats:</p>
+                      <div className="text-sm text-gray-600 flex flex-wrap gap-3">
+                        {Object.entries(cd.stats).map(([key, value]) => (
+                          <span key={key} className="bg-gray-100 px-2 py-1 rounded">
+                            {key}: {String(value)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setEditing(cd);
+                    setShowForm(true);
+                  }}
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(cd.id)}
                   className="p-2 text-red-600 hover:bg-red-50 rounded"
                 >
                   <Trash2 className="w-4 h-4" />
