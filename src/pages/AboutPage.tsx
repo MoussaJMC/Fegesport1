@@ -14,20 +14,35 @@ interface LeadershipMember {
   is_active: boolean;
 }
 
+interface HistoryEntry {
+  id: string;
+  title_fr: string;
+  title_en: string;
+  description_fr: string;
+  description_en: string;
+  year_start: number;
+  year_end: number | null;
+  order_position: number;
+  is_active: boolean;
+}
+
 const AboutPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [leadershipTeam, setLeadershipTeam] = useState<LeadershipMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
+  const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   useEffect(() => {
     fetchLeadershipTeam();
+    fetchHistoryEntries();
   }, []);
 
   const fetchLeadershipTeam = async () => {
     try {
       setLoading(true);
-      
+
       // Try to fetch from Supabase
       const { data, error } = await supabase
         .from('leadership_team')
@@ -51,6 +66,32 @@ const AboutPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchHistoryEntries = async () => {
+    try {
+      setHistoryLoading(true);
+      const { data, error } = await supabase
+        .from('history_timeline')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_position', { ascending: true });
+
+      if (error) throw error;
+      setHistoryEntries(data || []);
+    } catch (error) {
+      console.error('Error fetching history entries:', error);
+      setHistoryEntries([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const formatYearRange = (start: number, end: number | null): string => {
+    if (end) {
+      return `${start}-${end}`;
+    }
+    return i18n.language === 'fr' ? `${start} - Aujourd'hui` : `${start} - Present`;
   };
 
   const toggleBio = (memberId: string) => {

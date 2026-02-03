@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 import {
   Loader2, Home, Newspaper, Calendar, Users, Building2,
   MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers,
-  Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, Layout
+  Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, Layout, Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -191,6 +191,7 @@ const AdminLayout: React.FC = () => {
     { icon: Users, label: 'Membres', path: '/admin/members' },
     { icon: Tag, label: 'Types d\'Adhésion', path: '/admin/membership-types' },
     { icon: Award, label: 'Notre Direction', path: '/admin/leadership' },
+    { icon: Clock, label: 'Notre Histoire', path: '/admin/history' },
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },

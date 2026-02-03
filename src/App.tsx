@@ -50,6 +50,7 @@ import EmailTestDiagnosticPage from './pages/admin/EmailTestDiagnosticPage';
 import LEGAdminPage from './pages/admin/LEGAdminPage';
 import MenuAdminPage from './pages/admin/MenuAdminPage';
 import FooterAdminPage from './pages/admin/FooterAdminPage';
+import HistoryAdminPage from './pages/admin/HistoryAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -74,6 +75,7 @@ function App() {
             <Route path="pages" element={<PagesAdminPage />} />
             <Route path="menu" element={<MenuAdminPage />} />
             <Route path="footer" element={<FooterAdminPage />} />
+            <Route path="history" element={<HistoryAdminPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
             <Route path="leg" element={<LEGAdminPage />} />
