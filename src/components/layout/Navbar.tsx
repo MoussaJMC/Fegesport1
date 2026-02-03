@@ -53,7 +53,8 @@ const Navbar: React.FC = () => {
       { label: "Actualités", path: "/news", order: 3 },
       { label: "Adhésion", path: "/membership", order: 4, submenu: [
         { label: "Adhésion", path: "/membership" },
-        { label: "Communauté", path: "/membership/community" }
+        { label: "Communauté", path: "/membership/community" },
+        { label: "eLeague", path: "/leg" }
       ]},
       { label: "Ressources", path: "/resources", order: 5 },
       { label: "Partenaires", path: "/partners", order: 6 },
@@ -127,9 +128,10 @@ const Navbar: React.FC = () => {
 
   // Get translated label for navigation items
   const getTranslatedLabel = (label: string): string => {
-    // Special case for DIRECT and LEG which should always be uppercase
+    // Special case for DIRECT, LEG and eLeague which should keep their specific format
     if (label === 'DIRECT') return 'DIRECT';
     if (label === 'LEG') return 'LEG';
+    if (label === 'eLeague') return 'eLeague';
 
     // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
