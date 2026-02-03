@@ -5,6 +5,7 @@ import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twit
 import { clubs, disciplines, getClubsByDisciplineRanking, Club, Discipline } from '../data/legData';
 import GuineaMap from '../components/leg/GuineaMap';
 import TournamentForm from '../components/forms/TournamentForm';
+import SponsorsCarousel from '../components/leg/SponsorsCarousel';
 
 const LEGPage: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
@@ -844,6 +845,9 @@ const LEGPage: React.FC = () => {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Sponsors Carousel */}
+      <SponsorsCarousel />
 
       {/* Footer */}
       <footer className="relative py-12 bg-black border-t border-gray-800">
