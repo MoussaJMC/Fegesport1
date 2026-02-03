@@ -53,9 +53,9 @@ const Navbar: React.FC = () => {
       { label: "Actualités", path: "/news", order: 3 },
       { label: "Adhésion", path: "/membership", order: 4, submenu: [
         { label: "Adhésion", path: "/membership" },
-        { label: "Communauté", path: "/membership/community" },
-        { label: "eLeague", path: "/leg" }
+        { label: "Communauté", path: "/membership/community" }
       ]},
+      { label: "eLeague", path: "/leg", order: 4.5 },
       { label: "Ressources", path: "/resources", order: 5 },
       { label: "Partenaires", path: "/partners", order: 6 },
       { label: "Contact", path: "/contact", order: 7 },
