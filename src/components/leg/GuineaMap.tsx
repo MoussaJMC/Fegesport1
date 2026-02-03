@@ -85,6 +85,7 @@ const mapOptions = {
 export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
   const [selectedMarker, setSelectedMarker] = useState<Club | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -94,12 +95,27 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
     setMap(null);
   }, []);
 
+  const handleScriptLoad = useCallback(() => {
+    setIsLoaded(true);
+  }, []);
+
   // Clé API Google Maps - L'utilisateur doit créer sa propre clé
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBpGuAdDlxGc8rkGmpLi2gR5jrMy5c3gLs';
 
   return (
     <div className="relative">
-      <LoadScript googleMapsApiKey={apiKey}>
+      <LoadScript
+        googleMapsApiKey={apiKey}
+        onLoad={handleScriptLoad}
+        loadingElement={
+          <div className="w-full h-[600px] bg-gray-800 rounded-xl flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Chargement de la carte...</p>
+            </div>
+          </div>
+        }
+      >
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
@@ -108,7 +124,7 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
           onUnmount={onUnmount}
           options={mapOptions}
         >
-          {clubs.map((club) => (
+          {isLoaded && clubs.map((club) => (
             <Marker
               key={club.id}
               position={{
@@ -130,7 +146,7 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
             />
           ))}
 
-          {selectedMarker && (
+          {isLoaded && selectedMarker && (
             <InfoWindow
               position={{
                 lat: selectedMarker.coordinates[0],
