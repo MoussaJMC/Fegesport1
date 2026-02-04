@@ -340,55 +340,86 @@ const AboutPage: React.FC = () => {
       <section className="section bg-gray-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre Histoire</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              {i18n.language === 'fr' ? 'Notre Histoire' : 'Our History'}
+            </h2>
             <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-bold mb-2">Fondation (2009-2013)</h3>
-              <p className="text-gray-600 mb-4">
-                Création de la FEGESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer 
-                et développer l'écosystème esport national.
-              </p>
+          {historyLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             </div>
+          ) : historyEntries.length > 0 ? (
+            <div className="max-w-4xl mx-auto">
+              {historyEntries.map((entry, index) => (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`relative pl-8 ${index < historyEntries.length - 1 ? 'pb-12 border-l-2 border-primary-300' : ''}`}
+                >
+                  <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+                    {index + 1}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">
+                    {i18n.language === 'fr' ? entry.title_fr : entry.title_en} ({formatYearRange(entry.year_start, entry.year_end)})
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {i18n.language === 'fr' ? entry.description_fr : entry.description_en}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto">
+              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
+                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+                  1
+                </div>
+                <h3 className="text-xl font-bold mb-2">Fondation (2009-2013)</h3>
+                <p className="text-gray-600 mb-4">
+                  Création de la FEGESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer
+                  et développer l'écosystème esport national.
+                </p>
+              </div>
 
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                2
+              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
+                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+                  2
+                </div>
+                <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2017)</h3>
+                <p className="text-gray-600 mb-4">
+                  Obtention de la reconnaissance officielle par l'Administration du territoir (la ville de Conakry) puis le Ministère de la Jeunesse et des Sports, faisant de
+                  la FEGESPORT l'organe officiel de gouvernance de l'esport en Guinée.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2017)</h3>
-              <p className="text-gray-600 mb-4">
-                Obtention de la reconnaissance officielle par l'Administration du territoir (la ville de Conakry) puis le Ministère de la Jeunesse et des Sports, faisant de 
-                la FEGESPORT l'organe officiel de gouvernance de l'esport en Guinée.
-              </p>
-            </div>
 
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                3
+              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
+                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+                  3
+                </div>
+                <h3 className="text-xl font-bold mb-2">Premiers Championnats Nationaux (2018-Nos jours)</h3>
+                <p className="text-gray-600 mb-4">
+                  Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport,
+                  établissant les standards de compétition pour le pays.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-2">Premiers Championnats Nationaux (2018-Nos jours)</h3>
-              <p className="text-gray-600 mb-4">
-                Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport, 
-                établissant les standards de compétition pour le pays.
-              </p>
-            </div>
 
-            <div className="relative pl-8">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                4
+              <div className="relative pl-8">
+                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+                  4
+                </div>
+                <h3 className="text-xl font-bold mb-2">Affiliation Internationale (2019 - Nos jours)</h3>
+                <p className="text-gray-600 mb-4">
+                  Affiliation aux principales fédérations internationales d'esport ACDS, WESCO, IESF & GEF, permettant aux équipes guinéennes
+                  de participer aux compétitions internationales sous les couleurs nationales.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-2">Affiliation Internationale (2019 - Nos jours)</h3>
-              <p className="text-gray-600 mb-4">
-                Affiliation aux principales fédérations internationales d'esport ACDS, WESCO, IESF & GEF, permettant aux équipes guinéennes 
-                de participer aux compétitions internationales sous les couleurs nationales.
-              </p>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>
