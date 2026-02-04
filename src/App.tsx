@@ -48,6 +48,7 @@ import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
 import EmailAdminPage from './pages/admin/EmailAdminPage';
 import EmailTestDiagnosticPage from './pages/admin/EmailTestDiagnosticPage';
 import LEGAdminPage from './pages/admin/LEGAdminPage';
+import SponsorsAdminPage from './pages/admin/SponsorsAdminPage';
 import MenuAdminPage from './pages/admin/MenuAdminPage';
 import FooterAdminPage from './pages/admin/FooterAdminPage';
 import HistoryAdminPage from './pages/admin/HistoryAdminPage';
@@ -79,6 +80,7 @@ function App() {
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
             <Route path="leg" element={<LEGAdminPage />} />
+            <Route path="sponsors" element={<SponsorsAdminPage />} />
             <Route path="members" element={<MembersAdminPage />} />
             <Route path="membership-types" element={<MembershipTypesAdminPage />} />
             <Route path="leadership" element={<LeadershipAdminPage />} />

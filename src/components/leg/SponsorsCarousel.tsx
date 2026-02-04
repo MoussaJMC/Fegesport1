@@ -1,25 +1,56 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
 
 interface SponsorLogo {
-  src: string;
-  alt: string;
+  id: string;
+  name: string;
+  logo_url: string;
+  alt_text: string;
+  order_index: number;
 }
 
 const SponsorsCarousel: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const [logos, setLogos] = useState<SponsorLogo[]>([]);
+  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const logos: SponsorLogo[] = [
-    { src: 'https://cdn.worldvectorlogo.com/logos/red-bull-2.svg', alt: 'Red Bull' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/razer-2.svg', alt: 'Razer' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/intel-2.svg', alt: 'Intel' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/logitech-2.svg', alt: 'Logitech' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/monster-energy-1.svg', alt: 'Monster Energy' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/alienware-2.svg', alt: 'Alienware' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/nvidia.svg', alt: 'NVIDIA' },
-    { src: 'https://cdn.worldvectorlogo.com/logos/kingston-3.svg', alt: 'Kingston' },
-  ];
+  useEffect(() => {
+    fetchSponsors();
+
+    const subscription = supabase
+      .channel('sponsors_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sponsors' }, () => {
+        fetchSponsors();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const fetchSponsors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('sponsors')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      setLogos(data || []);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || logos.length === 0) {
+    return null;
+  }
 
   const duplicatedLogos = [...logos, ...logos, ...logos];
 
@@ -227,18 +258,17 @@ const SponsorsCarousel: React.FC = () => {
         >
           {duplicatedLogos.map((logo, index) => (
             <div
-              key={`${logo.alt}-${index}`}
+              key={`${logo.id}-${index}`}
               className="sponsor-logo-item"
               role="listitem"
             >
               <img
-                src={logo.src}
-                alt={logo.alt}
+                src={logo.logo_url}
+                alt={logo.alt_text}
                 className="logo-image"
                 loading="lazy"
                 draggable="false"
                 onError={(e) => {
-                  // Fallback for broken images
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                 }}
