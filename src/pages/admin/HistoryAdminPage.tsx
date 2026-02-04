@@ -59,9 +59,10 @@ const HistoryAdminPage = () => {
 
       if (error) throw error;
       setEntries(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching history entries:', error);
-      toast.error('Erreur lors du chargement de l\'historique');
+      const errorMessage = error?.message || 'Erreur lors du chargement de l\'historique';
+      toast.error(`Erreur: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -106,9 +107,10 @@ const HistoryAdminPage = () => {
 
       resetForm();
       fetchEntries();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving history entry:', error);
-      toast.error('Erreur lors de l\'enregistrement');
+      const errorMessage = error?.message || 'Erreur lors de l\'enregistrement';
+      toast.error(`Erreur: ${errorMessage}`);
     }
   };
 
@@ -141,9 +143,10 @@ const HistoryAdminPage = () => {
       if (error) throw error;
       toast.success('Entrée supprimée avec succès');
       fetchEntries();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting history entry:', error);
-      toast.error('Erreur lors de la suppression');
+      const errorMessage = error?.message || 'Erreur lors de la suppression';
+      toast.error(`Erreur: ${errorMessage}`);
     }
   };
 
@@ -157,9 +160,10 @@ const HistoryAdminPage = () => {
       if (error) throw error;
       toast.success(`Entrée ${!entry.is_active ? 'activée' : 'désactivée'}`);
       fetchEntries();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling active status:', error);
-      toast.error('Erreur lors de la mise à jour');
+      const errorMessage = error?.message || 'Erreur lors de la mise à jour';
+      toast.error(`Erreur: ${errorMessage}`);
     }
   };
 
