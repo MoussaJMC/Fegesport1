@@ -45,6 +45,7 @@ import StreamsAdminPage from './pages/admin/StreamsAdminPage';
 import NewsletterAdminPage from './pages/admin/NewsletterAdminPage';
 import EventRegistrationsAdminPage from './pages/admin/EventRegistrationsAdminPage';
 import SiteSettingsAdminPage from './pages/admin/SiteSettingsAdminPage';
+import SocialMediaAdminPage from './pages/admin/SocialMediaAdminPage';
 import EmailAdminPage from './pages/admin/EmailAdminPage';
 import EmailTestDiagnosticPage from './pages/admin/EmailTestDiagnosticPage';
 import LEGAdminPage from './pages/admin/LEGAdminPage';
@@ -94,6 +95,7 @@ function App() {
             <Route path="newsletter" element={<NewsletterAdminPage />} />
             <Route path="registrations" element={<EventRegistrationsAdminPage />} />
             <Route path="settings" element={<SiteSettingsAdminPage />} />
+            <Route path="social-media" element={<SocialMediaAdminPage />} />
             <Route path="emails" element={<EmailAdminPage />} />
             <Route path="email-test" element={<EmailTestDiagnosticPage />} />
           </Route>
