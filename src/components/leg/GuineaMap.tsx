@@ -1,7 +1,29 @@
 import { useState, useCallback } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import { motion } from 'framer-motion';
-import { Club } from '../../data/legData';
+
+interface Club {
+  id: string;
+  name: string;
+  city: string;
+  region: string;
+  leader_name: string;
+  leader_title: string;
+  leader_photo?: string;
+  leader_quote?: string;
+  latitude?: number;
+  longitude?: number;
+  color: string;
+  logo?: string;
+  trophies: number;
+  stream_viewers: number;
+  win_rate: number;
+  rank: number;
+  discord_url?: string;
+  twitch_url?: string;
+  twitter_url?: string;
+  is_active: boolean;
+}
 
 interface GuineaMapProps {
   clubs: Club[];
@@ -124,12 +146,12 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
           onUnmount={onUnmount}
           options={mapOptions}
         >
-          {isLoaded && clubs.map((club) => (
+          {isLoaded && clubs.filter(club => club.latitude && club.longitude).map((club) => (
             <Marker
               key={club.id}
               position={{
-                lat: club.coordinates[0],
-                lng: club.coordinates[1]
+                lat: club.latitude!,
+                lng: club.longitude!
               }}
               onClick={() => {
                 setSelectedMarker(club);
@@ -146,11 +168,11 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
             />
           ))}
 
-          {isLoaded && selectedMarker && (
+          {isLoaded && selectedMarker && selectedMarker.latitude && selectedMarker.longitude && (
             <InfoWindow
               position={{
-                lat: selectedMarker.coordinates[0],
-                lng: selectedMarker.coordinates[1]
+                lat: selectedMarker.latitude,
+                lng: selectedMarker.longitude
               }}
               onCloseClick={() => setSelectedMarker(null)}
             >
@@ -167,15 +189,15 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
 
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   <div className="text-center">
-                    <p className="text-yellow-400 font-bold">{selectedMarker.stats.trophies}</p>
+                    <p className="text-yellow-400 font-bold">{selectedMarker.trophies}</p>
                     <p className="text-xs text-gray-400">Trophées</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-green-400 font-bold">{selectedMarker.stats.winRate}%</p>
+                    <p className="text-green-400 font-bold">{selectedMarker.win_rate}%</p>
                     <p className="text-xs text-gray-400">Win Rate</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-blue-400 font-bold">#{selectedMarker.stats.rank}</p>
+                    <p className="text-blue-400 font-bold">#{selectedMarker.rank}</p>
                     <p className="text-xs text-gray-400">Rang</p>
                   </div>
                 </div>

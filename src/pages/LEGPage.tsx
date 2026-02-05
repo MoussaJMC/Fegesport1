@@ -2,10 +2,44 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown, X, ArrowLeft, Home } from 'lucide-react';
-import { clubs, disciplines, getClubsByDisciplineRanking, Club, Discipline } from '../data/legData';
+import { supabase } from '../lib/supabase';
 import GuineaMap from '../components/leg/GuineaMap';
 import TournamentForm from '../components/forms/TournamentForm';
 import SponsorsCarousel from '../components/leg/SponsorsCarousel';
+
+interface Discipline {
+  id: string;
+  name: string;
+  games: string[];
+  icon: string;
+  color: string;
+  image?: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
+interface Club {
+  id: string;
+  name: string;
+  city: string;
+  region: string;
+  leader_name: string;
+  leader_title: string;
+  leader_photo?: string;
+  leader_quote?: string;
+  latitude?: number;
+  longitude?: number;
+  color: string;
+  logo?: string;
+  trophies: number;
+  stream_viewers: number;
+  win_rate: number;
+  rank: number;
+  discord_url?: string;
+  twitch_url?: string;
+  twitter_url?: string;
+  is_active: boolean;
+}
 
 interface TimeRemaining {
   days: number;
@@ -20,6 +54,9 @@ const LEGPage: React.FC = () => {
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'clubs' | 'rankings' | 'tournaments'>('clubs');
   const [showTournamentModal, setShowTournamentModal] = useState(false);
+  const [disciplines, setDisciplines] = useState<Discipline[]>([]);
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -34,7 +71,39 @@ const LEGPage: React.FC = () => {
 
   useEffect(() => {
     document.title = 'LEG - League eSport de Guinée | 8 Clubs, 5 Disciplines';
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // Récupérer les disciplines actives
+      const { data: disciplinesData, error: disciplinesError } = await supabase
+        .from('leg_disciplines')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (disciplinesError) throw disciplinesError;
+
+      // Récupérer les clubs actifs
+      const { data: clubsData, error: clubsError } = await supabase
+        .from('leg_clubs')
+        .select('*')
+        .eq('is_active', true)
+        .order('rank');
+
+      if (clubsError) throw clubsError;
+
+      setDisciplines(disciplinesData || []);
+      setClubs(clubsData || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données LEG:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Date cible du tournoi - 15 février 2026 à 14h00
@@ -81,6 +150,17 @@ const LEGPage: React.FC = () => {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-500 mx-auto mb-4"></div>
+          <p className="text-xl text-gray-400">Chargement des données LEG...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
@@ -290,7 +370,7 @@ const LEGPage: React.FC = () => {
                 </div>
 
                 <div className="absolute top-2 right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-sm">
-                  {clubs.length}
+                  {clubs.filter(c => c.is_active).length}
                 </div>
               </motion.div>
             ))}
@@ -348,7 +428,7 @@ const LEGPage: React.FC = () => {
                 {/* Rank Badge */}
                 <div className="absolute top-4 right-4 z-20">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center border-2 border-yellow-300 shadow-lg">
-                    <span className="text-black font-black text-lg">#{club.stats.rank}</span>
+                    <span className="text-black font-black text-lg">#{club.rank}</span>
                   </div>
                 </div>
 
@@ -361,7 +441,7 @@ const LEGPage: React.FC = () => {
                   ></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-8xl opacity-20 group-hover:scale-110 transition-transform">
-                      {disciplines.find(d => d.id === Object.keys(club.disciplines)[0])?.icon || '🏆'}
+                      {disciplines[0]?.icon || '🏆'}
                     </div>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4">
@@ -380,10 +460,10 @@ const LEGPage: React.FC = () => {
                   <div className="bg-black/30 rounded-lg p-3">
                     <p className="text-xs text-gray-400 mb-1">Représentant Fédéral</p>
                     <p className="text-sm font-bold" style={{ color: club.color }}>
-                      {club.leader.name}
+                      {club.leader_name}
                     </p>
                     <p className="text-xs text-gray-500 italic mt-1">
-                      "{club.leader.quote}"
+                      "{club.leader_quote || 'Ensemble vers la victoire'}"
                     </p>
                   </div>
 
@@ -391,17 +471,17 @@ const LEGPage: React.FC = () => {
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-black/30 rounded p-2">
                       <Trophy className="w-4 h-4 mx-auto mb-1 text-yellow-400" />
-                      <p className="text-lg font-bold">{club.stats.trophies}</p>
+                      <p className="text-lg font-bold">{club.trophies}</p>
                       <p className="text-xs text-gray-400">Trophées</p>
                     </div>
                     <div className="bg-black/30 rounded p-2">
                       <TrendingUp className="w-4 h-4 mx-auto mb-1 text-green-400" />
-                      <p className="text-lg font-bold">{club.stats.winRate}%</p>
+                      <p className="text-lg font-bold">{club.win_rate}%</p>
                       <p className="text-xs text-gray-400">Victoires</p>
                     </div>
                     <div className="bg-black/30 rounded p-2">
                       <Users className="w-4 h-4 mx-auto mb-1 text-blue-400" />
-                      <p className="text-lg font-bold">{(club.stats.streamViewers / 1000).toFixed(1)}K</p>
+                      <p className="text-lg font-bold">{(club.stream_viewers / 1000).toFixed(1)}K</p>
                       <p className="text-xs text-gray-400">Viewers</p>
                     </div>
                   </div>
@@ -503,78 +583,70 @@ const LEGPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {(selectedDiscipline === 'all'
-                  ? clubs.sort((a, b) => a.stats.rank - b.stats.rank)
-                  : getClubsByDisciplineRanking(selectedDiscipline)
-                ).map((item, index) => {
-                  const club = 'club' in item ? item.club : item;
-                  const stats = 'stats' in item && item.stats ? item.stats : club.stats;
-
-                  return (
-                    <motion.tr
-                      key={club.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer"
-                      onClick={() => setSelectedClub(club)}
-                    >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          {index < 3 ? (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${
-                              index === 0 ? 'bg-yellow-400 text-black' :
-                              index === 1 ? 'bg-gray-400 text-black' :
-                              'bg-orange-600 text-white'
-                            }`}>
-                              {index + 1}
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">
-                              {index + 1}
-                            </div>
-                          )}
+                {clubs.map((club, index) => (
+                  <motion.tr
+                    key={club.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer"
+                    onClick={() => setSelectedClub(club)}
+                  >
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-2">
+                        {index < 3 ? (
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${
+                            index === 0 ? 'bg-yellow-400 text-black' :
+                            index === 1 ? 'bg-gray-400 text-black' :
+                            'bg-orange-600 text-white'
+                          }`}>
+                            {index + 1}
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">
+                            {index + 1}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: club.color }}
+                        ></div>
+                        <div>
+                          <p className="font-bold text-white">{club.name}</p>
+                          <p className="text-xs text-gray-400">{club.city}</p>
                         </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-gray-300">{club.region}</td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="inline-flex items-center gap-1 text-yellow-400 font-bold">
+                        <Trophy className="w-4 h-4" />
+                        {club.trophies}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
                           <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: club.color }}
+                            className="h-full bg-gradient-to-r from-green-400 to-green-600"
+                            style={{ width: `${club.win_rate}%` }}
                           ></div>
-                          <div>
-                            <p className="font-bold text-white">{club.name}</p>
-                            <p className="text-xs text-gray-400">{club.city}</p>
-                          </div>
                         </div>
-                      </td>
-                      <td className="py-4 px-4 text-gray-300">{club.region}</td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="inline-flex items-center gap-1 text-yellow-400 font-bold">
-                          <Trophy className="w-4 h-4" />
-                          {club.stats.trophies}
+                        <span className="text-green-400 font-bold">
+                          {club.win_rate}%
                         </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-green-400 to-green-600"
-                              style={{ width: `${stats.winRate || club.stats.winRate}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-green-400 font-bold">
-                            {stats.winRate || club.stats.winRate}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-center text-blue-400 font-bold">
-                        {(club.stats.streamViewers / 1000).toFixed(1)}K
-                      </td>
-                    </motion.tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-center text-blue-400 font-bold">
+                      {(club.stream_viewers / 1000).toFixed(1)}K
+                    </td>
+                  </motion.tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -868,57 +940,35 @@ const LEGPage: React.FC = () => {
             <div className="bg-black/50 rounded-lg p-6 mb-6">
               <p className="text-sm text-gray-400 mb-2">Représentant Fédéral</p>
               <p className="text-xl font-bold mb-2" style={{ color: selectedClub.color }}>
-                {selectedClub.leader.name}
+                {selectedClub.leader_name}
               </p>
-              <p className="text-gray-300 italic">"{selectedClub.leader.quote}"</p>
+              <p className="text-gray-300 italic">"{selectedClub.leader_quote || 'Ensemble vers la victoire'}"</p>
             </div>
 
-            {/* Disciplines Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {disciplines.map(disc => {
-                const discData = selectedClub.disciplines[disc.id];
-                if (!discData) return null;
-
-                return (
-                  <div
-                    key={disc.id}
-                    className="bg-black/30 rounded-lg p-4 border-2"
-                    style={{ borderColor: disc.color }}
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">{disc.icon}</span>
-                      <h4 className="text-xl font-bold" style={{ color: disc.color }}>
-                        {disc.name}
-                      </h4>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <p className="text-gray-400 mb-1">Roster:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {discData.roster.map((player, i) => (
-                            <span key={i} className="bg-gray-800 px-2 py-1 rounded text-xs">
-                              {player}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 mb-1">Achievements:</p>
-                        {discData.achievements.map((achievement, i) => (
-                          <p key={i} className="text-xs text-green-400">• {achievement}</p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            {/* Club Stats */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="bg-black/30 rounded-lg p-4 text-center">
+                <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                <p className="text-2xl font-bold">{selectedClub.trophies}</p>
+                <p className="text-sm text-gray-400">Trophées</p>
+              </div>
+              <div className="bg-black/30 rounded-lg p-4 text-center">
+                <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-400" />
+                <p className="text-2xl font-bold">{selectedClub.win_rate}%</p>
+                <p className="text-sm text-gray-400">Win Rate</p>
+              </div>
+              <div className="bg-black/30 rounded-lg p-4 text-center">
+                <Users className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+                <p className="text-2xl font-bold">{(selectedClub.stream_viewers / 1000).toFixed(1)}K</p>
+                <p className="text-sm text-gray-400">Viewers</p>
+              </div>
             </div>
 
             {/* Socials */}
             <div className="flex gap-4">
-              {selectedClub.socials.discord && (
+              {selectedClub.discord_url && (
                 <a
-                  href={selectedClub.socials.discord}
+                  href={selectedClub.discord_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-bold text-center transition-colors"
@@ -927,9 +977,9 @@ const LEGPage: React.FC = () => {
                   Discord
                 </a>
               )}
-              {selectedClub.socials.twitch && (
+              {selectedClub.twitch_url && (
                 <a
-                  href={selectedClub.socials.twitch}
+                  href={selectedClub.twitch_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-center transition-colors"
