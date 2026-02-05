@@ -112,7 +112,7 @@ export default function LEGAdminPage() {
         supabase.from('leg_disciplines').select('*').order('sort_order'),
         supabase.from('leg_clubs').select('*').order('rank'),
         supabase.from('leg_club_disciplines').select('*, club:leg_clubs(*), discipline:leg_disciplines(*)'),
-        supabase.from('events').select('*').eq('category', 'LEG').order('date', { ascending: false }),
+        supabase.from('leg_tournaments').select('*').order('start_date', { ascending: false }),
         supabase.from('streams').select('*').order('created_at', { ascending: false })
       ]);
 
@@ -301,29 +301,30 @@ export default function LEGAdminPage() {
 
   const handleSaveTournament = async (tournament: Partial<any>) => {
     try {
-      const eventData = {
+      const tournamentData = {
         title: tournament.title,
+        discipline_id: tournament.discipline_id,
         description: tournament.description,
-        date: tournament.start_date,
-        category: 'LEG',
-        type: 'online',
+        start_date: tournament.start_date,
+        end_date: tournament.end_date || null,
+        prize_pool: tournament.prize_pool || null,
+        format: tournament.format || 'Single Elimination',
+        max_teams: tournament.max_teams || 8,
         status: tournament.status || 'upcoming',
-        max_participants: tournament.max_teams,
-        price: tournament.prize_pool,
-        image_url: tournament.image_url
+        is_active: tournament.is_active !== false
       };
 
       if (tournament.id) {
         const { error } = await supabase
-          .from('events')
-          .update(eventData)
+          .from('leg_tournaments')
+          .update(tournamentData)
           .eq('id', tournament.id);
         if (error) throw error;
         toast.success('Tournoi mis à jour');
       } else {
         const { error } = await supabase
-          .from('events')
-          .insert([eventData]);
+          .from('leg_tournaments')
+          .insert([tournamentData]);
         if (error) throw error;
         toast.success('Tournoi créé');
       }
@@ -340,15 +341,14 @@ export default function LEGAdminPage() {
     }
   };
 
-  const handleToggleTournament = async (id: string, currentStatus: string) => {
+  const handleToggleTournament = async (id: string, currentActive: boolean) => {
     try {
-      const newStatus = currentStatus === 'cancelled' ? 'upcoming' : 'cancelled';
       const { error } = await supabase
-        .from('events')
-        .update({ status: newStatus })
+        .from('leg_tournaments')
+        .update({ is_active: !currentActive })
         .eq('id', id);
       if (error) throw error;
-      toast.success(`Tournoi ${newStatus === 'cancelled' ? 'désactivé' : 'activé'}`);
+      toast.success(`Tournoi ${!currentActive ? 'activé' : 'désactivé'}`);
       fetchData();
     } catch (error: any) {
       console.error('Erreur toggle tournoi:', error);
@@ -1405,49 +1405,46 @@ function TournamentsTab({
           <div className="grid gap-4">
             {tournaments.map((tournament: any) => (
               <div key={tournament.id} className={`border-2 rounded-lg p-6 hover:shadow-lg transition-shadow ${
-                tournament.status === 'cancelled' ? 'bg-gray-100 opacity-60' : 'bg-gradient-to-r from-red-50 to-white'
+                !tournament.is_active ? 'bg-gray-100 opacity-60' : 'bg-gradient-to-r from-red-50 to-white'
               }`}>
                 <div className="flex items-start justify-between gap-4">
-                  {tournament.image_url && (
-                    <div className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
-                      <img
-                        src={tournament.image_url}
-                        alt={tournament.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h4 className="text-xl font-bold text-gray-900">{tournament.title}</h4>
+                      {!tournament.is_active && (
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-500 text-white">
+                          Désactivé
+                        </span>
+                      )}
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         tournament.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
                         tournament.status === 'ongoing' ? 'bg-green-100 text-green-800' :
-                        tournament.status === 'cancelled' ? 'bg-gray-500 text-white' :
+                        tournament.status === 'completed' ? 'bg-purple-100 text-purple-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {tournament.status === 'upcoming' ? 'À venir' :
                          tournament.status === 'ongoing' ? 'En cours' :
-                         tournament.status === 'cancelled' ? 'Désactivé' : 'Terminé'}
+                         tournament.status === 'completed' ? 'Terminé' :
+                         tournament.status === 'cancelled' ? 'Annulé' : tournament.status}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-4">{tournament.description}</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                       <div className="bg-gray-50 rounded p-2">
-                        <p className="text-gray-500">Date</p>
-                        <p className="font-semibold">{new Date(tournament.date).toLocaleDateString('fr-FR')}</p>
+                        <p className="text-gray-500">Date de début</p>
+                        <p className="font-semibold">{new Date(tournament.start_date).toLocaleDateString('fr-FR')}</p>
                       </div>
                       <div className="bg-gray-50 rounded p-2">
                         <p className="text-gray-500">Équipes max</p>
-                        <p className="font-semibold">{tournament.max_participants || 'N/A'}</p>
+                        <p className="font-semibold">{tournament.max_teams || 'N/A'}</p>
                       </div>
                       <div className="bg-gray-50 rounded p-2">
                         <p className="text-gray-500">Prize Pool</p>
-                        <p className="font-semibold text-yellow-600">{tournament.price ? `${tournament.price.toLocaleString()} GNF` : 'N/A'}</p>
+                        <p className="font-semibold text-yellow-600">{tournament.prize_pool ? `${parseFloat(tournament.prize_pool).toLocaleString()} GNF` : 'N/A'}</p>
                       </div>
                       <div className="bg-gray-50 rounded p-2">
-                        <p className="text-gray-500">Type</p>
-                        <p className="font-semibold">{tournament.type || 'Online'}</p>
+                        <p className="text-gray-500">Format</p>
+                        <p className="font-semibold">{tournament.format || 'N/A'}</p>
                       </div>
                     </div>
                   </div>
@@ -1463,11 +1460,11 @@ function TournamentsTab({
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onToggleTournament(tournament.id, tournament.status)}
-                      className={`p-2 rounded ${tournament.status === 'cancelled' ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}`}
-                      title={tournament.status === 'cancelled' ? 'Activer' : 'Désactiver'}
+                      onClick={() => onToggleTournament(tournament.id, tournament.is_active)}
+                      className={`p-2 rounded ${!tournament.is_active ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}`}
+                      title={!tournament.is_active ? 'Activer' : 'Désactiver'}
                     >
-                      {tournament.status === 'cancelled' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {!tournament.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -1713,20 +1710,29 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    discipline_id: '',
     start_date: '',
+    end_date: '',
     prize_pool: 0,
-    format: '',
+    format: 'Single Elimination',
     max_teams: 8,
     status: 'upcoming',
-    image_url: ''
+    is_active: true
   });
 
   useEffect(() => {
     if (editing) {
       setFormData({
-        ...editing,
-        start_date: editing.date,
-        image_url: editing.image_url || ''
+        title: editing.title || '',
+        description: editing.description || '',
+        discipline_id: editing.discipline_id || '',
+        start_date: editing.start_date || '',
+        end_date: editing.end_date || '',
+        prize_pool: editing.prize_pool || 0,
+        format: editing.format || 'Single Elimination',
+        max_teams: editing.max_teams || 8,
+        status: editing.status || 'upcoming',
+        is_active: editing.is_active !== false
       });
     }
   }, [editing]);
@@ -1751,6 +1757,20 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
           />
         </div>
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Discipline *</label>
+          <select
+            value={formData.discipline_id}
+            onChange={(e) => setFormData({ ...formData, discipline_id: e.target.value })}
+            className="w-full px-3 py-2 border rounded-lg"
+            required
+          >
+            <option value="">Sélectionner une discipline</option>
+            {disciplines.map((d: Discipline) => (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Date de début *</label>
           <input
             type="date"
@@ -1758,6 +1778,15 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
             onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
             className="w-full px-3 py-2 border rounded-lg"
             required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date de fin</label>
+          <input
+            type="date"
+            value={formData.end_date}
+            onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+            className="w-full px-3 py-2 border rounded-lg"
           />
         </div>
         <div>
@@ -1799,6 +1828,7 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
             <option value="upcoming">À venir</option>
             <option value="ongoing">En cours</option>
             <option value="completed">Terminé</option>
+            <option value="cancelled">Annulé</option>
           </select>
         </div>
       </div>
@@ -1813,25 +1843,15 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          URL de l'image
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={formData.is_active}
+            onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+            className="rounded border-gray-300"
+          />
+          <span className="text-sm font-medium text-gray-700">Tournoi actif</span>
         </label>
-        <input
-          type="url"
-          value={formData.image_url || ''}
-          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-          className="w-full px-3 py-2 border rounded-lg"
-          placeholder="https://images.pexels.com/photos/..."
-        />
-        {formData.image_url && (
-          <div className="mt-2 relative h-32 rounded-lg overflow-hidden">
-            <img
-              src={formData.image_url}
-              alt="Aperçu"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
       </div>
       <div className="flex gap-2">
         <button type="submit" className="btn-primary">
