@@ -49,6 +49,21 @@ interface TimeRemaining {
   expired: boolean;
 }
 
+interface Tournament {
+  id: string;
+  title: string;
+  discipline_id: string;
+  description?: string;
+  start_date: string;
+  end_date?: string;
+  prize_pool?: number;
+  format: string;
+  max_teams: number;
+  status: 'upcoming' | 'ongoing' | 'completed';
+  is_active: boolean;
+  discipline?: Discipline;
+}
+
 const LEGPage: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
@@ -56,6 +71,7 @@ const LEGPage: React.FC = () => {
   const [showTournamentModal, setShowTournamentModal] = useState(false);
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [nextTournament, setNextTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
@@ -96,8 +112,24 @@ const LEGPage: React.FC = () => {
 
       if (clubsError) throw clubsError;
 
+      // Récupérer le prochain tournoi avec sa discipline
+      const { data: tournamentData, error: tournamentError } = await supabase
+        .from('leg_tournaments')
+        .select('*, discipline:leg_disciplines(*)')
+        .eq('is_active', true)
+        .in('status', ['upcoming', 'ongoing'])
+        .gte('start_date', new Date().toISOString().split('T')[0])
+        .order('start_date', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (tournamentError) {
+        console.error('Error fetching tournament:', tournamentError);
+      }
+
       setDisciplines(disciplinesData || []);
       setClubs(clubsData || []);
+      setNextTournament(tournamentData);
     } catch (error) {
       console.error('Erreur lors du chargement des données LEG:', error);
     } finally {
@@ -106,8 +138,18 @@ const LEGPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Date cible du tournoi - 15 février 2026 à 14h00
-    const targetDate = new Date('2026-02-15T14:00:00').getTime();
+    if (!nextTournament?.start_date) {
+      setTimeRemaining({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        expired: true
+      });
+      return;
+    }
+
+    const targetDate = new Date(nextTournament.start_date).getTime();
 
     const calculateTimeRemaining = () => {
       const now = new Date().getTime();
@@ -142,7 +184,7 @@ const LEGPage: React.FC = () => {
     const interval = setInterval(calculateTimeRemaining, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [nextTournament]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -709,23 +751,33 @@ const LEGPage: React.FC = () => {
               </div>
 
               {/* Image de la discipline */}
-              {disciplines.find(d => d.id === 'fps')?.image && (
+              {nextTournament && nextTournament.discipline?.image ? (
                 <div className="relative h-48 rounded-xl overflow-hidden mb-6">
                   <img
-                    src={disciplines.find(d => d.id === 'fps')!.image}
-                    alt="CS:GO Tournament"
+                    src={nextTournament.discipline.image}
+                    alt={nextTournament.title}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-4xl">{disciplines.find(d => d.id === 'fps')?.icon}</span>
+                      {nextTournament.discipline.icon && (
+                        <span className="text-4xl">{nextTournament.discipline.icon}</span>
+                      )}
                       <div>
-                        <h4 className="text-2xl font-black text-white">CS:GO</h4>
-                        <p className="text-sm text-red-400">National Cup 2026</p>
+                        <h4 className="text-2xl font-black text-white">{nextTournament.discipline.name}</h4>
+                        <p className="text-sm text-red-400">{nextTournament.title}</p>
                       </div>
                     </div>
                   </div>
+                </div>
+              ) : nextTournament && (
+                <div className="bg-black/30 rounded-xl p-6 mb-6 text-center">
+                  <Gamepad2 className="w-16 h-16 mx-auto mb-2 text-red-400" />
+                  <h4 className="text-xl font-bold text-white">{nextTournament.title}</h4>
+                  {nextTournament.discipline && (
+                    <p className="text-sm text-gray-400 mt-1">{nextTournament.discipline.name}</p>
+                  )}
                 </div>
               )}
 
@@ -772,28 +824,49 @@ const LEGPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-400">Discipline</span>
-                    <span className="font-bold text-white">CS:GO - National Cup</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-400">Format</span>
-                    <span className="font-bold text-white">8 Équipes - Single Elimination</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-400">Prize Pool</span>
-                    <span className="font-bold text-yellow-400">5,000,000 GNF</span>
-                  </div>
-                </div>
+                {nextTournament ? (
+                  <>
+                    <div className="space-y-2">
+                      {nextTournament.discipline && (
+                        <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                          <span className="text-gray-400">Discipline</span>
+                          <span className="font-bold text-white">{nextTournament.discipline.name}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                        <span className="text-gray-400">Format</span>
+                        <span className="font-bold text-white">{nextTournament.max_teams} Équipes - {nextTournament.format}</span>
+                      </div>
+                      {nextTournament.prize_pool && (
+                        <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                          <span className="text-gray-400">Prize Pool</span>
+                          <span className="font-bold text-yellow-400">
+                            {nextTournament.prize_pool.toLocaleString('fr-FR')} GNF
+                          </span>
+                        </div>
+                      )}
+                      {nextTournament.description && (
+                        <div className="p-3 bg-black/30 rounded-lg">
+                          <p className="text-sm text-gray-300">{nextTournament.description}</p>
+                        </div>
+                      )}
+                    </div>
 
-                <button
-                  onClick={() => setShowTournamentModal(true)}
-                  className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
-                >
-                  <Award className="w-5 h-5 inline mr-2" />
-                  S'inscrire Maintenant
-                </button>
+                    <button
+                      onClick={() => setShowTournamentModal(true)}
+                      className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg font-bold text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
+                    >
+                      <Award className="w-5 h-5 inline mr-2" />
+                      S'inscrire Maintenant
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-500" />
+                    <p className="text-gray-400">Aucun tournoi prévu pour le moment</p>
+                    <p className="text-sm text-gray-500 mt-2">Revenez bientôt pour découvrir nos prochaines compétitions</p>
+                  </div>
+                )}
               </div>
             </motion.div>
 
