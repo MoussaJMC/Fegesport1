@@ -73,7 +73,7 @@ interface Stream {
   thumbnail_url?: string;
 }
 
-export default function LEGAdminPage() {
+const LEGAdminPage = React.memo(function LEGAdminPage() {
   const [activeTab, setActiveTab] = useState<'disciplines' | 'clubs' | 'rankings' | 'tournaments'>('disciplines');
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
@@ -92,11 +92,15 @@ export default function LEGAdminPage() {
   const [showTournamentForm, setShowTournamentForm] = useState(false);
   const [showStreamForm, setShowStreamForm] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    fetchData();
-    checkUserEmail();
-  }, []);
+    if (!hasInitialized) {
+      fetchData();
+      checkUserEmail();
+      setHasInitialized(true);
+    }
+  }, [hasInitialized]);
 
   const checkUserEmail = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -555,7 +559,9 @@ export default function LEGAdminPage() {
       </div>
     </div>
   );
-}
+});
+
+export default LEGAdminPage;
 
 function DisciplinesTab({
   disciplines,

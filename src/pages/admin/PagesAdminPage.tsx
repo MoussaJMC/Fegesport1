@@ -41,7 +41,7 @@ interface SiteSetting {
   updated_at: string;
 }
 
-const PagesAdminPage = () => {
+const PagesAdminPage = React.memo(() => {
   const [pages, setPages] = useState<Page[]>([]);
   const [sections, setSections] = useState<PageSection[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSetting[]>([]);
@@ -55,6 +55,7 @@ const PagesAdminPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [showPageEditor, setShowPageEditor] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Form states
   const [pageForm, setPageForm] = useState<{
@@ -101,9 +102,12 @@ const PagesAdminPage = () => {
   });
 
   useEffect(() => {
-    fetchPages();
-    fetchSiteSettings();
-  }, []);
+    if (!hasInitialized) {
+      fetchPages();
+      fetchSiteSettings();
+      setHasInitialized(true);
+    }
+  }, [hasInitialized]);
 
   useEffect(() => {
     if (selectedPage) {
@@ -1258,6 +1262,6 @@ const PagesAdminPage = () => {
       </AnimatePresence>
     </div>
   );
-};
+});
 
 export default PagesAdminPage;

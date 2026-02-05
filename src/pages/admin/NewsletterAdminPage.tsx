@@ -14,15 +14,19 @@ interface Subscriber {
   updated_at: string;
 }
 
-const NewsletterAdminPage: React.FC = () => {
+const NewsletterAdminPage: React.FC = React.memo(() => {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    fetchSubscribers();
-  }, []);
+    if (!hasInitialized) {
+      fetchSubscribers();
+      setHasInitialized(true);
+    }
+  }, [hasInitialized]);
 
   const fetchSubscribers = async () => {
     try {
@@ -210,6 +214,6 @@ const NewsletterAdminPage: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default NewsletterAdminPage;

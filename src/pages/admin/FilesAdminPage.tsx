@@ -4,7 +4,7 @@ import FileUploadDiagnostic from '../../components/admin/FileUploadDiagnostic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 import { Database, AlertTriangle } from 'lucide-react';
 
-const FilesAdminPage: React.FC = () => {
+const FilesAdminPage: React.FC = React.memo(() => {
   const [activeTab, setActiveTab] = useState<string>('files');
 
   return (
@@ -46,6 +46,6 @@ const FilesAdminPage: React.FC = () => {
       </Tabs>
     </div>
   );
-};
+});
 
 export default FilesAdminPage;

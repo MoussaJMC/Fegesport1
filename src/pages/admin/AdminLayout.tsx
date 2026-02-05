@@ -25,12 +25,14 @@ const AdminLayout: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationLoading, setNotificationLoading] = useState(false);
+  const [hasLoadedNotifications, setHasLoadedNotifications] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !hasLoadedNotifications) {
       fetchNotifications();
+      setHasLoadedNotifications(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, hasLoadedNotifications]);
 
   const fetchNotifications = async () => {
     try {
@@ -397,7 +399,13 @@ const AdminLayout: React.FC = () => {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          <Outlet />
+          <React.Suspense fallback={
+            <div className="flex items-center justify-center min-h-[400px]">
+              <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+            </div>
+          }>
+            <Outlet />
+          </React.Suspense>
         </main>
       </div>
 
