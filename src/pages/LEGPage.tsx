@@ -7,11 +7,26 @@ import GuineaMap from '../components/leg/GuineaMap';
 import TournamentForm from '../components/forms/TournamentForm';
 import SponsorsCarousel from '../components/leg/SponsorsCarousel';
 
+interface TimeRemaining {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  expired: boolean;
+}
+
 const LEGPage: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'clubs' | 'rankings' | 'tournaments'>('clubs');
   const [showTournamentModal, setShowTournamentModal] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    expired: false
+  });
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -19,6 +34,45 @@ const LEGPage: React.FC = () => {
 
   useEffect(() => {
     document.title = 'LEG - League eSport de Guinée | 8 Clubs, 5 Disciplines';
+  }, []);
+
+  useEffect(() => {
+    // Date cible du tournoi - 15 février 2026 à 14h00
+    const targetDate = new Date('2026-02-15T14:00:00').getTime();
+
+    const calculateTimeRemaining = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        setTimeRemaining({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          expired: true
+        });
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      setTimeRemaining({
+        days,
+        hours,
+        minutes,
+        seconds,
+        expired: false
+      });
+    };
+
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
@@ -556,23 +610,45 @@ const LEGPage: React.FC = () => {
 
               <div className="space-y-4">
                 <div className="bg-black/50 rounded-lg p-6 text-center">
-                  <p className="text-sm text-gray-400 mb-2">Démarre dans</p>
-                  <div className="flex justify-center gap-4">
+                  {timeRemaining.expired ? (
                     <div>
-                      <p className="text-4xl font-black text-red-400">07</p>
-                      <p className="text-xs text-gray-400">JOURS</p>
+                      <p className="text-2xl font-bold text-red-400 mb-2">Tournoi Terminé</p>
+                      <p className="text-sm text-gray-400">Consultez les résultats prochainement</p>
                     </div>
-                    <div className="text-4xl text-gray-600">:</div>
-                    <div>
-                      <p className="text-4xl font-black text-red-400">14</p>
-                      <p className="text-xs text-gray-400">HEURES</p>
-                    </div>
-                    <div className="text-4xl text-gray-600">:</div>
-                    <div>
-                      <p className="text-4xl font-black text-red-400">32</p>
-                      <p className="text-xs text-gray-400">MINUTES</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-400 mb-2">Démarre dans</p>
+                      <div className="flex justify-center gap-4">
+                        <div>
+                          <p className="text-4xl font-black text-red-400">
+                            {String(timeRemaining.days).padStart(2, '0')}
+                          </p>
+                          <p className="text-xs text-gray-400">JOURS</p>
+                        </div>
+                        <div className="text-4xl text-gray-600">:</div>
+                        <div>
+                          <p className="text-4xl font-black text-red-400">
+                            {String(timeRemaining.hours).padStart(2, '0')}
+                          </p>
+                          <p className="text-xs text-gray-400">HEURES</p>
+                        </div>
+                        <div className="text-4xl text-gray-600">:</div>
+                        <div>
+                          <p className="text-4xl font-black text-red-400">
+                            {String(timeRemaining.minutes).padStart(2, '0')}
+                          </p>
+                          <p className="text-xs text-gray-400">MINUTES</p>
+                        </div>
+                        <div className="text-4xl text-gray-600">:</div>
+                        <div>
+                          <p className="text-4xl font-black text-red-400">
+                            {String(timeRemaining.seconds).padStart(2, '0')}
+                          </p>
+                          <p className="text-xs text-gray-400">SECONDES</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="space-y-2">
