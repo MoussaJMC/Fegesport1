@@ -313,7 +313,8 @@ export default function LEGAdminPage() {
         type: 'online',
         status: tournament.status || 'upcoming',
         max_participants: tournament.max_teams,
-        price: tournament.prize_pool
+        price: tournament.prize_pool,
+        image_url: tournament.image_url
       };
 
       if (tournament.id) {
@@ -1389,7 +1390,16 @@ function TournamentsTab({
           <div className="grid gap-4">
             {tournaments.map((tournament: any) => (
               <div key={tournament.id} className="border-2 rounded-lg p-6 bg-gradient-to-r from-red-50 to-white hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
+                  {tournament.image_url && (
+                    <div className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
+                      <img
+                        src={tournament.image_url}
+                        alt={tournament.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h4 className="text-xl font-bold text-gray-900">{tournament.title}</h4>
@@ -1484,7 +1494,16 @@ function TournamentsTab({
           <div className="grid gap-4">
             {streams.map((stream: any) => (
               <div key={stream.id} className="border-2 rounded-lg p-6 bg-gradient-to-r from-purple-50 to-white hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
+                  {stream.thumbnail_url && (
+                    <div className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
+                      <img
+                        src={stream.thumbnail_url}
+                        alt={stream.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h4 className="text-xl font-bold text-gray-900">{stream.title}</h4>
@@ -1677,14 +1696,16 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
     prize_pool: 0,
     format: '',
     max_teams: 8,
-    status: 'upcoming'
+    status: 'upcoming',
+    image_url: ''
   });
 
   useEffect(() => {
     if (editing) {
       setFormData({
         ...editing,
-        start_date: editing.date
+        start_date: editing.date,
+        image_url: editing.image_url || ''
       });
     }
   }, [editing]);
@@ -1769,6 +1790,27 @@ function TournamentForm({ editing, disciplines, onSave, onCancel }: any) {
           rows={3}
           placeholder="Description du tournoi..."
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          URL de l'image
+        </label>
+        <input
+          type="url"
+          value={formData.image_url || ''}
+          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+          className="w-full px-3 py-2 border rounded-lg"
+          placeholder="https://images.pexels.com/photos/..."
+        />
+        {formData.image_url && (
+          <div className="mt-2 relative h-32 rounded-lg overflow-hidden">
+            <img
+              src={formData.image_url}
+              alt="Aperçu"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
       </div>
       <div className="flex gap-2">
         <button type="submit" className="btn-primary">
@@ -1861,6 +1903,15 @@ function StreamForm({ editing, onSave, onCancel }: any) {
             className="w-full px-3 py-2 border rounded-lg"
             placeholder="https://..."
           />
+          {formData.thumbnail_url && (
+            <div className="mt-2 relative h-32 rounded-lg overflow-hidden">
+              <img
+                src={formData.thumbnail_url}
+                alt="Aperçu miniature"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
         </div>
       </div>
       <div>
