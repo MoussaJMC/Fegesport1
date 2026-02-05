@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit2, Trash2, Save, X, Trophy, Users, Target, Link as LinkIcon, Flame, Gamepad2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, Trophy, Users, Target, Link as LinkIcon, Flame, Gamepad2, Eye, EyeOff } from 'lucide-react';
 
 interface Discipline {
   id: string;
@@ -162,23 +162,21 @@ export default function LEGAdminPage() {
     }
   };
 
-  const handleDeleteDiscipline = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette discipline ?')) return;
-
+  const handleToggleDiscipline = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
         .from('leg_disciplines')
-        .delete()
+        .update({ is_active: !currentStatus })
         .eq('id', id);
       if (error) throw error;
-      toast.success('Discipline supprimée');
+      toast.success(`Discipline ${!currentStatus ? 'activée' : 'désactivée'}`);
       fetchData();
     } catch (error: any) {
-      console.error('Erreur suppression discipline:', error);
+      console.error('Erreur toggle discipline:', error);
       if (error.code === '42501' || error.message?.includes('policy')) {
         toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
       } else {
-        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+        toast.error(`Erreur: ${error.message || 'Échec de l\'opération'}`);
       }
     }
   };
@@ -212,23 +210,21 @@ export default function LEGAdminPage() {
     }
   };
 
-  const handleDeleteClub = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce club ?')) return;
-
+  const handleToggleClub = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
         .from('leg_clubs')
-        .delete()
+        .update({ is_active: !currentStatus })
         .eq('id', id);
       if (error) throw error;
-      toast.success('Club supprimé');
+      toast.success(`Club ${!currentStatus ? 'activé' : 'désactivé'}`);
       fetchData();
     } catch (error: any) {
-      console.error('Erreur suppression club:', error);
+      console.error('Erreur toggle club:', error);
       if (error.code === '42501' || error.message?.includes('policy')) {
         toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
       } else {
-        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+        toast.error(`Erreur: ${error.message || 'Échec de l\'opération'}`);
       }
     }
   };
@@ -344,19 +340,22 @@ export default function LEGAdminPage() {
     }
   };
 
-  const handleDeleteTournament = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce tournoi ?')) return;
+  const handleToggleTournament = async (id: string, currentStatus: string) => {
     try {
-      const { error } = await supabase.from('events').delete().eq('id', id);
+      const newStatus = currentStatus === 'cancelled' ? 'upcoming' : 'cancelled';
+      const { error } = await supabase
+        .from('events')
+        .update({ status: newStatus })
+        .eq('id', id);
       if (error) throw error;
-      toast.success('Tournoi supprimé');
+      toast.success(`Tournoi ${newStatus === 'cancelled' ? 'désactivé' : 'activé'}`);
       fetchData();
     } catch (error: any) {
-      console.error('Erreur suppression tournoi:', error);
+      console.error('Erreur toggle tournoi:', error);
       if (error.code === '42501' || error.message?.includes('policy')) {
         toast.error(`Permission refusée. Votre email (${userEmail}) n'a pas les droits admin.`);
       } else {
-        toast.error(`Erreur: ${error.message || 'Échec de la suppression'}`);
+        toast.error(`Erreur: ${error.message || 'Échec de l\'opération'}`);
       }
     }
   };
@@ -495,7 +494,7 @@ export default function LEGAdminPage() {
               editing={editingDiscipline}
               setEditing={setEditingDiscipline}
               onSave={handleSaveDiscipline}
-              onDelete={handleDeleteDiscipline}
+              onToggle={handleToggleDiscipline}
             />
           )}
 
@@ -507,7 +506,7 @@ export default function LEGAdminPage() {
               editing={editingClub}
               setEditing={setEditingClub}
               onSave={handleSaveClub}
-              onDelete={handleDeleteClub}
+              onToggle={handleToggleClub}
             />
           )}
 
@@ -539,7 +538,7 @@ export default function LEGAdminPage() {
               editingStream={editingStream}
               setEditingStream={setEditingStream}
               onSaveTournament={handleSaveTournament}
-              onDeleteTournament={handleDeleteTournament}
+              onToggleTournament={handleToggleTournament}
               onSaveStream={handleSaveStream}
               onDeleteStream={handleDeleteStream}
             />
@@ -557,7 +556,7 @@ function DisciplinesTab({
   editing,
   setEditing,
   onSave,
-  onDelete
+  onToggle
 }: any) {
   const [formData, setFormData] = useState<Partial<Discipline>>({
     name: '',
@@ -720,7 +719,7 @@ function DisciplinesTab({
 
       <div className="grid gap-4">
         {disciplines.map((discipline: Discipline) => (
-          <div key={discipline.id} className="border rounded-lg p-4 flex items-center justify-between">
+          <div key={discipline.id} className={`border rounded-lg p-4 flex items-center justify-between ${!discipline.is_active ? 'bg-gray-100 opacity-60' : ''}`}>
             <div className="flex items-center gap-4">
               <div className="text-3xl">{discipline.icon}</div>
               {discipline.image && (
@@ -733,7 +732,14 @@ function DisciplinesTab({
                 </div>
               )}
               <div>
-                <h3 className="font-semibold">{discipline.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold">{discipline.name}</h3>
+                  {!discipline.is_active && (
+                    <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded">
+                      Désactivée
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-600">{discipline.games.join(', ')}</p>
               </div>
               <div
@@ -748,14 +754,16 @@ function DisciplinesTab({
                   setShowForm(true);
                 }}
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                title="Modifier"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onDelete(discipline.id)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded"
+                onClick={() => onToggle(discipline.id, discipline.is_active)}
+                className={`p-2 rounded ${discipline.is_active ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'}`}
+                title={discipline.is_active ? 'Désactiver' : 'Activer'}
               >
-                <Trash2 className="w-4 h-4" />
+                {discipline.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -772,7 +780,7 @@ function ClubsTab({
   editing,
   setEditing,
   onSave,
-  onDelete
+  onToggle
 }: any) {
   const [formData, setFormData] = useState<Partial<Club>>({
     name: '',
@@ -1072,11 +1080,16 @@ function ClubsTab({
 
       <div className="grid gap-4">
         {clubs.map((club: Club) => (
-          <div key={club.id} className="border rounded-lg p-4">
+          <div key={club.id} className={`border rounded-lg p-4 ${!club.is_active ? 'bg-gray-100 opacity-60' : ''}`}>
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="font-semibold text-lg">{club.name}</h3>
+                  {!club.is_active && (
+                    <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded">
+                      Désactivé
+                    </span>
+                  )}
                   <div
                     className="w-6 h-6 rounded"
                     style={{ backgroundColor: club.color }}
@@ -1098,14 +1111,16 @@ function ClubsTab({
                     setShowForm(true);
                   }}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                  title="Modifier"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => onDelete(club.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded"
+                  onClick={() => onToggle(club.id, club.is_active)}
+                  className={`p-2 rounded ${club.is_active ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'}`}
+                  title={club.is_active ? 'Désactiver' : 'Activer'}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  {club.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -1305,7 +1320,7 @@ function TournamentsTab({
   editingStream,
   setEditingStream,
   onSaveTournament,
-  onDeleteTournament,
+  onToggleTournament,
   onSaveStream,
   onDeleteStream
 }: any) {
@@ -1389,7 +1404,9 @@ function TournamentsTab({
 
           <div className="grid gap-4">
             {tournaments.map((tournament: any) => (
-              <div key={tournament.id} className="border-2 rounded-lg p-6 bg-gradient-to-r from-red-50 to-white hover:shadow-lg transition-shadow">
+              <div key={tournament.id} className={`border-2 rounded-lg p-6 hover:shadow-lg transition-shadow ${
+                tournament.status === 'cancelled' ? 'bg-gray-100 opacity-60' : 'bg-gradient-to-r from-red-50 to-white'
+              }`}>
                 <div className="flex items-start justify-between gap-4">
                   {tournament.image_url && (
                     <div className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
@@ -1406,10 +1423,12 @@ function TournamentsTab({
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         tournament.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
                         tournament.status === 'ongoing' ? 'bg-green-100 text-green-800' :
+                        tournament.status === 'cancelled' ? 'bg-gray-500 text-white' :
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {tournament.status === 'upcoming' ? 'À venir' :
-                         tournament.status === 'ongoing' ? 'En cours' : 'Terminé'}
+                         tournament.status === 'ongoing' ? 'En cours' :
+                         tournament.status === 'cancelled' ? 'Désactivé' : 'Terminé'}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-4">{tournament.description}</p>
@@ -1439,14 +1458,16 @@ function TournamentsTab({
                         setShowTournamentForm(true);
                       }}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                      title="Modifier"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onDeleteTournament(tournament.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded"
+                      onClick={() => onToggleTournament(tournament.id, tournament.status)}
+                      className={`p-2 rounded ${tournament.status === 'cancelled' ? 'text-green-600 hover:bg-green-50' : 'text-orange-600 hover:bg-orange-50'}`}
+                      title={tournament.status === 'cancelled' ? 'Activer' : 'Désactiver'}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {tournament.status === 'cancelled' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
