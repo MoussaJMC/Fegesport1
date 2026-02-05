@@ -162,6 +162,30 @@ const LEGPage: React.FC = () => {
     );
   }
 
+  // Si pas de données, afficher un message
+  if (disciplines.length === 0 && clubs.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+        <div className="text-center max-w-2xl px-4">
+          <Trophy className="w-24 h-24 mx-auto mb-6 text-gray-600" />
+          <h2 className="text-3xl font-black mb-4 text-gray-300">
+            LEG en Préparation
+          </h2>
+          <p className="text-xl text-gray-400 mb-6">
+            La League eSport de Guinée est en cours de configuration. Les disciplines et clubs seront bientôt disponibles.
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 rounded-lg font-bold transition-all hover:scale-105"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Retour à l'accueil
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
       {/* Back to Home Button */}
@@ -323,21 +347,22 @@ const LEGPage: React.FC = () => {
       </motion.section>
 
       {/* Disciplines Overview */}
-      <section className="relative py-20 bg-gradient-to-b from-black to-gray-900">
-        <div className="container mx-auto px-4">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black text-center mb-16"
-          >
-            <span className="bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent">
-              5 Disciplines de Combat
-            </span>
-          </motion.h2>
+      {disciplines.length > 0 && (
+        <section className="relative py-20 bg-gradient-to-b from-black to-gray-900">
+          <div className="container mx-auto px-4">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-6xl font-black text-center mb-16"
+            >
+              <span className="bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent">
+                {disciplines.length} Discipline{disciplines.length > 1 ? 's' : ''} de Combat
+              </span>
+            </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {disciplines.map((discipline, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {disciplines.map((discipline, index) => (
               <motion.div
                 key={discipline.id}
                 initial={{ opacity: 0, y: 50 }}
@@ -373,10 +398,11 @@ const LEGPage: React.FC = () => {
                   {clubs.filter(c => c.is_active).length}
                 </div>
               </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Interactive Map Section */}
       <section id="map" className="relative py-20 bg-gradient-to-b from-gray-900 to-black">
@@ -533,19 +559,20 @@ const LEGPage: React.FC = () => {
           </motion.h2>
 
           {/* Discipline Tabs */}
-          <div className="flex justify-center gap-4 mb-12 flex-wrap">
-            <button
-              onClick={() => setSelectedDiscipline('all')}
-              className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                selectedDiscipline === 'all'
-                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              <Crown className="w-5 h-5 inline mr-2" />
-              Général
-            </button>
-            {disciplines.map(disc => (
+          {disciplines.length > 0 && (
+            <div className="flex justify-center gap-4 mb-12 flex-wrap">
+              <button
+                onClick={() => setSelectedDiscipline('all')}
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                  selectedDiscipline === 'all'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                }`}
+              >
+                <Crown className="w-5 h-5 inline mr-2" />
+                Général
+              </button>
+              {disciplines.map(disc => (
               <button
                 key={disc.id}
                 onClick={() => setSelectedDiscipline(disc.id)}
@@ -566,8 +593,9 @@ const LEGPage: React.FC = () => {
                 <span className="text-lg mr-2">{disc.icon}</span>
                 {disc.name}
               </button>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Rankings Table */}
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border-2 border-gray-700 shadow-2xl overflow-x-auto">
@@ -786,15 +814,17 @@ const LEGPage: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                {clubs.slice(0, 4).map((club, index) => (
-                  <div key={club.id} className="bg-black/50 rounded-lg p-4 hover:bg-black/70 transition-colors cursor-pointer">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
-                        {disciplines[index % disciplines.length].icon}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-white mb-1">{club.name}</h4>
-                        <p className="text-sm text-gray-400">{disciplines[index % disciplines.length].name} - Match amical</p>
+                {clubs.slice(0, 4).map((club, index) => {
+                  const discipline = disciplines.length > 0 ? disciplines[index % disciplines.length] : null;
+                  return (
+                    <div key={club.id} className="bg-black/50 rounded-lg p-4 hover:bg-black/70 transition-colors cursor-pointer">
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
+                          {discipline?.icon || '🎮'}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-white mb-1">{club.name}</h4>
+                          <p className="text-sm text-gray-400">{discipline?.name || 'eSport'} - Match amical</p>
                         <div className="flex items-center gap-2 mt-1">
                           <Users className="w-4 h-4 text-red-400" />
                           <span className="text-sm text-red-400 font-bold">
@@ -810,7 +840,8 @@ const LEGPage: React.FC = () => {
                       </Link>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <Link
