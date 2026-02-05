@@ -164,13 +164,21 @@ export default function LEGAdminPage() {
 
   const handleToggleDiscipline = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
+      console.log('Toggle discipline:', { id, currentStatus, newStatus: !currentStatus });
+      const { data, error } = await supabase
         .from('leg_disciplines')
         .update({ is_active: !currentStatus })
-        .eq('id', id);
-      if (error) throw error;
+        .eq('id', id)
+        .select();
+
+      if (error) {
+        console.error('Erreur Supabase:', error);
+        throw error;
+      }
+
+      console.log('Toggle réussi:', data);
       toast.success(`Discipline ${!currentStatus ? 'activée' : 'désactivée'}`);
-      fetchData();
+      await fetchData();
     } catch (error: any) {
       console.error('Erreur toggle discipline:', error);
       if (error.code === '42501' || error.message?.includes('policy')) {
