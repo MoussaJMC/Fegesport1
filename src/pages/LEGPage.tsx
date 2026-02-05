@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown, X, ArrowLeft, Home } from 'lucide-react';
+import { Trophy, Users, Flame, Target, Gamepad2, Map, TrendingUp, Calendar, Twitch, MessageCircle, ExternalLink, Award, Zap, Crown, X, ArrowLeft, Home, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import GuineaMap from '../components/leg/GuineaMap';
 import TournamentForm from '../components/forms/TournamentForm';
@@ -73,6 +73,13 @@ const LEGPage: React.FC = () => {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [nextTournament, setNextTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
+  const [socialMedia, setSocialMedia] = useState<{
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    youtube?: string;
+    discord?: string;
+  }>({});
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -125,6 +132,17 @@ const LEGPage: React.FC = () => {
 
       if (tournamentError) {
         console.error('Error fetching tournament:', tournamentError);
+      }
+
+      // Récupérer les informations de réseaux sociaux
+      const { data: contactInfo } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'contact_info')
+        .maybeSingle();
+
+      if (contactInfo?.setting_value?.social_media) {
+        setSocialMedia(contactInfo.setting_value.social_media);
       }
 
       setDisciplines(disciplinesData || []);
@@ -960,18 +978,68 @@ const LEGPage: React.FC = () => {
             transition={{ delay: 0.4 }}
             className="flex flex-wrap justify-center gap-6"
           >
-            <button className="group px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg font-bold text-lg transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50">
-              <MessageCircle className="w-5 h-5 inline mr-2" />
-              Rejoindre Discord
-            </button>
-            <button className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg font-bold text-lg transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50">
+            {socialMedia.facebook && (
+              <a
+                href={socialMedia.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50"
+              >
+                <Facebook className="w-5 h-5 inline mr-2" />
+                Facebook
+              </a>
+            )}
+            {socialMedia.twitter && (
+              <a
+                href={socialMedia.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-8 py-4 bg-gradient-to-r from-sky-500 to-blue-500 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/50"
+              >
+                <Twitter className="w-5 h-5 inline mr-2" />
+                Twitter
+              </a>
+            )}
+            {socialMedia.instagram && (
+              <a
+                href={socialMedia.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/50"
+              >
+                <Instagram className="w-5 h-5 inline mr-2" />
+                Instagram
+              </a>
+            )}
+            {socialMedia.youtube && (
+              <a
+                href={socialMedia.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
+              >
+                <Youtube className="w-5 h-5 inline mr-2" />
+                YouTube
+              </a>
+            )}
+            {socialMedia.discord && (
+              <a
+                href={socialMedia.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
+              >
+                <MessageCircle className="w-5 h-5 inline mr-2" />
+                Discord
+              </a>
+            )}
+            <Link
+              to="/membership"
+              className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50"
+            >
               <Users className="w-5 h-5 inline mr-2" />
-              Trouver Mon Club
-            </button>
-            <button className="group px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 rounded-lg font-bold text-lg transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50">
-              <Zap className="w-5 h-5 inline mr-2" />
-              Newsletter
-            </button>
+              Adhérer
+            </Link>
           </motion.div>
         </div>
       </section>
