@@ -608,6 +608,27 @@ const LEGPage: React.FC = () => {
                 <h3 className="text-3xl font-black text-white">Prochain Tournoi</h3>
               </div>
 
+              {/* Image de la discipline */}
+              {disciplines.find(d => d.id === 'fps')?.image && (
+                <div className="relative h-48 rounded-xl overflow-hidden mb-6">
+                  <img
+                    src={disciplines.find(d => d.id === 'fps')!.image}
+                    alt="CS:GO Tournament"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-4xl">{disciplines.find(d => d.id === 'fps')?.icon}</span>
+                      <div>
+                        <h4 className="text-2xl font-black text-white">CS:GO</h4>
+                        <p className="text-sm text-red-400">National Cup 2026</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div className="bg-black/50 rounded-lg p-6 text-center">
                   {timeRemaining.expired ? (

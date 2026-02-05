@@ -4,6 +4,7 @@ export interface Discipline {
   games: string[];
   icon: string;
   color: string;
+  image?: string;
 }
 
 export interface ClubStats {
@@ -48,35 +49,40 @@ export const disciplines: Discipline[] = [
     name: 'Stratégie',
     games: ['League of Legends', 'Dota 2'],
     icon: '🧠',
-    color: '#8B5CF6'
+    color: '#8B5CF6',
+    image: 'https://images.pexels.com/photos/7915435/pexels-photo-7915435.jpeg'
   },
   {
     id: 'fps',
     name: 'FPS',
     games: ['CS:GO', 'Valorant'],
     icon: '🎯',
-    color: '#EF4444'
+    color: '#EF4444',
+    image: 'https://images.pexels.com/photos/7915257/pexels-photo-7915257.jpeg'
   },
   {
     id: 'foot',
     name: 'Football',
     games: ['FC 26', 'eFootball'],
     icon: '⚽',
-    color: '#10B981'
+    color: '#10B981',
+    image: 'https://images.pexels.com/photos/274422/pexels-photo-274422.jpeg'
   },
   {
     id: 'racing',
     name: 'Racing',
     games: ['F1 24', 'Gran Turismo'],
     icon: '🏎️',
-    color: '#F59E0B'
+    color: '#F59E0B',
+    image: 'https://images.pexels.com/photos/92071/pexels-photo-92071.jpeg'
   },
   {
     id: 'fighting',
     name: 'Fighting',
     games: ['Tekken 8', 'Street Fighter 6'],
     icon: '🥊',
-    color: '#EC4899'
+    color: '#EC4899',
+    image: 'https://images.pexels.com/photos/163452/basketball-dunk-blue-game-163452.jpeg'
   }
 ];
 
