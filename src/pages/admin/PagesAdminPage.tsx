@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, Search, Filter, Globe, Save, X, ArrowUp, ArrowDown, Image, Type, Layout, BarChart3, Star, Users, MessageSquare, Menu as MenuIcon, Settings } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, Search, Filter, Globe, Save, X, ArrowUp, ArrowDown, Image, Type, Layout, BarChart3, Star, Users, MessageSquare, Menu as MenuIcon, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageEditor from '../../components/admin/PageEditor';
 
@@ -264,39 +264,33 @@ const PagesAdminPage = () => {
     }
   };
 
-  const handleDeletePage = async (pageId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) return;
+  const handleArchivePage = async (pageId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'archived' ? 'draft' : 'archived';
 
     try {
       const { error } = await supabase
         .from('pages')
-        .delete()
+        .update({ status: newStatus })
         .eq('id', pageId);
 
       if (error) throw error;
-      toast.success('Page supprimée avec succès');
+      toast.success(`Page ${newStatus === 'archived' ? 'archivée' : 'restaurée'} avec succès`);
       fetchPages();
-      if (selectedPage?.id === pageId) {
-        setSelectedPage(null);
-        setSections([]);
-      }
     } catch (error) {
-      console.error('Error deleting page:', error);
-      toast.error('Erreur lors de la suppression');
+      console.error('Error archiving page:', error);
+      toast.error('Erreur lors de l\'opération');
     }
   };
 
-  const handleDeleteSection = async (sectionId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) return;
-
+  const handleToggleSection = async (sectionId: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
         .from('page_sections')
-        .delete()
+        .update({ is_active: !currentStatus })
         .eq('id', sectionId);
 
       if (error) throw error;
-      toast.success('Section supprimée avec succès');
+      toast.success(`Section ${!currentStatus ? 'activée' : 'désactivée'} avec succès`);
       if (selectedPage) {
         fetchSections(selectedPage.id);
       }
@@ -538,8 +532,19 @@ const PagesAdminPage = () => {
                             setShowPageForm(true);
                           }}
                           className="text-blue-600 hover:text-blue-800"
+                          title="Modifier"
                         >
                           <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleArchivePage(page.id, page.status);
+                          }}
+                          className={`${page.status === 'archived' ? 'text-green-600 hover:text-green-800' : 'text-orange-600 hover:text-orange-800'}`}
+                          title={page.status === 'archived' ? 'Restaurer' : 'Archiver'}
+                        >
+                          {page.status === 'archived' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
