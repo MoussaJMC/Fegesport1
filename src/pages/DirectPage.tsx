@@ -126,8 +126,34 @@ const DirectPage: React.FC = () => {
       const streamId = stream.stream_id.trim();
 
       if (streamId.startsWith('UC')) {
-        // Format spécial pour les chaînes YouTube en live
-        embedUrl = `https://www.youtube.com/embed/live_stream?channel=${streamId}&autoplay=1&modestbranding=1&enablejsapi=1`;
+        // YouTube ne permet pas l'intégration fiable avec l'ID de chaîne
+        return (
+          <div className="w-full aspect-video bg-secondary-700 rounded-lg flex flex-col items-center justify-center p-8 text-center">
+            <Youtube className="w-16 h-16 text-red-500 mb-4" />
+            <p className="text-white text-xl font-bold mb-3">Comment intégrer votre live YouTube</p>
+            <div className="bg-white/10 rounded-lg p-4 mb-4 text-left max-w-lg">
+              <p className="text-gray-200 font-semibold mb-3">Étapes à suivre:</p>
+              <ol className="text-gray-300 space-y-2 text-sm list-decimal list-inside">
+                <li>Démarrez votre live sur YouTube</li>
+                <li>Une fois le live actif, cliquez sur "Partager" sous la vidéo</li>
+                <li>Copiez l'URL (ex: https://youtu.be/<strong className="text-white">jfKfPfyJRdk</strong>)</li>
+                <li>Dans l'admin, remplacez l'ID de chaîne par l'ID de la vidéo (la partie après youtu.be/)</li>
+              </ol>
+            </div>
+            <a
+              href={`https://www.youtube.com/channel/${streamId}/live`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              <Youtube className="w-5 h-5 mr-2" />
+              Voir le live sur YouTube
+            </a>
+            <p className="text-gray-400 text-xs mt-4">
+              YouTube ne permet pas l'intégration automatique avec l'ID de chaîne
+            </p>
+          </div>
+        );
       } else if (streamId.startsWith('@')) {
         // Pour les handles, on ne peut pas les intégrer directement
         return (
