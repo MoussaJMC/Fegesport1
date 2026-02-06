@@ -461,43 +461,33 @@ const StreamsAdminPage: React.FC = () => {
                         value={formData.stream_id}
                         onChange={(e) => setFormData({ ...formData, stream_id: e.target.value })}
                         className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                        placeholder={formData.platform === 'youtube' ? 'jfKfPfyJRdk (ID de la vidéo live)' : 'fegesport'}
+                        placeholder={formData.platform === 'youtube' ? 'UCrqM0rNeu8-tK2fKiKwlxTQ (ID de chaîne)' : 'fegesport'}
                         required
                       />
                     </div>
                     {formData.platform === 'youtube' ? (
                       <div className="mt-2 space-y-3">
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                          <p className="text-xs font-bold text-red-900 mb-2">⚠️ IMPORTANT pour l'intégration:</p>
-                          <p className="text-xs text-red-800 mb-2">
-                            Pour afficher le stream <strong>directement sur le site</strong>, vous DEVEZ utiliser l'ID de la vidéo live, PAS l'ID de chaîne.
+                        <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                          <p className="text-xs font-bold text-green-900 mb-2">✅ Pour intégrer le live de votre chaîne:</p>
+                          <p className="text-xs text-green-800 mb-2">
+                            Utilisez l'<strong>ID de chaîne</strong> (commence par UC) pour afficher automatiquement le live en cours de votre chaîne.
                           </p>
-                          <p className="text-xs text-red-700 font-medium">
-                            Comment obtenir l'ID de vidéo live:
+                          <p className="text-xs text-green-700">
+                            Exemple: <strong>UCrqM0rNeu8-tK2fKiKwlxTQ</strong>
                           </p>
-                          <ol className="text-xs text-red-800 space-y-1 list-decimal list-inside ml-2 mt-1">
-                            <li>Démarrez votre live sur YouTube</li>
-                            <li>Cliquez sur "Partager" sous la vidéo live</li>
-                            <li>Copiez l'URL: https://youtu.be/<strong>jfKfPfyJRdk</strong></li>
-                            <li>L'ID est la partie après youtu.be/</li>
-                          </ol>
                         </div>
                         <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                          <p className="text-xs font-medium text-blue-900 mb-2">Formats acceptés:</p>
+                          <p className="text-xs font-medium text-blue-900 mb-2">Autres formats acceptés:</p>
                           <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
-                            <li><strong>ID de vidéo live</strong> (recommandé): jfKfPfyJRdk</li>
+                            <li><strong>ID de vidéo live spécifique</strong>: jfKfPfyJRdk</li>
                             <li><strong>URL complète</strong>: https://www.youtube.com/watch?v=jfKfPfyJRdk</li>
                             <li><strong>URL courte</strong>: https://youtu.be/jfKfPfyJRdk</li>
                           </ul>
                         </div>
-                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                          <p className="text-xs font-medium text-gray-900 mb-1">Formats NON intégrables (lien externe seulement):</p>
-                          <ul className="text-xs text-gray-700 space-y-1 list-disc list-inside">
-                            <li><strong>ID de chaîne</strong> (UC...): UCrqM0rNeu8-tK2fKiKwlxTQ</li>
-                            <li><strong>Handle</strong> (@...): @fegesporttv7126</li>
-                          </ul>
-                          <p className="text-xs text-gray-600 mt-1 italic">
-                            Ces formats afficheront un bouton pour voir le stream sur YouTube
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                          <p className="text-xs font-medium text-yellow-900 mb-1">Format non supporté:</p>
+                          <p className="text-xs text-yellow-800">
+                            <strong>Handle</strong> (@...): @fegesporttv7126 - Utilisez plutôt l'ID de chaîne (UC...)
                           </p>
                         </div>
                       </div>

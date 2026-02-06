@@ -125,20 +125,20 @@ const DirectPage: React.FC = () => {
       let embedUrl: string;
       const streamId = stream.stream_id.trim();
 
-      if (streamId.startsWith('UC') || streamId.startsWith('@')) {
+      if (streamId.startsWith('UC')) {
+        // Format spécial pour les chaînes YouTube en live
+        embedUrl = `https://www.youtube.com/embed/live_stream?channel=${streamId}&autoplay=1&modestbranding=1&enablejsapi=1`;
+      } else if (streamId.startsWith('@')) {
+        // Pour les handles, on ne peut pas les intégrer directement
         return (
           <div className="w-full aspect-video bg-secondary-700 rounded-lg flex flex-col items-center justify-center p-8 text-center">
             <Youtube className="w-16 h-16 text-red-500 mb-4" />
-            <p className="text-white text-lg font-semibold mb-2">Stream non disponible en intégration</p>
+            <p className="text-white text-lg font-semibold mb-2">Intégration non disponible avec un handle</p>
             <p className="text-gray-300 mb-4">
-              YouTube ne permet pas l'intégration directe des live streams de chaîne.
+              Veuillez utiliser l'ID de chaîne (commence par UC) au lieu du handle (@)
             </p>
             <a
-              href={
-                streamId.startsWith('UC')
-                  ? `https://www.youtube.com/channel/${streamId}/live`
-                  : `https://www.youtube.com/${streamId}/live`
-              }
+              href={`https://www.youtube.com/${streamId}/live`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -146,9 +146,6 @@ const DirectPage: React.FC = () => {
               <Youtube className="w-5 h-5 mr-2" />
               Voir sur YouTube
             </a>
-            <p className="text-gray-400 text-sm mt-4">
-              Conseil: Utilisez l'ID de la vidéo live spécifique dans les paramètres pour l'intégrer ici
-            </p>
           </div>
         );
       } else if (streamId.includes('youtube.com/watch?v=')) {
