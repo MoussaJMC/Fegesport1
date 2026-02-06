@@ -122,10 +122,20 @@ const DirectPage: React.FC = () => {
 
   const renderEmbed = (stream: Stream) => {
     if (stream.platform === 'youtube') {
-      const isChannelId = stream.stream_id.startsWith('UC');
-      const embedUrl = isChannelId
-        ? `https://www.youtube.com/embed/live_stream?channel=${stream.stream_id}&autoplay=1`
-        : `https://www.youtube.com/embed/${stream.stream_id}?autoplay=1&rel=0`;
+      let embedUrl: string;
+      const streamId = stream.stream_id.trim();
+
+      if (streamId.startsWith('UC') || streamId.startsWith('@')) {
+        embedUrl = `https://www.youtube.com/embed/live_stream?channel=${streamId}&autoplay=1&modestbranding=1&enablejsapi=1`;
+      } else if (streamId.includes('youtube.com/watch?v=')) {
+        const videoId = streamId.split('v=')[1]?.split('&')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      } else if (streamId.includes('youtu.be/')) {
+        const videoId = streamId.split('youtu.be/')[1]?.split('?')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      } else {
+        embedUrl = `https://www.youtube.com/embed/${streamId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      }
 
       return (
         <iframe
@@ -133,14 +143,15 @@ const DirectPage: React.FC = () => {
           className="w-full aspect-video rounded-lg"
           title={stream.title}
           frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
         ></iframe>
       );
     } else if (stream.platform === 'twitch') {
       return (
         <iframe
-          src={`https://player.twitch.tv/?channel=${stream.stream_id}&parent=${window.location.hostname}`}
+          src={`https://player.twitch.tv/?channel=${stream.stream_id}&parent=${window.location.hostname}&autoplay=true`}
           className="w-full aspect-video rounded-lg"
           title={stream.title}
           frameBorder="0"
@@ -205,6 +216,10 @@ const DirectPage: React.FC = () => {
                             href={
                               activeStream.stream_id.startsWith('UC')
                                 ? `https://www.youtube.com/channel/${activeStream.stream_id}/live`
+                                : activeStream.stream_id.startsWith('@')
+                                ? `https://www.youtube.com/${activeStream.stream_id}/live`
+                                : activeStream.stream_id.includes('youtube.com')
+                                ? activeStream.stream_id
                                 : `https://www.youtube.com/watch?v=${activeStream.stream_id}`
                             }
                             target="_blank"

@@ -448,7 +448,7 @@ const StreamsAdminPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.platform === 'youtube' ? 'ID de vidéo ou ID de chaîne YouTube' : 'Nom de la chaîne Twitch'}
+                      {formData.platform === 'youtube' ? 'ID de vidéo, ID de chaîne ou URL YouTube' : 'Nom de la chaîne Twitch'}
                     </label>
                     <div className="relative">
                       {formData.platform === 'youtube' ? (
@@ -461,15 +461,28 @@ const StreamsAdminPage: React.FC = () => {
                         value={formData.stream_id}
                         onChange={(e) => setFormData({ ...formData, stream_id: e.target.value })}
                         className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                        placeholder={formData.platform === 'youtube' ? 'dQw4w9WgXcQ ou UCrqM0rNeu8-tK2fKiKwlxTQ' : 'fegesport'}
+                        placeholder={formData.platform === 'youtube' ? 'UCrqM0rNeu8-tK2fKiKwlxTQ ou @fegesporttv7126' : 'fegesport'}
                         required
                       />
                     </div>
-                    <p className="mt-1 text-xs text-gray-500">
-                      {formData.platform === 'youtube'
-                        ? 'Pour une vidéo: dQw4w9WgXcQ | Pour un live de chaîne: UCrqM0rNeu8-tK2fKiKwlxTQ (commence par UC)'
-                        : 'Exemple: Pour https://www.twitch.tv/fegesport, entrez fegesport'}
-                    </p>
+                    {formData.platform === 'youtube' ? (
+                      <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p className="text-xs font-medium text-blue-900 mb-2">Formats acceptés pour YouTube:</p>
+                        <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+                          <li><strong>ID de chaîne</strong> (commence par UC): UCrqM0rNeu8-tK2fKiKwlxTQ</li>
+                          <li><strong>Handle</strong> (commence par @): @fegesporttv7126</li>
+                          <li><strong>ID de vidéo live</strong>: jfKfPfyJRdk</li>
+                          <li><strong>URL complète</strong>: https://www.youtube.com/watch?v=VIDEO_ID</li>
+                        </ul>
+                        <p className="text-xs text-blue-700 mt-2 italic">
+                          💡 Pour un stream en direct permanent, utilisez l'ID de chaîne (UC...) ou le handle (@...)
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-xs text-gray-500">
+                        Exemple: Pour https://www.twitch.tv/fegesport, entrez fegesport
+                      </p>
+                    )}
                   </div>
                 </div>
 
