@@ -190,15 +190,16 @@ const DirectPage: React.FC = () => {
       }
 
       return (
-        <iframe
-          src={embedUrl}
-          className="w-full aspect-video rounded-lg"
-          title={stream.title}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-        ></iframe>
+        <div className="w-full aspect-video">
+          <iframe
+            src={embedUrl}
+            className="w-full h-full rounded-lg"
+            title={stream.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
+        </div>
       );
     } else if (stream.platform === 'twitch') {
       return (
