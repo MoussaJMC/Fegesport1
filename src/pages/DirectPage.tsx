@@ -174,6 +174,9 @@ const DirectPage: React.FC = () => {
             </a>
           </div>
         );
+      } else if (streamId.includes('youtube.com/live/')) {
+        const videoId = streamId.split('/live/')[1]?.split('?')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
       } else if (streamId.includes('youtube.com/watch?v=')) {
         const videoId = streamId.split('v=')[1]?.split('&')[0];
         embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;

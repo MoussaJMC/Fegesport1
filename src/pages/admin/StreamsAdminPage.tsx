@@ -483,6 +483,7 @@ const StreamsAdminPage: React.FC = () => {
                           <p className="text-xs font-medium text-blue-900 mb-2">Formats acceptés:</p>
                           <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
                             <li><strong>ID de vidéo live</strong>: jfKfPfyJRdk</li>
+                            <li><strong>URL live</strong>: https://www.youtube.com/live/SIgl_HvHtT8</li>
                             <li><strong>URL complète</strong>: https://www.youtube.com/watch?v=jfKfPfyJRdk</li>
                             <li><strong>URL courte</strong>: https://youtu.be/jfKfPfyJRdk</li>
                           </ul>
