@@ -125,7 +125,17 @@ const DirectPage: React.FC = () => {
       let embedUrl: string;
       const streamId = stream.stream_id.trim();
 
-      if (streamId.startsWith('UC')) {
+      // Vérifier d'abord les URLs complètes AVANT de vérifier les IDs
+      if (streamId.includes('youtube.com/live/')) {
+        const videoId = streamId.split('/live/')[1]?.split('?')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      } else if (streamId.includes('youtube.com/watch?v=')) {
+        const videoId = streamId.split('v=')[1]?.split('&')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      } else if (streamId.includes('youtu.be/')) {
+        const videoId = streamId.split('youtu.be/')[1]?.split('?')[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
+      } else if (streamId.startsWith('UC')) {
         // YouTube ne permet pas l'intégration fiable avec l'ID de chaîne
         return (
           <div className="w-full aspect-video bg-secondary-700 rounded-lg flex flex-col items-center justify-center p-8 text-center">
@@ -137,7 +147,7 @@ const DirectPage: React.FC = () => {
                 <li>Démarrez votre live sur YouTube</li>
                 <li>Une fois le live actif, cliquez sur "Partager" sous la vidéo</li>
                 <li>Copiez l'URL (ex: https://youtu.be/<strong className="text-white">jfKfPfyJRdk</strong>)</li>
-                <li>Dans l'admin, remplacez l'ID de chaîne par l'ID de la vidéo (la partie après youtu.be/)</li>
+                <li>Dans l'admin, remplacez l'ID de chaîne par l'URL complète du live</li>
               </ol>
             </div>
             <a
@@ -161,7 +171,7 @@ const DirectPage: React.FC = () => {
             <Youtube className="w-16 h-16 text-red-500 mb-4" />
             <p className="text-white text-lg font-semibold mb-2">Intégration non disponible avec un handle</p>
             <p className="text-gray-300 mb-4">
-              Veuillez utiliser l'ID de chaîne (commence par UC) au lieu du handle (@)
+              Veuillez utiliser l'URL complète du live au lieu du handle (@)
             </p>
             <a
               href={`https://www.youtube.com/${streamId}/live`}
@@ -174,16 +184,8 @@ const DirectPage: React.FC = () => {
             </a>
           </div>
         );
-      } else if (streamId.includes('youtube.com/live/')) {
-        const videoId = streamId.split('/live/')[1]?.split('?')[0];
-        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
-      } else if (streamId.includes('youtube.com/watch?v=')) {
-        const videoId = streamId.split('v=')[1]?.split('&')[0];
-        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
-      } else if (streamId.includes('youtu.be/')) {
-        const videoId = streamId.split('youtu.be/')[1]?.split('?')[0];
-        embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
       } else {
+        // Traiter comme un ID de vidéo direct
         embedUrl = `https://www.youtube.com/embed/${streamId}?autoplay=1&modestbranding=1&rel=0&enablejsapi=1`;
       }
 
