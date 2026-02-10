@@ -79,8 +79,17 @@ const FileManager: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching files:', error);
+        throw error;
+      }
+
+      console.log('Files fetched:', data?.length || 0);
       setFiles(data || []);
+
+      if (!data || data.length === 0) {
+        console.log('No files found in database');
+      }
     } catch (error) {
       console.error('Error fetching files:', error);
       toast.error('Erreur lors du chargement des fichiers');
@@ -143,8 +152,11 @@ const FileManager: React.FC = () => {
     );
   };
 
-  const handleUploadSuccess = () => {
-    fetchFiles();
+  const handleUploadSuccess = async () => {
+    // Force a fresh fetch from the database
+    setLoading(true);
+    await fetchFiles();
+    setLoading(false);
     setShowUploadModal(false);
   };
 

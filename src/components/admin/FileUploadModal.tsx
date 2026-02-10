@@ -229,14 +229,19 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             uploaded_by: user?.id
           };
 
-          const { error: insertError } = await supabase
+          console.log('Inserting file metadata:', fileData);
+
+          const { data: insertData, error: insertError } = await supabase
             .from('static_files')
-            .insert([fileData]);
+            .insert([fileData])
+            .select();
 
           if (insertError) {
             console.error('Database insert error:', insertError);
             throw new Error(`Database insert failed: ${insertError.message}`);
           }
+
+          console.log('File metadata inserted successfully:', insertData);
 
           progress[file.name] = 100;
           setUploadProgress({ ...progress });
@@ -248,9 +253,13 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       }
 
       toast.success(`${files.length} fichier(s) téléchargé(s) avec succès`);
-      onSuccess();
-      onClose();
+
+      // Call onSuccess first to refresh the file list
+      await onSuccess();
+
+      // Then reset form and close modal
       resetForm();
+      onClose();
     } catch (error: any) {
       console.error('Error uploading files:', error);
       setError(error.message);
