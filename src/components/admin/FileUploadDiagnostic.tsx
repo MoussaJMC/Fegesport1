@@ -44,6 +44,8 @@ const FileUploadDiagnostic: React.FC = () => {
       { name: 'Rôle Administrateur', status: 'pending', message: 'Vérification...' },
       { name: 'Table file_categories', status: 'pending', message: 'Vérification...' },
       { name: 'Catégories disponibles', status: 'pending', message: 'Vérification...' },
+      { name: 'Table static_files', status: 'pending', message: 'Vérification...' },
+      { name: 'Fichiers avec JOIN', status: 'pending', message: 'Vérification...' },
       { name: 'Bucket de stockage', status: 'pending', message: 'Vérification...' },
       { name: 'Permissions de stockage', status: 'pending', message: 'Vérification...' }
     ];
@@ -218,14 +220,95 @@ const FileUploadDiagnostic: React.FC = () => {
       setDiagnostics([...results]);
     }
 
-    // Test 6: Storage bucket
+    // Test 6: static_files table
+    try {
+      const { data: filesCount, error: filesError } = await supabase
+        .from('static_files')
+        .select('id', { count: 'exact', head: true });
+
+      if (filesError) {
+        results[5] = {
+          name: 'Table static_files',
+          status: 'error',
+          message: `Erreur d'accès à la table: ${filesError.message}`,
+          details: filesError
+        };
+      } else {
+        results[5] = {
+          name: 'Table static_files',
+          status: 'success',
+          message: `Table static_files accessible (${filesCount || 0} fichiers)`,
+          details: { count: filesCount }
+        };
+      }
+      setDiagnostics([...results]);
+    } catch (error: any) {
+      results[5] = {
+        name: 'Table static_files',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setDiagnostics([...results]);
+    }
+
+    // Test 7: Fetch files with JOIN (comme le FileManager)
+    try {
+      const { data: filesData, error: filesJoinError } = await supabase
+        .from('static_files')
+        .select(`
+          *,
+          category:file_categories(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (filesJoinError) {
+        results[6] = {
+          name: 'Fichiers avec JOIN',
+          status: 'error',
+          message: `Erreur lors du chargement des fichiers avec JOIN: ${filesJoinError.message}`,
+          details: filesJoinError
+        };
+      } else if (!filesData || filesData.length === 0) {
+        results[6] = {
+          name: 'Fichiers avec JOIN',
+          status: 'warning',
+          message: 'Aucun fichier trouvé (la table est vide)',
+          details: { count: 0 }
+        };
+      } else {
+        results[6] = {
+          name: 'Fichiers avec JOIN',
+          status: 'success',
+          message: `${filesData.length} fichiers récupérés avec succès`,
+          details: {
+            count: filesData.length,
+            files: filesData.slice(0, 3).map(f => ({
+              filename: f.filename,
+              category: f.category?.name || 'N/A'
+            }))
+          }
+        };
+      }
+      setDiagnostics([...results]);
+    } catch (error: any) {
+      results[6] = {
+        name: 'Fichiers avec JOIN',
+        status: 'error',
+        message: `Erreur: ${error.message}`,
+        details: error
+      };
+      setDiagnostics([...results]);
+    }
+
+    // Test 8: Storage bucket
     try {
       const { data: buckets, error: bucketsError } = await supabase
         .storage
         .listBuckets();
-      
+
       if (bucketsError) {
-        results[5] = {
+        results[7] = {
           name: 'Bucket de stockage',
           status: 'error',
           message: `Erreur d'accès aux buckets: ${bucketsError.message}`,
@@ -233,16 +316,16 @@ const FileUploadDiagnostic: React.FC = () => {
         };
       } else {
         const staticFilesBucket = buckets?.find(b => b.name === 'static-files');
-        
+
         if (!staticFilesBucket) {
-          results[5] = {
+          results[7] = {
             name: 'Bucket de stockage',
             status: 'warning',
             message: 'Bucket static-files non trouvé',
             details: { availableBuckets: buckets?.map(b => b.name) }
           };
         } else {
-          results[5] = {
+          results[7] = {
             name: 'Bucket de stockage',
             status: 'success',
             message: 'Bucket static-files accessible',
@@ -252,7 +335,7 @@ const FileUploadDiagnostic: React.FC = () => {
       }
       setDiagnostics([...results]);
     } catch (error: any) {
-      results[5] = {
+      results[7] = {
         name: 'Bucket de stockage',
         status: 'error',
         message: `Erreur: ${error.message}`,
@@ -261,19 +344,19 @@ const FileUploadDiagnostic: React.FC = () => {
       setDiagnostics([...results]);
     }
 
-    // Test 7: Storage permissions
+    // Test 9: Storage permissions
     try {
       // Try to upload a small test file
       const testFile = new Blob(['test'], { type: 'text/plain' });
       const fileName = `test-${Date.now()}.txt`;
-      
+
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('static-files')
         .upload(`test/${fileName}`, testFile);
-      
+
       if (uploadError) {
         if (uploadError.message.includes('new row violates row-level security policy')) {
-          results[6] = {
+          results[8] = {
             name: 'Permissions de stockage',
             status: 'error',
             message: 'Violation de la politique RLS - Permissions insuffisantes',
@@ -281,14 +364,14 @@ const FileUploadDiagnostic: React.FC = () => {
           };
         } else if (uploadError.message.includes('The resource already exists')) {
           // This is actually fine, it means we can upload
-          results[6] = {
+          results[8] = {
             name: 'Permissions de stockage',
             status: 'success',
             message: 'Permissions de téléchargement OK (conflit de nom de fichier)',
             details: uploadError
           };
         } else {
-          results[6] = {
+          results[8] = {
             name: 'Permissions de stockage',
             status: 'error',
             message: `Erreur de téléchargement: ${uploadError.message}`,
@@ -300,8 +383,8 @@ const FileUploadDiagnostic: React.FC = () => {
         await supabase.storage
           .from('static-files')
           .remove([`test/${fileName}`]);
-          
-        results[6] = {
+
+        results[8] = {
           name: 'Permissions de stockage',
           status: 'success',
           message: 'Test de téléchargement réussi',
@@ -310,7 +393,7 @@ const FileUploadDiagnostic: React.FC = () => {
       }
       setDiagnostics([...results]);
     } catch (error: any) {
-      results[6] = {
+      results[8] = {
         name: 'Permissions de stockage',
         status: 'error',
         message: `Erreur: ${error.message}`,

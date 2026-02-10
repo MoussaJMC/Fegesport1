@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { 
-  Upload, Search, Filter, Grid, List, Eye, Download, 
+import {
+  Upload, Search, Filter, Grid, List, Eye, Download,
   Trash2, Edit, Plus, Image, FileText, Video, Music,
-  Shield, Layout, User, Archive, X, Copy, ExternalLink
+  Shield, Layout, User, Archive, X, Copy, ExternalLink, RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FileUploadModal from './FileUploadModal';
@@ -180,13 +180,27 @@ const FileManager: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Gestionnaire de Fichiers</h1>
           <p className="text-gray-600">Gérer les images, documents et autres fichiers statiques</p>
         </div>
-        <button
-          onClick={() => setShowUploadModal(true)}
-          className="btn bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          Télécharger
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              setLoading(true);
+              await fetchFiles();
+              setLoading(false);
+              toast.success('Liste rafraîchie');
+            }}
+            className="btn bg-gray-600 hover:bg-gray-700 text-white"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Rafraîchir
+          </button>
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="btn bg-primary-600 hover:bg-primary-700 text-white"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Télécharger
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
