@@ -70,7 +70,9 @@ const FileManager: React.FC = () => {
   };
 
   const fetchFiles = async () => {
+    console.log('=== fetchFiles START ===');
     try {
+      console.log('Making query to static_files...');
       const { data, error } = await supabase
         .from('static_files')
         .select(`
@@ -79,22 +81,35 @@ const FileManager: React.FC = () => {
         `)
         .order('created_at', { ascending: false });
 
+      console.log('Query response:', { data: data?.length, error });
+
       if (error) {
         console.error('Error fetching files:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
 
-      console.log('Files fetched:', data?.length || 0);
+      console.log('Files fetched successfully:', data?.length || 0);
+      if (data && data.length > 0) {
+        console.log('First 3 files:', data.slice(0, 3).map(f => ({
+          id: f.id,
+          filename: f.filename,
+          category: f.category
+        })));
+      }
+
       setFiles(data || []);
+      console.log('State updated with files:', data?.length || 0);
 
       if (!data || data.length === 0) {
-        console.log('No files found in database');
+        console.warn('No files found in database');
       }
     } catch (error) {
-      console.error('Error fetching files:', error);
+      console.error('Exception in fetchFiles:', error);
       toast.error('Erreur lors du chargement des fichiers');
     } finally {
       setLoading(false);
+      console.log('=== fetchFiles END ===');
     }
   };
 
@@ -120,6 +135,17 @@ const FileManager: React.FC = () => {
     const matchesCategory = !selectedCategory || file.category_id === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('FileManager state:', {
+      totalFiles: files.length,
+      filteredFiles: filteredFiles.length,
+      searchTerm,
+      selectedCategory,
+      loading
+    });
+  }, [files.length, filteredFiles.length, searchTerm, selectedCategory, loading]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
