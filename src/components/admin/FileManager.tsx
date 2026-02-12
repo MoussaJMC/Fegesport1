@@ -200,34 +200,6 @@ const FileManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* DEBUG INFO - TRES VISIBLE */}
-      <div className="bg-red-100 border-4 border-red-500 rounded-lg p-6">
-        <h2 className="text-3xl font-bold text-red-900 mb-4">🔍 PANNEAU DEBUG</h2>
-        <div className="bg-white p-4 rounded text-xl space-y-3">
-          <p>Total fichiers chargés: <strong className="text-4xl text-blue-600">{files.length}</strong></p>
-          <p>Fichiers après filtrage: <strong className="text-4xl text-green-600">{filteredFiles.length}</strong></p>
-          <p>Recherche active: <strong>{searchTerm || '(AUCUNE)'}</strong></p>
-          <p>Catégorie sélectionnée: <strong>{selectedCategory || '(TOUTES)'}</strong></p>
-          <p>En chargement: <strong>{loading ? '✅ OUI' : '❌ NON'}</strong></p>
-          <p className="text-2xl mt-4 pt-4 border-t-2">hasFilteredFiles: <strong className={hasFilteredFiles ? 'text-green-600' : 'text-red-600'}>{hasFilteredFiles ? '✅ TRUE' : '❌ FALSE'}</strong></p>
-          <p className="text-2xl">hasFiles: <strong className={hasFiles ? 'text-green-600' : 'text-red-600'}>{hasFiles ? '✅ TRUE' : '❌ FALSE'}</strong></p>
-          <p className="text-2xl">viewMode: <strong>{viewMode}</strong></p>
-        </div>
-        {files.length > 0 && (
-          <div className="mt-4 bg-yellow-100 p-4 rounded">
-            <p className="font-bold text-lg mb-2">Premiers fichiers trouvés:</p>
-            <ul className="space-y-2">
-              {files.slice(0, 5).map(f => (
-                <li key={f.id} className="bg-white p-2 rounded text-sm">
-                  <strong>{f.filename}</strong> - {f.title || '(sans titre)'}<br/>
-                  Type: {f.file_type} - URL existe: {f.file_url ? '✅' : '❌'}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -345,15 +317,8 @@ const FileManager: React.FC = () => {
       <div className="bg-white rounded-lg shadow">
         {hasFilteredFiles ? (
           <>
-            <div className="bg-green-200 p-4 text-center text-2xl font-bold border-b-4 border-green-600">
-              ✅ ON ENTRE DANS hasFilteredFiles = TRUE
-            </div>
             {viewMode === 'grid' ? (
-              <>
-                <div className="bg-blue-200 p-4 text-center text-xl font-bold border-b-2 border-blue-600">
-                  ✅ MODE GRILLE ACTIF - {filteredFiles.length} fichiers à afficher
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
                 {filteredFiles.map((file, index) => (
                   <motion.div
                     key={file.id}
@@ -423,8 +388,7 @@ const FileManager: React.FC = () => {
                     )}
                   </motion.div>
                 ))}
-                </div>
-              </>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
