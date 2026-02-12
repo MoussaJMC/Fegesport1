@@ -209,6 +209,9 @@ const FileManager: React.FC = () => {
           <p>Recherche active: <strong>{searchTerm || '(AUCUNE)'}</strong></p>
           <p>Catégorie sélectionnée: <strong>{selectedCategory || '(TOUTES)'}</strong></p>
           <p>En chargement: <strong>{loading ? '✅ OUI' : '❌ NON'}</strong></p>
+          <p className="text-2xl mt-4 pt-4 border-t-2">hasFilteredFiles: <strong className={hasFilteredFiles ? 'text-green-600' : 'text-red-600'}>{hasFilteredFiles ? '✅ TRUE' : '❌ FALSE'}</strong></p>
+          <p className="text-2xl">hasFiles: <strong className={hasFiles ? 'text-green-600' : 'text-red-600'}>{hasFiles ? '✅ TRUE' : '❌ FALSE'}</strong></p>
+          <p className="text-2xl">viewMode: <strong>{viewMode}</strong></p>
         </div>
         {files.length > 0 && (
           <div className="mt-4 bg-yellow-100 p-4 rounded">
@@ -342,8 +345,15 @@ const FileManager: React.FC = () => {
       <div className="bg-white rounded-lg shadow">
         {hasFilteredFiles ? (
           <>
+            <div className="bg-green-200 p-4 text-center text-2xl font-bold border-b-4 border-green-600">
+              ✅ ON ENTRE DANS hasFilteredFiles = TRUE
+            </div>
             {viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
+              <>
+                <div className="bg-blue-200 p-4 text-center text-xl font-bold border-b-2 border-blue-600">
+                  ✅ MODE GRILLE ACTIF - {filteredFiles.length} fichiers à afficher
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-6">
                 {filteredFiles.map((file, index) => (
                   <motion.div
                     key={file.id}
@@ -413,7 +423,8 @@ const FileManager: React.FC = () => {
                     )}
                   </motion.div>
                 ))}
-              </div>
+                </div>
+              </>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
