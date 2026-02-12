@@ -200,25 +200,24 @@ const FileManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* DEBUG INFO */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="font-bold text-yellow-800 mb-2">🔍 Debug Info</h3>
-        <div className="text-sm text-yellow-700 space-y-1">
-          <p>Total fichiers: <strong>{files.length}</strong></p>
-          <p>Fichiers filtrés: <strong>{filteredFiles.length}</strong></p>
-          <p>Recherche: <strong>{searchTerm || '(vide)'}</strong></p>
-          <p>Catégorie sélectionnée: <strong>{selectedCategory || '(toutes)'}</strong></p>
-          <p>Loading: <strong>{loading ? 'Oui' : 'Non'}</strong></p>
-          <p>hasFiles: <strong>{hasFiles ? 'Oui' : 'Non'}</strong></p>
-          <p>hasFilteredFiles: <strong>{hasFilteredFiles ? 'Oui' : 'Non'}</strong></p>
+      {/* DEBUG INFO - TRES VISIBLE */}
+      <div className="bg-red-100 border-4 border-red-500 rounded-lg p-6">
+        <h2 className="text-3xl font-bold text-red-900 mb-4">🔍 PANNEAU DEBUG</h2>
+        <div className="bg-white p-4 rounded text-xl space-y-3">
+          <p>Total fichiers chargés: <strong className="text-4xl text-blue-600">{files.length}</strong></p>
+          <p>Fichiers après filtrage: <strong className="text-4xl text-green-600">{filteredFiles.length}</strong></p>
+          <p>Recherche active: <strong>{searchTerm || '(AUCUNE)'}</strong></p>
+          <p>Catégorie sélectionnée: <strong>{selectedCategory || '(TOUTES)'}</strong></p>
+          <p>En chargement: <strong>{loading ? '✅ OUI' : '❌ NON'}</strong></p>
         </div>
         {files.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-yellow-300">
-            <p className="font-bold mb-2">Premiers fichiers (max 5):</p>
-            <ul className="list-disc list-inside space-y-1 text-xs">
+          <div className="mt-4 bg-yellow-100 p-4 rounded">
+            <p className="font-bold text-lg mb-2">Premiers fichiers trouvés:</p>
+            <ul className="space-y-2">
               {files.slice(0, 5).map(f => (
-                <li key={f.id}>
-                  {f.filename} - {f.title || '(sans titre)'} - Cat: {f.category_id || 'N/A'}
+                <li key={f.id} className="bg-white p-2 rounded text-sm">
+                  <strong>{f.filename}</strong> - {f.title || '(sans titre)'}<br/>
+                  Type: {f.file_type} - URL existe: {f.file_url ? '✅' : '❌'}
                 </li>
               ))}
             </ul>
