@@ -51,10 +51,14 @@ const UpcomingEventsAdminPage = () => {
 
   const fetchUpcomingEvents = async () => {
     try {
+      const today = new Date().toISOString().split('T')[0];
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('status', 'upcoming')
+        .gte('date', today)
+        .not('status', 'eq', 'completed')
+        .not('status', 'eq', 'cancelled')
         .order('date', { ascending: true });
 
       if (error) throw error;
