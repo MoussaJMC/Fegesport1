@@ -15,6 +15,7 @@ import ResourcesPage from './pages/ResourcesPage';
 import PartnersPage from './pages/PartnersPage';
 import ContactPage from './pages/ContactPage';
 import EventPage from './pages/EventPage';
+import EventsListPage from './pages/EventsListPage';
 import CardPage from './pages/CardPage';
 import DirectPage from './pages/DirectPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -114,6 +115,7 @@ function App() {
           <Route path="/resources" element={<PublicLayout><ResourcesPage /></PublicLayout>} />
           <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
           <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+          <Route path="/events" element={<PublicLayout><EventsListPage /></PublicLayout>} />
           <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
           <Route path="/card/:id" element={<PublicLayout><CardPage /></PublicLayout>} />
           <Route path="/direct" element={<PublicLayout><DirectPage /></PublicLayout>} />
