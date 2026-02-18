@@ -32,6 +32,7 @@ import TestDatabasePage from './pages/admin/TestDatabasePage';
 import PagesAdminPage from './pages/admin/PagesAdminPage';
 import NewsAdminPage from './pages/admin/NewsAdminPage';
 import EventsAdminPage from './pages/admin/EventsAdminPage';
+import UpcomingEventsAdminPage from './pages/admin/UpcomingEventsAdminPage';
 import MembersAdminPage from './pages/admin/MembersAdminPage';
 import MembershipTypesAdminPage from './pages/admin/MembershipTypesAdminPage';
 import LeadershipAdminPage from './pages/admin/LeadershipAdminPage';
@@ -81,6 +82,7 @@ function App() {
             <Route path="history" element={<HistoryAdminPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
+            <Route path="upcoming-events" element={<UpcomingEventsAdminPage />} />
             <Route path="leg" element={<LEGAdminPage />} />
             <Route path="sponsors" element={<SponsorsAdminPage />} />
             <Route path="members" element={<MembersAdminPage />} />

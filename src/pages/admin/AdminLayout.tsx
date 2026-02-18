@@ -189,6 +189,7 @@ const AdminLayout: React.FC = () => {
     { icon: Globe, label: 'Pages', path: '/admin/pages' },
     { icon: Newspaper, label: 'Actualités', path: '/admin/news' },
     { icon: Calendar, label: 'Événements', path: '/admin/events' },
+    { icon: Clock, label: 'Événements à Venir', path: '/admin/upcoming-events' },
     { icon: Gamepad2, label: 'eLeague', path: '/admin/leg' },
     { icon: Target, label: 'Sponsors LEG', path: '/admin/sponsors' },
     { icon: UserCheck, label: 'Inscriptions', path: '/admin/registrations' },
