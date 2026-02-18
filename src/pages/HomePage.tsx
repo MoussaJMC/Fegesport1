@@ -165,15 +165,20 @@ const HomePage: React.FC = () => {
 
   const fetchUpcomingEvents = async () => {
     try {
+      const today = new Date().toISOString().split('T')[0];
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('status', 'upcoming')
+        .gte('date', today)
+        .not('status', 'eq', 'completed')
+        .not('status', 'eq', 'cancelled')
         .order('date', { ascending: true })
         .limit(4);
 
       if (error) {
         console.error('Error fetching events:', error);
+        setEvents([]);
         return;
       }
 
@@ -194,9 +199,12 @@ const HomePage: React.FC = () => {
           currentParticipants: item.current_participants
         }));
         setEvents(mappedEvents);
+      } else {
+        setEvents([]);
       }
     } catch (error) {
       console.error('Error in fetchUpcomingEvents:', error);
+      setEvents([]);
     }
   };
 
