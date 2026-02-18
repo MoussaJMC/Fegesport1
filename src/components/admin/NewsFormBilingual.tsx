@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { NewsTranslations, buildTranslations } from '../../utils/translations';
 import TranslationEditor from './TranslationEditor';
+import { Upload, Image as ImageIcon, X } from 'lucide-react';
 
 const newsSchema = z.object({
   id: z.string().uuid().optional(),
@@ -34,6 +35,8 @@ const NewsFormBilingual: React.FC<NewsFormBilingualProps> = ({
       en: { title: '', excerpt: '', content: '' },
     }
   );
+  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image_url || null);
+  const [uploading, setUploading] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, setValue } = useForm<NewsFormData>({
     resolver: zodResolver(newsSchema),
@@ -44,6 +47,58 @@ const NewsFormBilingual: React.FC<NewsFormBilingualProps> = ({
       translations: initialData?.translations || {},
     },
   });
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('L\'image ne doit pas dépasser 5MB');
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `news-${Date.now()}.${fileExt}`;
+      const filePath = `news/${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('static-files')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('static-files')
+        .getPublicUrl(filePath);
+
+      setValue('image_url', publicUrl);
+      setImagePreview(publicUrl);
+      toast.success('Image téléchargée avec succès');
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast.error('Erreur lors du téléchargement de l\'image');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setValue('image_url', '');
+    setImagePreview(null);
+  };
 
   const onSubmit = async (data: NewsFormData) => {
     try {
@@ -139,17 +194,70 @@ const NewsFormBilingual: React.FC<NewsFormBilingualProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL de l'image
+              Image
             </label>
-            <input
-              type="url"
-              {...register('image_url')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="mb-3 relative">
+                <img
+                  src={imagePreview}
+                  alt="Aperçu"
+                  className="w-full h-48 object-cover rounded-md"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/800x400?text=Image+non+disponible';
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                  title="Supprimer l'image"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+
+            {/* Upload Button */}
+            <div className="flex flex-col gap-2">
+              <label className="cursor-pointer">
+                <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-md hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                  <Upload size={20} className="text-gray-400" />
+                  <span className="text-sm text-gray-600">
+                    {uploading ? 'Téléchargement...' : 'Télécharger une image'}
+                  </span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </label>
+
+              {/* URL Input */}
+              <div className="text-center text-sm text-gray-500">ou</div>
+              <input
+                type="url"
+                {...register('image_url')}
+                onChange={(e) => {
+                  setValue('image_url', e.target.value);
+                  setImagePreview(e.target.value);
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="URL de l'image (https://...)"
+              />
+            </div>
+
             {errors.image_url && (
               <p className="mt-1 text-sm text-red-600">{errors.image_url.message}</p>
             )}
+
+            <p className="mt-1 text-xs text-gray-500">
+              Max 5MB. Formats acceptés: JPG, PNG, GIF, WebP
+            </p>
           </div>
 
           <div className="flex items-center">

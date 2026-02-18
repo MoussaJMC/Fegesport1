@@ -5,7 +5,8 @@ import { Plus, Edit, Trash2, Eye, Search, Filter, Newspaper, Calendar, Tag, Copy
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import NewsForm from '../../components/admin/NewsForm';
+import NewsFormBilingual from '../../components/admin/NewsFormBilingual';
+import { NewsTranslations } from '../../utils/translations';
 
 interface NewsItem {
   id: string;
@@ -18,6 +19,7 @@ interface NewsItem {
   published: boolean;
   created_at: string;
   updated_at: string;
+  translations?: NewsTranslations;
 }
 
 const NewsAdminPage = () => {
@@ -304,7 +306,7 @@ const NewsAdminPage = () => {
               <h2 className="text-xl font-bold mb-4">
                 {editingNews ? 'Modifier l\'actualité' : 'Nouvelle actualité'}
               </h2>
-              <NewsForm
+              <NewsFormBilingual
                 initialData={editingNews || undefined}
                 onSuccess={handleFormSuccess}
                 onCancel={() => {
