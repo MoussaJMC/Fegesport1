@@ -55,23 +55,37 @@ const EventForm: React.FC<EventFormProps> = ({ initialData, onSuccess, onCancel 
       };
 
       if (initialData?.id) {
-        const { error } = await supabase
+        console.log('Updating event:', initialData.id, cleanData);
+        const { data: updatedData, error } = await supabase
           .from('events')
           .update(cleanData)
-          .eq('id', initialData.id);
-        if (error) throw error;
+          .eq('id', initialData.id)
+          .select();
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        console.log('Update successful:', updatedData);
         toast.success('Événement mis à jour avec succès');
       } else {
-        const { error } = await supabase
+        console.log('Creating event:', cleanData);
+        const { data: newData, error } = await supabase
           .from('events')
-          .insert([cleanData]);
-        if (error) throw error;
+          .insert([cleanData])
+          .select();
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        console.log('Insert successful:', newData);
         toast.success('Événement créé avec succès');
       }
       onSuccess();
     } catch (error: any) {
       console.error('Error saving event:', error);
-      toast.error('Une erreur est survenue');
+      toast.error(`Erreur: ${error.message || 'Une erreur est survenue'}`);
     }
   };
 

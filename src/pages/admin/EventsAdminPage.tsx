@@ -77,17 +77,25 @@ const EventsAdminPage = () => {
 
   const updateEventStatus = async (id: string, newStatus: string) => {
     try {
-      const { error } = await supabase
+      console.log('Updating event status:', { id, newStatus });
+
+      const { data, error } = await supabase
         .from('events')
         .update({ status: newStatus })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Update successful:', data);
       toast.success('Statut de l\'événement mis à jour');
       fetchEvents();
     } catch (error) {
       console.error('Error updating event status:', error);
-      toast.error('Erreur lors de la mise à jour');
+      toast.error('Erreur lors de la mise à jour du statut');
     }
   };
 

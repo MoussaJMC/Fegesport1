@@ -53,6 +53,7 @@ import SponsorsAdminPage from './pages/admin/SponsorsAdminPage';
 import MenuAdminPage from './pages/admin/MenuAdminPage';
 import FooterAdminPage from './pages/admin/FooterAdminPage';
 import HistoryAdminPage from './pages/admin/HistoryAdminPage';
+import EventsUpdateTestPage from './pages/admin/EventsUpdateTestPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -98,6 +99,7 @@ function App() {
             <Route path="social-media" element={<SocialMediaAdminPage />} />
             <Route path="emails" element={<EmailAdminPage />} />
             <Route path="email-test" element={<EmailTestDiagnosticPage />} />
+            <Route path="events-test" element={<EventsUpdateTestPage />} />
           </Route>
 
           {/* Public routes */}
