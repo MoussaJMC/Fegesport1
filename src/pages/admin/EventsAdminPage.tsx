@@ -79,6 +79,10 @@ const EventsAdminPage = () => {
     try {
       console.log('Updating event status:', { id, newStatus });
 
+      // Get current user session to debug
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Current session user_metadata:', session?.user?.user_metadata);
+
       const { data, error } = await supabase
         .from('events')
         .update({ status: newStatus })
@@ -87,15 +91,16 @@ const EventsAdminPage = () => {
 
       if (error) {
         console.error('Supabase error:', error);
+        toast.error(`Erreur: ${error.message}`);
         throw error;
       }
 
       console.log('Update successful:', data);
       toast.success('Statut de l\'événement mis à jour');
       fetchEvents();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating event status:', error);
-      toast.error('Erreur lors de la mise à jour du statut');
+      toast.error(`Erreur lors de la mise à jour du statut: ${error.message || 'Inconnu'}`);
     }
   };
 
