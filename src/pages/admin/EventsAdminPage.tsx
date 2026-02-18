@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2, Eye, Search, Filter, Calendar as CalendarIcon } fro
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import EventForm from '../../components/admin/EventForm';
+import EventFormBilingual from '../../components/admin/EventFormBilingual';
 
 interface Event {
   id: string;
@@ -168,6 +168,32 @@ const EventsAdminPage = () => {
         </button>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-blue-600">{events.length}</div>
+          <div className="text-sm text-gray-600">Total Événements</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-green-600">
+            {events.filter(e => e.status === 'upcoming').length}
+          </div>
+          <div className="text-sm text-gray-600">À venir</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-yellow-600">
+            {events.filter(e => e.status === 'ongoing').length}
+          </div>
+          <div className="text-sm text-gray-600">En cours</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-gray-600">
+            {events.filter(e => e.status === 'completed').length}
+          </div>
+          <div className="text-sm text-gray-600">Terminés</div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -220,7 +246,7 @@ const EventsAdminPage = () => {
               <h2 className="text-xl font-bold mb-4">
                 {editingEvent ? 'Modifier l\'événement' : 'Nouvel événement'}
               </h2>
-              <EventForm
+              <EventFormBilingual
                 initialData={editingEvent || undefined}
                 onSuccess={handleFormSuccess}
                 onCancel={() => {
