@@ -427,8 +427,61 @@ const HomePage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-400 py-12">
-              <p>Aucun événement à venir pour le moment.</p>
+            <div className="text-center py-16 bg-gradient-to-br from-green-900/50 to-blue-900/50 rounded-lg shadow-xl border-2 border-green-600">
+              <div className="max-w-2xl mx-auto px-6">
+                <div className="bg-secondary-800 rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6 border-2 border-green-500">
+                  <Calendar className="h-12 w-12 text-green-400" />
+                </div>
+
+                <h3 className="text-3xl font-bold text-white mb-3">
+                  Période de vacances
+                </h3>
+
+                <div className="space-y-4 text-gray-200">
+                  <p className="text-xl font-medium">
+                    Les activités sportives sont actuellement en pause
+                  </p>
+
+                  <div className="bg-secondary-800/80 rounded-lg p-6 shadow-sm border border-green-600">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <div className="w-16 h-16 bg-green-900/50 rounded-full flex items-center justify-center text-3xl border-2 border-green-500">
+                        🌙
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold text-white">Mois sacré du Ramadan</p>
+                        <p className="text-sm text-gray-300">Période de jeûne et de recueillement</p>
+                      </div>
+                    </div>
+
+                    <p className="text-base leading-relaxed">
+                      Nous respectons cette période importante pour notre communauté.
+                      Tous les tournois, compétitions et événements sportifs reprendront
+                      après la fin du Ramadan.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-6 shadow-md">
+                    <p className="font-semibold text-xl mb-2">
+                      📅 Reprise prochaine des activités
+                    </p>
+                    <p className="text-base">
+                      Le calendrier complet des tournois et événements sera publié
+                      dès la fin du mois de Ramadan. Restez connectés !
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 mt-6 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>En attente</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span>Planification en cours</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
