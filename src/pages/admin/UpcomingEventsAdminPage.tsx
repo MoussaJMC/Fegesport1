@@ -637,26 +637,76 @@ const UpcomingEventsAdminPage = () => {
 
       {/* Empty State */}
       {filteredEvents.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-          <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun événement à venir</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || filterType || filterTimeRange !== 'all'
-              ? 'Aucun événement ne correspond à vos critères de recherche.'
-              : 'Commencez par créer votre premier événement à venir.'
-            }
-          </p>
-          {!searchTerm && !filterType && filterTimeRange === 'all' && (
-            <div className="mt-6">
-              <button
-                onClick={() => setShowForm(true)}
-                className="btn bg-primary-600 hover:bg-primary-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Créer un événement
-              </button>
+        <div className="text-center py-16 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg shadow-sm border-2 border-green-200">
+          <div className="max-w-2xl mx-auto px-6">
+            <div className="bg-white rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6">
+              <CalendarIcon className="h-12 w-12 text-green-600" />
             </div>
-          )}
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Période de vacances
+            </h3>
+
+            <div className="space-y-4 text-gray-700">
+              <p className="text-lg font-medium">
+                Les activités sportives sont actuellement en pause
+              </p>
+
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-green-200">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl">
+                    🌙
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-gray-900">Mois sacré du Ramadan</p>
+                    <p className="text-sm text-gray-600">Période de jeûne et de recueillement</p>
+                  </div>
+                </div>
+
+                <p className="text-base leading-relaxed">
+                  Nous respectons cette période importante pour notre communauté.
+                  Tous les tournois, compétitions et événements sportifs reprendront
+                  après la fin du Ramadan.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-5 shadow-md">
+                <p className="font-semibold text-lg mb-2">
+                  📅 Reprise prochaine des activités
+                </p>
+                <p className="text-sm">
+                  Le calendrier complet des tournois et événements sera publié
+                  dès la fin du mois de Ramadan. Restez connectés !
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 mt-6 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span>En attente</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span>Planification en cours</span>
+                </div>
+              </div>
+            </div>
+
+            {!searchTerm && !filterType && filterTimeRange === 'all' && (
+              <div className="mt-8">
+                <p className="text-sm text-gray-500 mb-4">
+                  Vous pouvez tout de même planifier des événements futurs
+                </p>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="btn bg-primary-600 hover:bg-primary-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Créer un événement
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
