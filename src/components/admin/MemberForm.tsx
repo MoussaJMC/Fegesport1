@@ -4,16 +4,40 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
+import { validate } from '../../lib/security';
 
 const memberSchema = z.object({
   id: z.string().uuid().optional(),
-  first_name: z.string().min(1, 'Le prénom est requis'),
-  last_name: z.string().min(1, 'Le nom est requis'),
-  email: z.string().email('Email invalide'),
-  phone: z.string().min(8, 'Numéro de téléphone invalide').optional().or(z.literal('')),
+  first_name: z.string()
+    .min(1, 'Le prénom est requis')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  last_name: z.string()
+    .min(1, 'Le nom est requis')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  email: z.string()
+    .email('Email invalide')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  phone: z.string()
+    .min(8, 'Numéro de téléphone invalide')
+    .refine(val => !val || validate.phone(val), 'Numéro de téléphone invalide')
+    .optional()
+    .or(z.literal('')),
   age_category: z.string().optional().or(z.literal('')),
-  address: z.string().min(1, 'L\'adresse est requise').optional().or(z.literal('')),
-  city: z.string().min(1, 'La ville est requise').optional().or(z.literal('')),
+  address: z.string()
+    .min(1, 'L\'adresse est requise')
+    .refine(val => !val || validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => !val || validate.noSqlInjection(val), 'Caractères invalides détectés')
+    .optional()
+    .or(z.literal('')),
+  city: z.string()
+    .min(1, 'La ville est requise')
+    .refine(val => !val || validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => !val || validate.noSqlInjection(val), 'Caractères invalides détectés')
+    .optional()
+    .or(z.literal('')),
   member_type: z.enum(['player', 'club', 'partner']),
   status: z.enum(['pending', 'active', 'suspended', 'expired']).default('pending'),
   membership_start: z.string().min(1, 'La date de début est requise').optional().or(z.literal('')),

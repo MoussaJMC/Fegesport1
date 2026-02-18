@@ -7,14 +7,29 @@ import { FormField, FormSelect, FormCheckbox, FormSubmitButton } from '../ui/For
 import PayPalButton from '../payment/PayPalButton';
 import { EventPrice } from '../../types/events';
 import { useTranslation } from 'react-i18next';
+import { validate } from '../../lib/security';
 
 const registrationSchema = z.object({
-  firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
-  lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Email invalide'),
-  phone: z.string().min(8, 'Numéro de téléphone invalide'),
+  firstName: z.string()
+    .min(2, 'Le prénom doit contenir au moins 2 caractères')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  lastName: z.string()
+    .min(2, 'Le nom doit contenir au moins 2 caractères')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  email: z.string()
+    .email('Email invalide')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
+  phone: z.string()
+    .min(8, 'Numéro de téléphone invalide')
+    .refine(val => validate.phone(val), 'Numéro de téléphone invalide'),
   birthDate: z.string().min(1, 'Date de naissance requise'),
-  gamertag: z.string().min(2, 'Le pseudo doit contenir au moins 2 caractères'),
+  gamertag: z.string()
+    .min(2, 'Le pseudo doit contenir au moins 2 caractères')
+    .refine(val => validate.noXSS(val), 'Caractères invalides détectés')
+    .refine(val => validate.noSqlInjection(val), 'Caractères invalides détectés'),
   platform: z.string().min(1, 'Plateforme requise'),
   priceId: z.string().min(1, 'Veuillez sélectionner un forfait'),
   acceptRules: z.literal(true, {

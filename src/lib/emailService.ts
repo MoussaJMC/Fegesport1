@@ -144,7 +144,7 @@ class EmailService {
   }
 
   async sendContactNotification(data: EmailTemplate): Promise<{ success: boolean; emailId?: string; error?: string }> {
-    const adminEmail = 'emmanuelfob@gmail.com';
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@fegesport224.org';
 
     return await this.sendEmailFromTemplate(
       'contact_notification',
