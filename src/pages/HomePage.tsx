@@ -20,7 +20,7 @@ import { useSiteSettings } from '../hooks/useSiteSettings';
 
 const HomePage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { getSetting } = useSiteSettings();
+  const { getSetting, loading: settingsLoading } = useSiteSettings();
   const [news, setNews] = useState(latestNews);
   const [events, setEvents] = useState(upcomingEvents);
   const [pageSections, setPageSections] = useState<any[]>([]);
@@ -32,17 +32,23 @@ const HomePage: React.FC = () => {
     partners: 0
   });
 
-  // Get settings from database
-  const logoSettings = getSetting('site_logo', {
+  const defaultLogoSettings = {
     main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
     alt_text: "FEGESPORT Logo",
     width: 48,
     height: 48,
     link: "/"
-  });
+  };
+
+  const logoSettings = getSetting('site_logo', defaultLogoSettings);
 
   useEffect(() => {
+    let isMounted = true;
+    let channel: any = null;
+
     const initializeData = async () => {
+      if (!isMounted) return;
+
       setLoading(true);
       setError(null);
 
@@ -56,25 +62,27 @@ const HomePage: React.FC = () => {
       } catch (err) {
         console.error('Error initializing data:', err);
       } finally {
-        setTimeout(() => {
+        if (isMounted) {
           setLoading(false);
-        }, 100);
+        }
       }
     };
 
     initializeData();
 
-    let channel: any = null;
     try {
       channel = subscribeToCommunityStats(() => {
-        console.log('Community stats changed, refreshing...');
-        fetchStats();
+        if (isMounted) {
+          console.log('Community stats changed, refreshing...');
+          fetchStats();
+        }
       });
     } catch (err) {
       console.error('Error subscribing to community stats:', err);
     }
 
     return () => {
+      isMounted = false;
       if (channel) {
         try {
           channel.unsubscribe();
@@ -222,7 +230,7 @@ const HomePage: React.FC = () => {
   const statsSection = getSection('stats');
 
   // Simple loading state for mobile
-  if (loading) {
+  if (loading || settingsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary-900 px-4">
         <div className="text-center">

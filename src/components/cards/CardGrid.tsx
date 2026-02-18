@@ -34,10 +34,9 @@ const CardGrid: React.FC<CardGridProps> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCards();
-  }, [category, limit]);
+    let isMounted = true;
 
-  const fetchCards = async () => {
+    const fetchCards = async () => {
     try {
       setLoading(true);
       
@@ -60,21 +59,36 @@ const CardGrid: React.FC<CardGridProps> = ({
 
       if (error) {
         console.error('Error fetching cards:', error);
-        // Use mock data on error
-        setCards(getMockCards(category, limit));
+        if (isMounted) {
+          setCards(getMockCards(category, limit));
+        }
       } else if (data && data.length > 0) {
-        setCards(data);
+        if (isMounted) {
+          setCards(data);
+        }
       } else {
-        // No data found, use mock data
-        setCards(getMockCards(category, limit));
+        if (isMounted) {
+          setCards(getMockCards(category, limit));
+        }
       }
     } catch (error) {
       console.error('Error in fetchCards:', error);
-      setCards(getMockCards(category, limit));
+      if (isMounted) {
+        setCards(getMockCards(category, limit));
+      }
     } finally {
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     }
   };
+
+    fetchCards();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [category, limit]);
 
   const getMockCards = (category?: string, limit: number = 3): Card[] => {
     const allCards = [
