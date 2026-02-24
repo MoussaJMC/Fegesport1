@@ -27,6 +27,7 @@ import LEGPage from './pages/LEGPage';
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
 import LoginPage from './pages/admin/LoginPage';
+import PasswordResetHelper from './pages/admin/PasswordResetHelper';
 import DashboardPage from './pages/admin/DashboardPage';
 import DiagnosticPage from './pages/admin/DiagnosticPage';
 import TestDatabasePage from './pages/admin/TestDatabasePage';
@@ -73,6 +74,7 @@ function App() {
         <Routes>
           {/* Admin routes */}
           <Route path="/admin/login" element={<LoginPage />} />
+          <Route path="/admin/reset-password-helper" element={<PasswordResetHelper />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="diagnostic" element={<DiagnosticPage />} />
