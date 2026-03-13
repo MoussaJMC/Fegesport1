@@ -57,6 +57,7 @@ import MenuAdminPage from './pages/admin/MenuAdminPage';
 import FooterAdminPage from './pages/admin/FooterAdminPage';
 import HistoryAdminPage from './pages/admin/HistoryAdminPage';
 import EventsUpdateTestPage from './pages/admin/EventsUpdateTestPage';
+import AnalyticsAdminPage from './pages/admin/AnalyticsAdminPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -77,6 +78,7 @@ function App() {
           <Route path="/admin/reset-password-helper" element={<PasswordResetHelper />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="analytics" element={<AnalyticsAdminPage />} />
             <Route path="diagnostic" element={<DiagnosticPage />} />
             <Route path="test-database" element={<TestDatabasePage />} />
             <Route path="pages" element={<PagesAdminPage />} />
