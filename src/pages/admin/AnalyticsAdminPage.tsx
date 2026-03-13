@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Edit2, Save, X, TrendingUp, Users, Eye, Download } from 'lucide-react';
+import { CreditCard as Edit2, Save, X, TrendingUp, Users, Eye, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AnalyticsData {

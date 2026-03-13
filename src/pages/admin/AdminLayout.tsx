@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import {
-  Loader2, Home, Newspaper, Calendar, Users, Building2,
-  MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers,
-  Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, Layout, Clock, Target, Share2, BarChart3
-} from 'lucide-react';
+import { Loader2, Home, Newspaper, Calendar, Users, Building2, MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers, Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, LayoutGrid as Layout, Clock, Target, Share2, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Notification {
