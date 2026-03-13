@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, FileText, Lock } from 'lucide-react';
+import { X, FileText, Lock, Download, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SecureDocumentViewerProps {
@@ -16,11 +16,23 @@ export default function SecureDocumentViewer({
   documentTitle
 }: SecureDocumentViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [viewerUrl, setViewerUrl] = useState('');
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && documentUrl) {
       document.body.style.overflow = 'hidden';
       setIsLoading(true);
+
+      const encodedUrl = encodeURIComponent(documentUrl);
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+
+      setViewerUrl(googleDocsUrl);
+
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -28,7 +40,7 @@ export default function SecureDocumentViewer({
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, documentUrl]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,8 +66,8 @@ export default function SecureDocumentViewer({
     return false;
   };
 
-  const handleIframeLoad = () => {
-    setIsLoading(false);
+  const handleOpenInNewTab = () => {
+    window.open(documentUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -88,38 +100,51 @@ export default function SecureDocumentViewer({
                   </div>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                aria-label="Fermer le document"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleOpenInNewTab}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  aria-label="Ouvrir dans un nouvel onglet"
+                  title="Ouvrir dans un nouvel onglet"
+                >
+                  <ExternalLink className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  aria-label="Fermer le document"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
             <div className="relative w-full h-[calc(100%-5rem)] bg-gray-100">
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white">
+                <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
                   <div className="text-center">
                     <div className="inline-block w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-gray-600">Chargement du document...</p>
+                    <p className="text-gray-600 mb-2">Chargement du document...</p>
+                    <p className="text-sm text-gray-500">Cela peut prendre quelques secondes</p>
                   </div>
                 </div>
               )}
 
-              <iframe
-                src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=1`}
-                className="w-full h-full border-0"
-                title={documentTitle}
-                onLoad={handleIframeLoad}
-                style={{
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  MozUserSelect: 'none',
-                  msUserSelect: 'none'
-                }}
-                onContextMenu={handleContextMenu}
-              />
+              {viewerUrl && (
+                <iframe
+                  src={viewerUrl}
+                  className="w-full h-full border-0"
+                  title={documentTitle}
+                  style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }}
+                  onContextMenu={handleContextMenu}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+              )}
 
               <div
                 className="absolute inset-0 pointer-events-none"
@@ -132,9 +157,18 @@ export default function SecureDocumentViewer({
             </div>
 
             <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 text-center text-sm text-gray-600">
-              <div className="flex items-center justify-center gap-2">
-                <Lock className="w-4 h-4" />
-                <span>Ce document est protégé. Téléchargement et impression désactivés.</span>
+              <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
+                  <span>Document protégé en lecture seule</span>
+                </div>
+                <button
+                  onClick={handleOpenInNewTab}
+                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Ouvrir en plein écran
+                </button>
               </div>
             </div>
           </motion.div>
