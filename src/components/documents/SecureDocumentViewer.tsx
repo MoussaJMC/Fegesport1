@@ -108,7 +108,7 @@ export default function SecureDocumentViewer({
               )}
 
               <iframe
-                src={`https://docs.google.com/viewer?url=${encodeURIComponent(documentUrl)}&embedded=true`}
+                src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=1`}
                 className="w-full h-full border-0"
                 title={documentTitle}
                 onLoad={handleIframeLoad}
