@@ -108,11 +108,10 @@ export default function SecureDocumentViewer({
               )}
 
               <iframe
-                src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`}
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(documentUrl)}&embedded=true`}
                 className="w-full h-full border-0"
                 title={documentTitle}
                 onLoad={handleIframeLoad}
-                sandbox="allow-same-origin allow-scripts"
                 style={{
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
