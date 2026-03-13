@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { FileText, Upload, Edit2, Trash2, Eye, EyeOff, Save, X, AlertCircle } from 'lucide-react';
+import { FileText, Upload, CreditCard as Edit2, Trash2, Eye, EyeOff, Save, X, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface OfficialDocument {
