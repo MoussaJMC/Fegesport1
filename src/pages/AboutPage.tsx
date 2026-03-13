@@ -37,6 +37,7 @@ interface OfficialDocument {
   file_url: string;
   file_size: number;
   version: string;
+  version_number: string;
   display_order: number;
 }
 
@@ -113,6 +114,8 @@ const AboutPage: React.FC = () => {
         .from('official_documents')
         .select('*')
         .eq('is_active', true)
+        .eq('is_current_version', true)
+        .is('parent_document_id', null)
         .order('display_order', { ascending: true });
 
       if (error) throw error;
@@ -363,9 +366,16 @@ const AboutPage: React.FC = () => {
                       {i18n.language === 'fr' ? doc.description : doc.description_en}
                     </p>
 
-                    {doc.version && (
-                      <p className="text-xs text-gray-500 mb-4">{doc.version}</p>
-                    )}
+                    <div className="flex items-center gap-3 mb-4">
+                      {doc.version_number && (
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
+                          Version {doc.version_number}
+                        </span>
+                      )}
+                      {doc.version && (
+                        <p className="text-xs text-gray-500">{doc.version}</p>
+                      )}
+                    </div>
 
                     <button
                       onClick={() => handleOpenDocument(doc)}
