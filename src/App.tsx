@@ -56,6 +56,7 @@ import SponsorsAdminPage from './pages/admin/SponsorsAdminPage';
 import MenuAdminPage from './pages/admin/MenuAdminPage';
 import FooterAdminPage from './pages/admin/FooterAdminPage';
 import HistoryAdminPage from './pages/admin/HistoryAdminPage';
+import DocumentsAdminPage from './pages/admin/DocumentsAdminPage';
 import EventsUpdateTestPage from './pages/admin/EventsUpdateTestPage';
 import AnalyticsAdminPage from './pages/admin/AnalyticsAdminPage';
 
@@ -85,6 +86,7 @@ function App() {
             <Route path="menu" element={<MenuAdminPage />} />
             <Route path="footer" element={<FooterAdminPage />} />
             <Route path="history" element={<HistoryAdminPage />} />
+            <Route path="documents" element={<DocumentsAdminPage />} />
             <Route path="news" element={<NewsAdminPage />} />
             <Route path="events" element={<EventsAdminPage />} />
             <Route path="upcoming-events" element={<UpcomingEventsAdminPage />} />

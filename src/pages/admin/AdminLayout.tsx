@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { Loader2, Home, Newspaper, Calendar, Users, Building2, MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers, Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, LayoutGrid as Layout, Clock, Target, Share2, BarChart3 } from 'lucide-react';
+import { Loader2, Home, Newspaper, Calendar, Users, Building2, MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers, Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, LayoutGrid as Layout, Clock, Target, Share2, BarChart3, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Notification {
@@ -194,6 +194,7 @@ const AdminLayout: React.FC = () => {
     { icon: Tag, label: 'Types d\'Adhésion', path: '/admin/membership-types' },
     { icon: Award, label: 'Notre Direction', path: '/admin/leadership' },
     { icon: Clock, label: 'Notre Histoire', path: '/admin/history' },
+    { icon: FileText, label: 'Documents Officiels', path: '/admin/documents' },
     { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
     { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
     { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
