@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { X, FileText, Lock, Download, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, ExternalLink, Loader2, AlertCircle, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface SecureDocumentViewerProps {
   isOpen: boolean;
@@ -9,30 +14,26 @@ interface SecureDocumentViewerProps {
   documentTitle: string;
 }
 
-export default function SecureDocumentViewer({
+const SecureDocumentViewer: React.FC<SecureDocumentViewerProps> = ({
   isOpen,
   onClose,
   documentUrl,
-  documentTitle
-}: SecureDocumentViewerProps) {
+  documentTitle,
+}) => {
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1.0);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewerUrl, setViewerUrl] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen && documentUrl) {
-      document.body.style.overflow = 'hidden';
+    if (isOpen) {
       setIsLoading(true);
-
-      const encodedUrl = encodeURIComponent(documentUrl);
-      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
-
-      setViewerUrl(googleDocsUrl);
-
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
-
-      return () => clearTimeout(timer);
+      setError(null);
+      setPageNumber(1);
+      setScale(1.0);
+      document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -47,8 +48,11 @@ export default function SecureDocumentViewer({
       if (e.key === 'Escape') {
         onClose();
       }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p')) {
-        e.preventDefault();
+      if (e.key === 'ArrowLeft' && pageNumber > 1) {
+        previousPage();
+      }
+      if (e.key === 'ArrowRight' && pageNumber < numPages) {
+        nextPage();
       }
     };
 
@@ -59,121 +63,174 @@ export default function SecureDocumentViewer({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, pageNumber, numPages]);
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    return false;
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setIsLoading(false);
+    setError(null);
   };
+
+  const onDocumentLoadError = (error: Error) => {
+    console.error('Error loading PDF:', error);
+    setIsLoading(false);
+    setError('Impossible de charger le document PDF');
+  };
+
+  const changePage = (offset: number) => {
+    setPageNumber(prevPageNumber => {
+      const newPage = prevPageNumber + offset;
+      return Math.min(Math.max(1, newPage), numPages);
+    });
+  };
+
+  const previousPage = () => changePage(-1);
+  const nextPage = () => changePage(1);
+
+  const zoomIn = () => setScale(prev => Math.min(prev + 0.2, 2.0));
+  const zoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.5));
 
   const handleOpenInNewTab = () => {
     window.open(documentUrl, '_blank', 'noopener,noreferrer');
   };
 
+  if (!isOpen) return null;
+
   return (
     <AnimatePresence>
-      {isOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75"
+        onClick={onClose}
+      >
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={onClose}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="relative w-full max-w-6xl h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
+          onClick={(e) => e.stopPropagation()}
         >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="relative w-full h-full max-w-7xl max-h-[95vh] m-4 bg-white rounded-lg shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-            onContextMenu={handleContextMenu}
-          >
-            <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-red-600 to-yellow-500 text-white">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6" />
-                <div>
-                  <h2 className="text-lg font-semibold">{documentTitle}</h2>
-                  <div className="flex items-center gap-2 text-sm text-white/90">
-                    <Lock className="w-3 h-3" />
-                    <span>Document protégé - Lecture seule</span>
-                  </div>
-                </div>
-              </div>
+          <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+            <h3 className="text-lg font-semibold text-gray-800 truncate flex-1">
+              {documentTitle}
+            </h3>
+            <div className="flex items-center gap-2 ml-4">
+              <button
+                onClick={handleOpenInNewTab}
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                title="Ouvrir dans un nouvel onglet"
+              >
+                <ExternalLink className="w-5 h-5 text-gray-600" />
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                title="Fermer"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          </div>
+
+          {!error && !isLoading && numPages > 0 && (
+            <div className="flex items-center justify-between p-3 border-b bg-gray-50 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={handleOpenInNewTab}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                  aria-label="Ouvrir dans un nouvel onglet"
-                  title="Ouvrir dans un nouvel onglet"
+                  onClick={previousPage}
+                  disabled={pageNumber <= 1}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Page précédente"
                 >
-                  <ExternalLink className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
+                <span className="text-sm text-gray-700 min-w-[100px] text-center">
+                  Page {pageNumber} / {numPages}
+                </span>
                 <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                  aria-label="Fermer le document"
+                  onClick={nextPage}
+                  disabled={pageNumber >= numPages}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Page suivante"
                 >
-                  <X className="w-6 h-6" />
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={zoomOut}
+                  disabled={scale <= 0.5}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Zoom arrière"
+                >
+                  <ZoomOut className="w-5 h-5" />
+                </button>
+                <span className="text-sm text-gray-700 min-w-[60px] text-center">
+                  {Math.round(scale * 100)}%
+                </span>
+                <button
+                  onClick={zoomIn}
+                  disabled={scale >= 2.0}
+                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Zoom avant"
+                >
+                  <ZoomIn className="w-5 h-5" />
                 </button>
               </div>
             </div>
+          )}
 
-            <div className="relative w-full h-[calc(100%-5rem)] bg-gray-100">
-              {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-                  <div className="text-center">
-                    <div className="inline-block w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="text-gray-600 mb-2">Chargement du document...</p>
-                    <p className="text-sm text-gray-500">Cela peut prendre quelques secondes</p>
-                  </div>
-                </div>
-              )}
+          <div
+            ref={containerRef}
+            className="relative flex-1 overflow-auto bg-gray-100 flex items-center justify-center"
+          >
+            {isLoading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
+                <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-4" />
+                <p className="text-gray-600">Chargement du document...</p>
+              </div>
+            )}
 
-              {viewerUrl && (
-                <iframe
-                  src={viewerUrl}
-                  className="w-full h-full border-0"
-                  title={documentTitle}
-                  style={{
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    MozUserSelect: 'none',
-                    msUserSelect: 'none'
-                  }}
-                  onContextMenu={handleContextMenu}
-                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                />
-              )}
+            {error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
+                <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
+                <p className="text-gray-800 font-medium mb-2">{error}</p>
+                <button
+                  onClick={handleOpenInNewTab}
+                  className="btn-primary mt-4"
+                >
+                  Ouvrir dans un nouvel onglet
+                </button>
+              </div>
+            )}
 
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'transparent',
-                  userSelect: 'none'
-                }}
-                onContextMenu={handleContextMenu}
+            <Document
+              file={documentUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+              loading=""
+              error=""
+              className="flex justify-center"
+            >
+              <Page
+                pageNumber={pageNumber}
+                scale={scale}
+                renderTextLayer={true}
+                renderAnnotationLayer={true}
+                className="shadow-lg"
               />
-            </div>
+            </Document>
+          </div>
 
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 text-center text-sm text-gray-600">
-              <div className="flex items-center justify-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
-                  <span>Document protégé en lecture seule</span>
-                </div>
-                <button
-                  onClick={handleOpenInNewTab}
-                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Ouvrir en plein écran
-                </button>
-              </div>
-            </div>
-          </motion.div>
+          <div className="bg-gray-800 text-white text-xs py-2 px-4 text-center flex-shrink-0">
+            Document protégé - Lecture seule
+          </div>
         </motion.div>
-      )}
+      </motion.div>
     </AnimatePresence>
   );
-}
+};
+
+export default SecureDocumentViewer;
