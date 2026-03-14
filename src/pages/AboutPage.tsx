@@ -129,6 +129,10 @@ const AboutPage: React.FC = () => {
   };
 
   const handleOpenDocument = (document: OfficialDocument) => {
+    if (!document.file_url || document.file_url.includes('africau.edu') || document.file_url.includes('example.com') || document.file_url.includes('sample.pdf')) {
+      alert('Ce document n\'est pas encore disponible. L\'administrateur doit télécharger le fichier PDF réel via la page d\'administration des documents.');
+      return;
+    }
     setSelectedDocument(document);
     setIsViewerOpen(true);
   };
