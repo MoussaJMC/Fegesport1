@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Upload, Eye, EyeOff, Trash2, CheckCircle, AlertCircle, FileText, Loader } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,8 +23,10 @@ interface OfficialDocument {
 export default function DocumentsAdminPage() {
   const [documents, setDocuments] = useState<OfficialDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   useEffect(() => {
     checkUserEmail();
@@ -94,42 +96,50 @@ export default function DocumentsAdminPage() {
     }
   };
 
-  const handleFileUpload = async (docId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, doc: OfficialDocument) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (file.type !== 'application/pdf') {
-      toast.error('Seuls les fichiers PDF sont acceptés');
+      alert('Seuls les fichiers PDF sont acceptés.');
       return;
     }
 
     if (file.size > 20971520) {
-      toast.error('Le fichier est trop volumineux (max 20MB)');
+      alert('Le fichier est trop volumineux (max 20MB)');
       return;
     }
 
+    setUploadingId(doc.id);
+    console.log('Starting upload for:', doc.id, 'file:', file.name);
+
     try {
-      setUploading(docId);
-
-      const fileExt = 'pdf';
-      const timestamp = Date.now();
-      const fileName = `${docId}-${timestamp}.${fileExt}`;
-      const filePath = `${docId}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
+      // 1. Upload file to Supabase Storage
+      const filePath = `${doc.id}/${file.name}`;
+      const { error: uploadError } = await supabase
+        .storage
         .from('official-documents')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true  // overwrite if exists
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        throw uploadError;
+      }
 
-      const { data: { publicUrl } } = supabase.storage
+      // 2. Get public URL
+      const { data: urlData } = supabase
+        .storage
         .from('official-documents')
         .getPublicUrl(filePath);
 
-      const { data: updateData, error: updateError } = await supabase
+      const publicUrl = urlData.publicUrl;
+      console.log('File uploaded, public URL:', publicUrl);
+
+      // 3. Update database row
+      const { data: updateData, error: dbError } = await supabase
         .from('official_documents')
         .update({
           file_url: publicUrl,
@@ -137,38 +147,66 @@ export default function DocumentsAdminPage() {
           file_size: file.size,
           uploaded_at: new Date().toISOString()
         })
-        .eq('id', docId)
+        .eq('id', doc.id)
         .select();
 
-      if (updateError) {
-        console.error('Update error:', updateError);
-        throw new Error(`Erreur RLS lors de la mise à jour: ${updateError.message}`);
+      if (dbError) {
+        console.error('Database update error:', dbError);
+        throw new Error(`Erreur RLS: ${dbError.message}`);
       }
 
       if (!updateData || updateData.length === 0) {
+        console.error('No data returned from update');
         throw new Error('La mise à jour a échoué - vérifiez vos permissions admin');
       }
 
+      console.log('Database updated successfully:', updateData);
+
+      // 4. Refresh local state immediately
+      setDocuments(prev => prev.map(d =>
+        d.id === doc.id
+          ? {
+              ...d,
+              file_url: publicUrl,
+              file_name: file.name,
+              file_size: file.size,
+              uploaded_at: new Date().toISOString()
+            }
+          : d
+      ));
+
+      alert(`✅ "${file.name}" uploadé avec succès !`);
       toast.success('Document uploadé et enregistré avec succès');
+
+      // Reload from database to ensure sync
       await fetchDocuments();
-    } catch (error: any) {
-      console.error('Error uploading file:', error);
-      toast.error(error.message || 'Erreur lors de l\'upload du fichier');
+
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      alert(`❌ Erreur : ${err.message}`);
+      toast.error(err.message || 'Erreur lors de l\'upload du fichier');
     } finally {
-      setUploading(null);
+      setUploadingId(null);
+      // Reset input so same file can be re-uploaded
+      event.target.value = '';
     }
   };
 
-  const togglePublish = async (doc: OfficialDocument) => {
-    if (!doc.file_url && !doc.is_published) {
+  const handleTogglePublish = async (doc: OfficialDocument) => {
+    if (!doc.file_url) {
+      alert('Uploadez d\'abord le fichier PDF.');
       toast.error('Veuillez d\'abord uploader le fichier');
       return;
     }
 
+    setPublishingId(doc.id);
+    console.log('Toggling publish for:', doc.id, 'current state:', doc.is_published);
+
     try {
+      const newValue = !doc.is_published;
       const { data, error } = await supabase
         .from('official_documents')
-        .update({ is_published: !doc.is_published })
+        .update({ is_published: newValue })
         .eq('id', doc.id)
         .select();
 
@@ -178,14 +216,35 @@ export default function DocumentsAdminPage() {
       }
 
       if (!data || data.length === 0) {
+        console.error('No data returned from publish update');
         throw new Error('La mise à jour a échoué - vérifiez vos permissions admin');
       }
 
-      toast.success(doc.is_published ? 'Document retiré du site' : 'Document publié sur le site');
+      console.log('Publish status updated successfully:', data);
+
+      // Update local state immediately
+      setDocuments(prev => prev.map(d =>
+        d.id === doc.id
+          ? { ...d, is_published: newValue }
+          : d
+      ));
+
+      const message = newValue
+        ? `✅ Document publié sur le site !`
+        : `⚠️ Document dépublié.`;
+
+      alert(message);
+      toast.success(newValue ? 'Document publié sur le site' : 'Document retiré du site');
+
+      // Reload from database
       await fetchDocuments();
-    } catch (error: any) {
-      console.error('Error toggling publish:', error);
-      toast.error(error.message || 'Erreur lors de la modification');
+
+    } catch (err: any) {
+      console.error('Error toggling publish:', err);
+      alert(`❌ Erreur : ${err.message}`);
+      toast.error(err.message || 'Erreur lors de la modification');
+    } finally {
+      setPublishingId(null);
     }
   };
 
@@ -232,27 +291,30 @@ export default function DocumentsAdminPage() {
     }
   };
 
+  const getStatus = (doc: OfficialDocument) => {
+    if (!doc.file_url) {
+      return { label: 'Manquant', color: '#C0392B', bgColor: '#FEE', icon: AlertCircle };
+    }
+    if (!doc.is_published) {
+      return { label: 'En attente', color: '#E67E22', bgColor: '#FFE8D4', icon: AlertCircle };
+    }
+    return { label: 'Publié', color: '#1E7145', bgColor: '#D4EDDA', icon: CheckCircle };
+  };
+
   const getStatusBadge = (doc: OfficialDocument) => {
-    if (doc.is_published && doc.file_url) {
-      return (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 flex items-center gap-1">
-          <CheckCircle className="w-3 h-3" />
-          Publié
-        </span>
-      );
-    }
-    if (doc.file_url && !doc.is_published) {
-      return (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-700 flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" />
-          En attente
-        </span>
-      );
-    }
+    const status = getStatus(doc);
+    const StatusIcon = status.icon;
+
     return (
-      <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 flex items-center gap-1">
-        <AlertCircle className="w-3 h-3" />
-        Manquant
+      <span
+        className="px-3 py-1.5 text-xs font-bold rounded-full flex items-center gap-1.5 inline-flex"
+        style={{
+          backgroundColor: status.bgColor,
+          color: status.color
+        }}
+      >
+        <StatusIcon className="w-3.5 h-3.5" />
+        {status.label}
       </span>
     );
   };
@@ -453,59 +515,94 @@ export default function DocumentsAdminPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
-                      <label
-                        className={`px-4 py-2 bg-[#C0392B] hover:bg-[#A13023] text-white rounded-lg text-xs font-medium flex items-center gap-2 cursor-pointer transition-colors ${
-                          uploading === doc.id ? 'opacity-50 pointer-events-none' : ''
-                        }`}
+                      {/* Hidden file input with ref */}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        style={{ display: 'none' }}
+                        ref={(el) => { fileInputRefs.current[doc.id] = el; }}
+                        onChange={(e) => handleFileUpload(e, doc)}
+                      />
+
+                      {/* Upload button */}
+                      <button
+                        onClick={() => {
+                          const input = fileInputRefs.current[doc.id];
+                          if (input) input.click();
+                        }}
+                        disabled={uploadingId === doc.id}
+                        style={{
+                          background: uploadingId === doc.id ? '#888' : '#2E75B6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 14px',
+                          cursor: uploadingId === doc.id ? 'not-allowed' : 'pointer',
+                          fontSize: '13px',
+                          fontWeight: 'bold',
+                          opacity: uploadingId === doc.id ? 0.6 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
                         title="Cliquez pour uploader un fichier PDF"
                       >
-                        {uploading === doc.id ? (
+                        {uploadingId === doc.id ? (
                           <>
                             <Loader className="w-4 h-4 animate-spin" />
                             Upload en cours...
                           </>
                         ) : (
                           <>
-                            <Upload className="w-4 h-4" />
-                            UPLOAD PDF
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(doc.id, e)}
-                          disabled={uploading === doc.id}
-                        />
-                      </label>
-
-                      <button
-                        onClick={() => togglePublish(doc)}
-                        disabled={!doc.file_url && !doc.is_published}
-                        className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
-                          !doc.file_url && !doc.is_published ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        title={doc.is_published ? 'Retirer du site' : 'Publier sur le site'}
-                      >
-                        {doc.is_published ? (
-                          <>
-                            <EyeOff className="w-4 h-4" />
-                            Dépublier
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="w-4 h-4" />
-                            Publier
+                            📤 UPLOAD PDF
                           </>
                         )}
                       </button>
 
+                      {/* Publish button */}
+                      <button
+                        onClick={() => handleTogglePublish(doc)}
+                        disabled={!doc.file_url || publishingId === doc.id}
+                        style={{
+                          background: doc.is_published ? '#888' : '#1E7145',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 14px',
+                          cursor: doc.file_url && publishingId !== doc.id ? 'pointer' : 'not-allowed',
+                          fontSize: '13px',
+                          fontWeight: 'bold',
+                          opacity: (!doc.file_url || publishingId === doc.id) ? 0.5 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                        title={doc.is_published ? 'Retirer du site' : 'Publier sur le site'}
+                      >
+                        {publishingId === doc.id ? (
+                          '...'
+                        ) : doc.is_published ? (
+                          '👁️ Dépublier'
+                        ) : (
+                          '🌐 Publier'
+                        )}
+                      </button>
+
+                      {/* Delete button */}
                       <button
                         onClick={() => handleDelete(doc)}
                         disabled={!doc.file_url}
-                        className={`p-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors ${
-                          !doc.file_url ? 'opacity-30 cursor-not-allowed' : ''
-                        }`}
+                        style={{
+                          background: '#C0392B',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 10px',
+                          cursor: doc.file_url ? 'pointer' : 'not-allowed',
+                          opacity: doc.file_url ? 1 : 0.3,
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
                         title="Supprimer définitivement le fichier"
                       >
                         <Trash2 className="w-4 h-4" />
