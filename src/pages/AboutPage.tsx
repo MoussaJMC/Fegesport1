@@ -128,9 +128,17 @@ const AboutPage: React.FC = () => {
     }
   };
 
+  const isValidDocumentUrl = (url: string): boolean => {
+    if (!url) return false;
+    if (url.includes('africau.edu') || url.includes('example.com') || url.includes('sample.pdf')) return false;
+    return true;
+  };
+
   const handleOpenDocument = (document: OfficialDocument) => {
-    if (!document.file_url || document.file_url.includes('africau.edu') || document.file_url.includes('example.com') || document.file_url.includes('sample.pdf')) {
-      alert('Ce document n\'est pas encore disponible. L\'administrateur doit télécharger le fichier PDF réel via la page d\'administration des documents.');
+    if (!isValidDocumentUrl(document.file_url)) {
+      alert(i18n.language === 'fr'
+        ? 'Ce document n\'est pas encore disponible. L\'administrateur doit télécharger le fichier PDF réel via la page d\'administration des documents.'
+        : 'This document is not yet available. The administrator must upload the actual PDF file via the document administration page.');
       return;
     }
     setSelectedDocument(document);
@@ -355,11 +363,19 @@ const AboutPage: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="card p-8 hover:shadow-xl transition-shadow duration-300"
+                  className={`card p-8 transition-shadow duration-300 ${
+                    isValidDocumentUrl(doc.file_url) ? 'hover:shadow-xl' : 'opacity-90'
+                  }`}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="bg-gradient-to-br from-red-100 to-yellow-100 p-6 rounded-full mb-6">
-                      <FileText className="w-12 h-12 text-red-600" />
+                    <div className={`bg-gradient-to-br p-6 rounded-full mb-6 ${
+                      isValidDocumentUrl(doc.file_url)
+                        ? 'from-red-100 to-yellow-100'
+                        : 'from-gray-100 to-gray-200'
+                    }`}>
+                      <FileText className={`w-12 h-12 ${
+                        isValidDocumentUrl(doc.file_url) ? 'text-red-600' : 'text-gray-400'
+                      }`} />
                     </div>
 
                     <h3 className="text-xl font-bold mb-2">
@@ -381,22 +397,41 @@ const AboutPage: React.FC = () => {
                       )}
                     </div>
 
-                    <button
-                      onClick={() => handleOpenDocument(doc)}
-                      className="btn-primary flex items-center gap-2 w-full justify-center"
-                    >
-                      <FileText className="w-4 h-4" />
-                      {i18n.language === 'fr' ? 'Lire le document' : 'Read document'}
-                    </button>
+                    {isValidDocumentUrl(doc.file_url) ? (
+                      <>
+                        <button
+                          onClick={() => handleOpenDocument(doc)}
+                          className="btn-primary flex items-center gap-2 w-full justify-center"
+                        >
+                          <FileText className="w-4 h-4" />
+                          {i18n.language === 'fr' ? 'Lire le document' : 'Read document'}
+                        </button>
 
-                    <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
-                      <Lock className="w-3 h-3" />
-                      <span>
-                        {i18n.language === 'fr'
-                          ? 'Lecture seule - Téléchargement désactivé'
-                          : 'Read-only - Download disabled'}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
+                          <Lock className="w-3 h-3" />
+                          <span>
+                            {i18n.language === 'fr'
+                              ? 'Lecture seule - Téléchargement désactivé'
+                              : 'Read-only - Download disabled'}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full">
+                        <div className="px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg text-center">
+                          <p className="text-sm text-orange-800 font-medium">
+                            {i18n.language === 'fr'
+                              ? 'Document en cours de configuration'
+                              : 'Document under configuration'}
+                          </p>
+                          <p className="text-xs text-orange-600 mt-1">
+                            {i18n.language === 'fr'
+                              ? 'Le fichier PDF sera disponible prochainement'
+                              : 'PDF file will be available soon'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
