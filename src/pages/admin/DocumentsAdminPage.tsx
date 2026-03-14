@@ -24,8 +24,10 @@ export default function DocumentsAdminPage() {
   const [documents, setDocuments] = useState<OfficialDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
+    checkUserEmail();
     fetchDocuments();
 
     const channel = supabase
@@ -43,6 +45,26 @@ export default function DocumentsAdminPage() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const checkUserEmail = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      setUserEmail(user.email);
+      console.log('Connected as:', user.email);
+
+      const adminEmails = [
+        'aamadoubah2002@gmail.com',
+        'admin@fegesport.org',
+        'admin@fegesport224.org',
+        'president@fegesport224.org'
+      ];
+
+      if (!adminEmails.includes(user.email)) {
+        toast.error(`ATTENTION: Votre email (${user.email}) n'est PAS dans la liste des admins autorisés !`);
+        console.error('Email not in admin list:', user.email);
+      }
+    }
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -107,7 +129,7 @@ export default function DocumentsAdminPage() {
         .from('official-documents')
         .getPublicUrl(filePath);
 
-      const { error: updateError } = await supabase
+      const { data: updateData, error: updateError } = await supabase
         .from('official_documents')
         .update({
           file_url: publicUrl,
@@ -115,12 +137,20 @@ export default function DocumentsAdminPage() {
           file_size: file.size,
           uploaded_at: new Date().toISOString()
         })
-        .eq('id', docId);
+        .eq('id', docId)
+        .select();
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw new Error(`Erreur RLS lors de la mise à jour: ${updateError.message}`);
+      }
 
-      toast.success('Document uploadé avec succès');
-      fetchDocuments();
+      if (!updateData || updateData.length === 0) {
+        throw new Error('La mise à jour a échoué - vérifiez vos permissions admin');
+      }
+
+      toast.success('Document uploadé et enregistré avec succès');
+      await fetchDocuments();
     } catch (error: any) {
       console.error('Error uploading file:', error);
       toast.error(error.message || 'Erreur lors de l\'upload du fichier');
@@ -136,15 +166,23 @@ export default function DocumentsAdminPage() {
     }
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('official_documents')
         .update({ is_published: !doc.is_published })
-        .eq('id', doc.id);
+        .eq('id', doc.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Publish error:', error);
+        throw new Error(`Erreur RLS: ${error.message}`);
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('La mise à jour a échoué - vérifiez vos permissions admin');
+      }
 
       toast.success(doc.is_published ? 'Document retiré du site' : 'Document publié sur le site');
-      fetchDocuments();
+      await fetchDocuments();
     } catch (error: any) {
       console.error('Error toggling publish:', error);
       toast.error(error.message || 'Erreur lors de la modification');
@@ -165,7 +203,7 @@ export default function DocumentsAdminPage() {
         }
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('official_documents')
         .update({
           file_url: null,
@@ -174,12 +212,20 @@ export default function DocumentsAdminPage() {
           is_published: false,
           uploaded_at: null
         })
-        .eq('id', doc.id);
+        .eq('id', doc.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw new Error(`Erreur RLS: ${error.message}`);
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('La suppression a échoué - vérifiez vos permissions admin');
+      }
 
       toast.success('Fichier supprimé');
-      fetchDocuments();
+      await fetchDocuments();
     } catch (error: any) {
       console.error('Error deleting file:', error);
       toast.error(error.message || 'Erreur lors de la suppression');
@@ -262,6 +308,11 @@ export default function DocumentsAdminPage() {
           <p className="text-gray-600 mt-2">
             Gérer les documents publiés sur le site
           </p>
+          {userEmail && (
+            <p className="text-sm text-gray-500 mt-1">
+              Connecté en tant que: <span className="font-mono font-semibold">{userEmail}</span>
+            </p>
+          )}
         </div>
       </div>
 
