@@ -515,6 +515,15 @@ export default function DocumentsAdminPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fichier PDF *
                 </label>
+
+                {editingDocument && formData.file_url.includes('africau.edu') && (
+                  <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-sm text-orange-800 font-medium">
+                      ⚠️ Ce document utilise actuellement une URL d'exemple. Veuillez télécharger votre fichier PDF réel.
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <input
@@ -529,30 +538,38 @@ export default function DocumentsAdminPage() {
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
-                      className="btn-secondary flex items-center gap-2"
+                      className={`flex items-center gap-2 ${
+                        editingDocument && formData.file_url.includes('africau.edu')
+                          ? 'btn-primary'
+                          : 'btn-secondary'
+                      }`}
                     >
                       {uploading ? (
                         <>
                           <Loader className="w-4 h-4 animate-spin" />
-                          Téléchargement...
+                          Téléchargement en cours...
                         </>
                       ) : (
                         <>
                           <Upload className="w-4 h-4" />
-                          Sélectionner le fichier PDF
+                          {editingDocument && formData.file_url ? 'Remplacer le fichier PDF' : 'Sélectionner le fichier PDF'}
                         </>
                       )}
                     </button>
-                    {formData.file_url && (
+                    {formData.file_url && !formData.file_url.includes('africau.edu') && (
                       <span className="text-sm text-green-600 flex items-center gap-1">
                         <CheckCircle className="w-4 h-4" />
-                        Fichier sélectionné
+                        Fichier prêt
                       </span>
                     )}
                   </div>
                   {formData.file_url && (
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-600 mb-1">URL du fichier:</p>
+                    <div className={`p-3 rounded-lg ${
+                      formData.file_url.includes('africau.edu')
+                        ? 'bg-orange-50 border border-orange-200'
+                        : 'bg-green-50 border border-green-200'
+                    }`}>
+                      <p className="text-xs text-gray-600 mb-1">URL actuelle:</p>
                       <p className="text-sm text-gray-900 break-all">{formData.file_url}</p>
                     </div>
                   )}
@@ -656,16 +673,32 @@ export default function DocumentsAdminPage() {
                             <span>Publié: {new Date(doc.published_at).toLocaleDateString('fr-FR')}</span>
                           )}
                         </div>
-                        <div className="mt-2">
-                          <a
-                            href={doc.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary-600 hover:text-primary-700"
-                          >
-                            {doc.file_url}
-                          </a>
-                        </div>
+                        {doc.file_url.includes('africau.edu') ? (
+                          <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <p className="text-sm text-orange-800 font-medium mb-2">
+                              ⚠️ URL d'exemple détectée - Remplacez par votre fichier PDF réel
+                            </p>
+                            <button
+                              onClick={() => handleEdit(doc)}
+                              className="btn-primary text-sm flex items-center gap-2"
+                            >
+                              <Upload className="w-4 h-4" />
+                              Télécharger le fichier PDF
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="mt-2">
+                            <a
+                              href={doc.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-green-600 hover:text-green-700 flex items-center gap-1"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              Fichier PDF configuré
+                            </a>
+                          </div>
+                        )}
 
                         <div className="flex items-center gap-2 mt-4">
                           <button
