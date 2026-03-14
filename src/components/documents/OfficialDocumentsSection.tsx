@@ -11,80 +11,84 @@ interface OfficialDocument {
   label: string;
   description: string;
   icon: string;
+  lang: string;
   url: string;
+  group?: string;
 }
 
 const officialDocuments: OfficialDocument[] = [
   {
-    id: "statuts",
+    id: "statuts-fr",
     label: "Statuts de la Fédération",
-    description: "Statuts officiels de la FEGESPORT",
+    description: "Document officiel — Version française",
     icon: "📋",
+    lang: "FR",
     url: "",
+    group: "Textes Fondateurs",
   },
   {
-    id: "reglement",
+    id: "statuts-en",
+    label: "Federation Statutes",
+    description: "Official document — English version",
+    icon: "📋",
+    lang: "EN",
+    url: "",
+    group: "Textes Fondateurs",
+  },
+  {
+    id: "reglement-fr",
     label: "Règlement Intérieur",
-    description: "Règlement intérieur de la FEGESPORT",
+    description: "Document officiel — Version française",
     icon: "📜",
+    lang: "FR",
     url: "",
+    group: "Textes Fondateurs",
   },
   {
-    id: "reconnaissance-serproma",
-    label: "Reconnaissance SERPROMA",
-    description: "Arrêté de reconnaissance officielle — 2013",
-    icon: "🏛️",
+    id: "reglement-en",
+    label: "Internal Regulations",
+    description: "Official document — English version",
+    icon: "📜",
+    lang: "EN",
     url: "",
+    group: "Textes Fondateurs",
   },
   {
-    id: "reconnaissance-conakry",
-    label: "Reconnaissance Ville de Conakry",
-    description: "Attestation de reconnaissance — 2018",
-    icon: "🏙️",
-    url: "",
-  },
-  {
-    id: "rapport-audit-2024",
-    label: "Rapport d'Audit 2024",
-    description: "Rapport d'audit administratif — Ministère des Sports",
-    icon: "🔍",
-    url: "",
-  },
-  {
-    id: "rapport-activites",
-    label: "Rapport d'Activités",
+    id: "rapport-annuel",
+    label: "Rapport Annuel",
     description: "Rapport annuel d'activités FEGESPORT",
     icon: "📊",
+    lang: "FR",
     url: "",
+    group: "Rapports & Plans",
   },
   {
-    id: "convention-easports",
-    label: "Convention EA Sports",
-    description: "Accord-cadre EA Sports — exploitation FIFA en Guinée — 2018",
-    icon: "🎮",
+    id: "plan-strategique",
+    label: "Plan Stratégique",
+    description: "Plan stratégique de développement FEGESPORT",
+    icon: "🎯",
+    lang: "FR",
     url: "",
+    group: "Rapports & Plans",
   },
   {
-    id: "attestation-iesf",
-    label: "Attestation IESF",
-    description: "Certificat d'affiliation — International Esports Federation",
+    id: "programme-jeunes",
+    label: "Programme Développement Jeunes",
+    description: "Programme d'inclusion et de développement — 2026–2029",
     icon: "🌍",
+    lang: "FR/EN",
     url: "",
-  },
-  {
-    id: "attestation-gef",
-    label: "Attestation GEF",
-    description: "Certificat de siège au conseil — Global Esports Federation",
-    icon: "🏆",
-    url: "",
+    group: "Rapports & Plans",
   },
 ];
 
 const OfficialDocumentsSection: React.FC = () => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const pdfCache = useRef(new Map<string, string>());
 
-  const selectedDocument = officialDocuments[selectedIndex];
+  const selectedDocument = selectedId
+    ? officialDocuments.find(doc => doc.id === selectedId)
+    : null;
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     renderToolbar: (Toolbar) => (
@@ -134,19 +138,56 @@ const OfficialDocumentsSection: React.FC = () => {
 
   // Prefetch next document
   useEffect(() => {
-    const nextIndex = (selectedIndex + 1) % officialDocuments.length;
+    if (!selectedId) return;
+    const currentIndex = officialDocuments.findIndex(doc => doc.id === selectedId);
+    const nextIndex = (currentIndex + 1) % officialDocuments.length;
     const nextDoc = officialDocuments[nextIndex];
     if (nextDoc.url && !pdfCache.current.has(nextDoc.id)) {
       fetch(nextDoc.url, { method: 'GET' })
         .then(() => pdfCache.current.set(nextDoc.id, nextDoc.url))
         .catch(() => {});
     }
-  }, [selectedIndex]);
+  }, [selectedId]);
 
   const getFileUrl = (doc: OfficialDocument) => {
     if (!doc.url) return null;
     return doc.url;
   };
+
+  const renderLanguageBadge = (lang: string) => {
+    if (lang === "FR/EN") {
+      return (
+        <div className="absolute top-2 right-2 flex gap-0.5">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-l-full bg-[#C0392B] text-white">
+            FR
+          </span>
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-r-full bg-[#2E75B6] text-white">
+            EN
+          </span>
+        </div>
+      );
+    }
+
+    const bgColor = lang === "FR" ? "#C0392B" : "#2E75B6";
+    return (
+      <span
+        className="absolute top-2 right-2 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
+        style={{ backgroundColor: bgColor }}
+      >
+        {lang}
+      </span>
+    );
+  };
+
+  // Group documents by their group property
+  const groupedDocuments: { [key: string]: OfficialDocument[] } = {};
+  officialDocuments.forEach(doc => {
+    const group = doc.group || 'Other';
+    if (!groupedDocuments[group]) {
+      groupedDocuments[group] = [];
+    }
+    groupedDocuments[group].push(doc);
+  });
 
   return (
     <section className="py-16 bg-gray-50">
@@ -160,41 +201,63 @@ const OfficialDocumentsSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Grid Layout for Document Tabs */}
+        {/* Grid Layout for Document Tabs with Groups */}
         <div className="mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {officialDocuments.map((doc, index) => (
-              <button
-                key={doc.id}
-                onClick={() => setSelectedIndex(index)}
-                className={`p-4 rounded-lg transition-all duration-200 text-left ${
-                  selectedIndex === index
-                    ? 'bg-[#C0392B] text-white shadow-lg border-2 border-[#C0392B]'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">{doc.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className={`font-semibold text-sm mb-1 ${
-                      selectedIndex === index ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {doc.label}
-                    </h3>
-                    <p className={`text-xs ${
-                      selectedIndex === index ? 'text-white/90' : 'text-gray-600'
-                    }`}>
-                      {doc.description}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+          {Object.entries(groupedDocuments).map(([groupName, docs]) => (
+            <div key={groupName} className="mb-6">
+              <div className="w-full py-2 mb-3 border-b border-gray-300">
+                <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                  {groupName}
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {docs.map((doc) => (
+                  <button
+                    key={doc.id}
+                    onClick={() => setSelectedId(doc.id)}
+                    className={`relative p-4 rounded-lg transition-all duration-200 text-left ${
+                      selectedId === doc.id
+                        ? 'bg-[#C0392B] text-white shadow-lg border-2 border-[#C0392B]'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+                    }`}
+                  >
+                    {renderLanguageBadge(doc.lang)}
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl flex-shrink-0">{doc.icon}</span>
+                      <div className="flex-1 min-w-0 pr-12">
+                        <h3 className={`font-semibold text-sm mb-1 ${
+                          selectedId === doc.id ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {doc.label}
+                        </h3>
+                        <p className={`text-xs ${
+                          selectedId === doc.id ? 'text-white/90' : 'text-gray-600'
+                        }`}>
+                          {doc.description}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* PDF Viewer or Placeholder */}
-        {selectedDocument.url ? (
+        {/* PDF Viewer, Placeholder, or Welcome Screen */}
+        {!selectedDocument ? (
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden flex items-center justify-center" style={{ height: '300px' }}>
+            <div className="text-center max-w-md mx-auto px-6">
+              <div className="text-5xl mb-4">📄</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Sélectionnez un document pour le consulter
+              </h3>
+              <p className="text-sm text-gray-600">
+                Tous les documents sont en lecture seule
+              </p>
+            </div>
+          </div>
+        ) : selectedDocument.url ? (
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="relative">
               <div className="absolute top-4 right-4 z-10 bg-red-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-lg">
@@ -213,17 +276,15 @@ const OfficialDocumentsSection: React.FC = () => {
               </div>
 
               <div
-                className="pdf-viewer-wrapper"
+                className="pdf-viewer-wrapper h-[350px] sm:h-[450px] lg:h-[650px]"
                 style={{
-                  height: window.innerWidth < 768 ? '400px' : '600px',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
                 }}
                 onContextMenu={(e) => e.preventDefault()}
               >
-                <Worker workerUrl={pdfjsWorker}>
+                <Worker key={selectedDocument.id} workerUrl={pdfjsWorker}>
                   <Viewer
-                    key={selectedDocument.id}
                     fileUrl={getFileUrl(selectedDocument)!}
                     plugins={[defaultLayoutPluginInstance]}
                     renderLoader={(percentages: number) => (
