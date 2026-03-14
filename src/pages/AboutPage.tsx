@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Award, Shield, Users, Globe, FileText, Lock } from 'lucide-react';
+import { Award, Shield, Users, Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import SecureDocumentViewer from '../components/documents/SecureDocumentViewer';
+import OfficialDocumentsSection from '../components/documents/OfficialDocumentsSection';
 
 interface LeadershipMember {
   id: string;
@@ -27,20 +27,6 @@ interface HistoryEntry {
   is_active: boolean;
 }
 
-interface OfficialDocument {
-  id: string;
-  title: string;
-  title_en: string;
-  description: string;
-  description_en: string;
-  document_type: string;
-  file_url: string;
-  file_size: number;
-  version: string;
-  version_number: string;
-  display_order: number;
-}
-
 const AboutPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [leadershipTeam, setLeadershipTeam] = useState<LeadershipMember[]>([]);
@@ -48,15 +34,10 @@ const AboutPage: React.FC = () => {
   const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [officialDocuments, setOfficialDocuments] = useState<OfficialDocument[]>([]);
-  const [documentsLoading, setDocumentsLoading] = useState(true);
-  const [selectedDocument, setSelectedDocument] = useState<OfficialDocument | null>(null);
-  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   useEffect(() => {
     fetchLeadershipTeam();
     fetchHistoryEntries();
-    fetchOfficialDocuments();
   }, []);
 
   const fetchLeadershipTeam = async () => {
@@ -107,48 +88,6 @@ const AboutPage: React.FC = () => {
     }
   };
 
-  const fetchOfficialDocuments = async () => {
-    try {
-      setDocumentsLoading(true);
-      const { data, error } = await supabase
-        .from('official_documents')
-        .select('*')
-        .eq('is_active', true)
-        .eq('is_current_version', true)
-        .is('parent_document_id', null)
-        .order('display_order', { ascending: true });
-
-      if (error) throw error;
-      setOfficialDocuments(data || []);
-    } catch (error) {
-      console.error('Error fetching official documents:', error);
-      setOfficialDocuments([]);
-    } finally {
-      setDocumentsLoading(false);
-    }
-  };
-
-  const isValidDocumentUrl = (url: string): boolean => {
-    if (!url) return false;
-    if (url.includes('africau.edu') || url.includes('example.com') || url.includes('sample.pdf')) return false;
-    return true;
-  };
-
-  const handleOpenDocument = (document: OfficialDocument) => {
-    if (!isValidDocumentUrl(document.file_url)) {
-      alert(i18n.language === 'fr'
-        ? 'Ce document n\'est pas encore disponible. L\'administrateur doit télécharger le fichier PDF réel via la page d\'administration des documents.'
-        : 'This document is not yet available. The administrator must upload the actual PDF file via the document administration page.');
-      return;
-    }
-    setSelectedDocument(document);
-    setIsViewerOpen(true);
-  };
-
-  const handleCloseViewer = () => {
-    setIsViewerOpen(false);
-    setTimeout(() => setSelectedDocument(null), 300);
-  };
 
   const formatYearRange = (start: number, end: number | null): string => {
     if (end) {
@@ -335,116 +274,8 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Official Documents */}
-      <section className="section bg-white">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              {i18n.language === 'fr' ? 'Statuts & Règlements Intérieurs' : 'Statutes & Internal Regulations'}
-            </h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
-              {i18n.language === 'fr'
-                ? 'Documents officiels de la fédération'
-                : 'Official federation documents'}
-            </p>
-          </div>
-
-          {documentsLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            </div>
-          ) : officialDocuments.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {officialDocuments.map((doc, index) => (
-                <motion.div
-                  key={doc.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className={`card p-8 transition-shadow duration-300 ${
-                    isValidDocumentUrl(doc.file_url) ? 'hover:shadow-xl' : 'opacity-90'
-                  }`}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className={`bg-gradient-to-br p-6 rounded-full mb-6 ${
-                      isValidDocumentUrl(doc.file_url)
-                        ? 'from-red-100 to-yellow-100'
-                        : 'from-gray-100 to-gray-200'
-                    }`}>
-                      <FileText className={`w-12 h-12 ${
-                        isValidDocumentUrl(doc.file_url) ? 'text-red-600' : 'text-gray-400'
-                      }`} />
-                    </div>
-
-                    <h3 className="text-xl font-bold mb-2">
-                      {i18n.language === 'fr' ? doc.title : doc.title_en}
-                    </h3>
-
-                    <p className="text-gray-600 mb-4 text-sm">
-                      {i18n.language === 'fr' ? doc.description : doc.description_en}
-                    </p>
-
-                    <div className="flex items-center gap-3 mb-4">
-                      {doc.version_number && (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
-                          Version {doc.version_number}
-                        </span>
-                      )}
-                      {doc.version && (
-                        <p className="text-xs text-gray-500">{doc.version}</p>
-                      )}
-                    </div>
-
-                    {isValidDocumentUrl(doc.file_url) ? (
-                      <>
-                        <button
-                          onClick={() => handleOpenDocument(doc)}
-                          className="btn-primary flex items-center gap-2 w-full justify-center"
-                        >
-                          <FileText className="w-4 h-4" />
-                          {i18n.language === 'fr' ? 'Lire le document' : 'Read document'}
-                        </button>
-
-                        <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
-                          <Lock className="w-3 h-3" />
-                          <span>
-                            {i18n.language === 'fr'
-                              ? 'Lecture seule - Téléchargement désactivé'
-                              : 'Read-only - Download disabled'}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-full">
-                        <div className="px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg text-center">
-                          <p className="text-sm text-orange-800 font-medium">
-                            {i18n.language === 'fr'
-                              ? 'Document en cours de configuration'
-                              : 'Document under configuration'}
-                          </p>
-                          <p className="text-xs text-orange-600 mt-1">
-                            {i18n.language === 'fr'
-                              ? 'Le fichier PDF sera disponible prochainement'
-                              : 'PDF file will be available soon'}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              {i18n.language === 'fr'
-                ? 'Aucun document disponible pour le moment'
-                : 'No documents available at the moment'}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Official Documents - New PDF Viewer Section */}
+      <OfficialDocumentsSection />
 
       {/* Leadership */}
       <section className="section bg-gray-50">
@@ -597,14 +428,6 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {selectedDocument && (
-        <SecureDocumentViewer
-          isOpen={isViewerOpen}
-          onClose={handleCloseViewer}
-          documentUrl={selectedDocument.file_url}
-          documentTitle={i18n.language === 'fr' ? selectedDocument.title : selectedDocument.title_en}
-        />
-      )}
     </div>
   );
 };
