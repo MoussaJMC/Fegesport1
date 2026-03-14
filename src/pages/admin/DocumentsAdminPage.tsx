@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
-import { FileText, Upload, CreditCard as Edit2, Trash2, Eye, EyeOff, Save, X, AlertCircle, History, Plus, CheckCircle, Clock } from 'lucide-react';
+import { FileText, Upload, CreditCard as Edit2, Trash2, Eye, EyeOff, Save, X, AlertCircle, History, Plus, CheckCircle, Clock, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface OfficialDocument {
@@ -45,6 +45,8 @@ export default function DocumentsAdminPage() {
   const [selectedDocumentVersions, setSelectedDocumentVersions] = useState<OfficialDocument[]>([]);
   const [showVersions, setShowVersions] = useState<string | null>(null);
   const [isAddingVersion, setIsAddingVersion] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<DocumentFormData>({
     title: '',
     title_en: '',
@@ -276,6 +278,54 @@ export default function DocumentsAdminPage() {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Seuls les fichiers PDF sont acceptés');
+      return;
+    }
+
+    if (file.size > 52428800) {
+      toast.error('Le fichier est trop volumineux (max 50MB)');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const fileExt = 'pdf';
+      const timestamp = Date.now();
+      const fileName = `${formData.document_type}-${timestamp}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('official-documents')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('official-documents')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, file_url: publicUrl });
+      toast.success('Fichier téléchargé avec succès');
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('Error uploading file:', error);
+      toast.error(error.message || 'Erreur lors du téléchargement du fichier');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const getDocumentTypeName = (type: string) => {
     switch (type) {
       case 'statuts':
@@ -314,15 +364,15 @@ export default function DocumentsAdminPage() {
         )}
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-yellow-800">
-          <p className="font-semibold mb-1">Instructions importantes:</p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-blue-800">
+          <p className="font-semibold mb-1">Instructions:</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Téléchargez d'abord le PDF dans le gestionnaire de fichiers</li>
-            <li>Copiez l'URL du fichier et collez-la dans le champ "URL du fichier"</li>
+            <li>Utilisez le bouton "Sélectionner le fichier PDF" pour télécharger votre document</li>
             <li>Les documents sont protégés contre le téléchargement côté utilisateur</li>
             <li>Seuls les documents actifs sont visibles sur la page À propos</li>
+            <li>Taille maximale: 50MB - Format: PDF uniquement</li>
           </ul>
         </div>
       </div>
@@ -463,19 +513,53 @@ export default function DocumentsAdminPage() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL du Fichier PDF *
+                  Fichier PDF *
                 </label>
-                <input
-                  type="text"
-                  value={formData.file_url}
-                  onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                  className="input"
-                  placeholder="/media/documents/statuts-fegesport.pdf"
-                  required
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Téléchargez le fichier dans le gestionnaire de fichiers, puis copiez l'URL ici
-                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="btn-secondary flex items-center gap-2"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader className="w-4 h-4 animate-spin" />
+                          Téléchargement...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          Sélectionner le fichier PDF
+                        </>
+                      )}
+                    </button>
+                    {formData.file_url && (
+                      <span className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        Fichier sélectionné
+                      </span>
+                    )}
+                  </div>
+                  {formData.file_url && (
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-gray-600 mb-1">URL du fichier:</p>
+                      <p className="text-sm text-gray-900 break-all">{formData.file_url}</p>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-500">
+                    Téléchargez votre fichier PDF (max 50MB). L'URL sera générée automatiquement.
+                  </p>
+                </div>
               </div>
 
               <div>

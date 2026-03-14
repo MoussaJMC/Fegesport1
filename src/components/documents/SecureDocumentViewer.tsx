@@ -77,7 +77,18 @@ const SecureDocumentViewer: React.FC<SecureDocumentViewerProps> = ({
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
     setIsLoading(false);
-    setError('Impossible de charger le document PDF');
+
+    let errorMessage = 'Impossible de charger le document PDF';
+
+    if (error.message.includes('404') || error.message.includes('Not Found')) {
+      errorMessage = 'Le document n\'a pas été trouvé. Veuillez vérifier que le fichier existe.';
+    } else if (error.message.includes('CORS')) {
+      errorMessage = 'Erreur de chargement du document. Veuillez réessayer.';
+    } else if (error.message.includes('Invalid PDF')) {
+      errorMessage = 'Le fichier PDF est invalide ou corrompu.';
+    }
+
+    setError(errorMessage);
   };
 
   const changePage = (offset: number) => {
@@ -197,15 +208,26 @@ const SecureDocumentViewer: React.FC<SecureDocumentViewerProps> = ({
             )}
 
             {error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
-                <AlertCircle className="w-12 h-12 text-red-600 mb-4" />
-                <p className="text-gray-800 font-medium mb-2">{error}</p>
-                <button
-                  onClick={handleOpenInNewTab}
-                  className="btn-primary mt-4"
-                >
-                  Ouvrir dans un nouvel onglet
-                </button>
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 p-8">
+                <AlertCircle className="w-16 h-16 text-red-600 mb-4" />
+                <p className="text-gray-800 font-semibold text-lg mb-2 text-center">{error}</p>
+                <p className="text-gray-600 text-sm mb-6 text-center max-w-md">
+                  Si vous êtes administrateur, vérifiez que le fichier a bien été téléchargé dans la page d'administration des documents.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleOpenInNewTab}
+                    className="btn-primary"
+                  >
+                    Ouvrir dans un nouvel onglet
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="btn-secondary"
+                  >
+                    Fermer
+                  </button>
+                </div>
               </div>
             )}
 
