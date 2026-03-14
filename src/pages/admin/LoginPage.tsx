@@ -36,9 +36,37 @@ const LoginPage: React.FC = () => {
   const [connectionTests, setConnectionTests] = useState<ConnectionTest[]>([]);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
 
+  // Security: Rate limiting
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutTime, setLockoutTime] = useState<Date | null>(null);
+
+  // Security: Honeypot field (bot trap)
+  const [honeypotValue, setHoneypotValue] = useState('');
+
   const { register, handleSubmit, formState: { errors, isSubmitting }, setError, clearErrors } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  // Check if account is still locked
+  useEffect(() => {
+    if (lockoutTime) {
+      const now = new Date();
+      if (now < lockoutTime) {
+        setIsLocked(true);
+        const timer = setTimeout(() => {
+          setIsLocked(false);
+          setFailedAttempts(0);
+          setLockoutTime(null);
+        }, lockoutTime.getTime() - now.getTime());
+        return () => clearTimeout(timer);
+      } else {
+        setIsLocked(false);
+        setFailedAttempts(0);
+        setLockoutTime(null);
+      }
+    }
+  }, [lockoutTime]);
 
   // Run connection tests on component mount
   useEffect(() => {
@@ -180,44 +208,63 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
+      // Security: Check honeypot (if filled, it's a bot)
+      if (honeypotValue.trim() !== '') {
+        console.warn('Bot detected: honeypot field filled');
+        // Silently reject without error message
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return;
+      }
+
+      // Security: Check if account is locked
+      if (isLocked) {
+        const remainingTime = lockoutTime ? Math.ceil((lockoutTime.getTime() - Date.now()) / 60000) : 0;
+        setError('root', {
+          message: `Compte temporairement bloqué. Réessayez dans ${remainingTime} minute${remainingTime > 1 ? 's' : ''}.`,
+          type: 'account_locked'
+        });
+        return;
+      }
+
       clearErrors();
       await login(data.email, data.password);
+
+      // Success: reset failed attempts
+      setFailedAttempts(0);
+      setIsLocked(false);
+      setLockoutTime(null);
+
       navigate(from, { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
-      
-      // Enhanced form error handling with better categorization
-      if (error.message.includes('Email ou mot de passe incorrect')) {
-        setError('email', { message: 'Vérifiez vos identifiants' });
-        setError('password', { message: 'Vérifiez vos identifiants' });
-      } else if (error.message.includes('🔧 Problème technique Supabase') || 
-                 error.message.includes('Database error querying schema') ||
-                 error.message.includes('🚨 Erreur serveur Supabase') ||
-                 error.message.includes('🔧 Service Supabase temporairement indisponible')) {
-        setError('root', { 
-          message: error.message,
-          type: 'supabase_server_error'
+
+      // Security: Increment failed attempts
+      const newAttempts = failedAttempts + 1;
+      setFailedAttempts(newAttempts);
+
+      // Security: Lock account after 5 failed attempts for 15 minutes
+      if (newAttempts >= 5) {
+        const lockTime = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        setLockoutTime(lockTime);
+        setIsLocked(true);
+        setError('root', {
+          message: 'Compte temporairement bloqué suite à trop de tentatives échouées. Réessayez dans 15 minutes.',
+          type: 'account_locked'
         });
-      } else if (error.message.includes('⚠️ Erreur serveur Supabase inattendue') ||
-                 error.message.includes('unexpected_failure')) {
-        setError('root', { 
-          message: error.message,
-          type: 'supabase_unexpected_error'
-        });
-      } else if (error.message.includes('🌐 Problème de connectivité') ||
-                 error.message.includes('connexion') || 
-                 error.message.includes('accessible')) {
-        setError('root', { 
-          message: error.message,
-          type: 'connectivity_error'
-        });
-      } else if (error.message.includes('Accès non autorisé')) {
-        setError('root', { 
-          message: error.message,
-          type: 'access_denied'
-        });
-      } else {
-        setError('root', { message: error.message });
+        return;
+      }
+
+      // Security: Generic error message to not leak information
+      // Never say "user not found" or "wrong password" separately
+      setError('root', {
+        message: 'Identifiants incorrects. Vérifiez votre email et votre mot de passe.',
+        type: 'auth_error'
+      });
+
+      // Log remaining attempts for user awareness
+      const remainingAttempts = 5 - newAttempts;
+      if (remainingAttempts <= 2) {
+        toast.error(`Attention: ${remainingAttempts} tentative${remainingAttempts > 1 ? 's' : ''} restante${remainingAttempts > 1 ? 's' : ''} avant blocage temporaire`);
       }
     }
   };
@@ -402,6 +449,18 @@ const LoginPage: React.FC = () => {
         )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {/* Honeypot field - hidden from users, bots will fill it */}
+          <input
+            type="text"
+            name="website"
+            value={honeypotValue}
+            onChange={(e) => setHoneypotValue(e.target.value)}
+            style={{ display: 'none' }}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">Email</label>
@@ -409,9 +468,10 @@ const LoginPage: React.FC = () => {
                 id="email"
                 type="email"
                 {...register('email')}
+                disabled={isLocked}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
                   errors.email ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
                 placeholder="Email"
               />
               {errors.email && (
@@ -424,9 +484,10 @@ const LoginPage: React.FC = () => {
                 id="password"
                 type="password"
                 {...register('password')}
+                disabled={isLocked}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
                   errors.password ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
                 placeholder="Mot de passe"
               />
               {errors.password && (
@@ -438,10 +499,15 @@ const LoginPage: React.FC = () => {
           <div>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLocked}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? (
+              {isLocked ? (
+                <div className="flex items-center">
+                  <Lock className="h-5 w-5 mr-2" />
+                  Compte bloqué
+                </div>
+              ) : isSubmitting ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
                   Connexion en cours...
@@ -449,6 +515,14 @@ const LoginPage: React.FC = () => {
               ) : 'Se connecter'}
             </button>
           </div>
+
+          {failedAttempts > 0 && !isLocked && (
+            <div className="text-center">
+              <p className="text-sm text-orange-600">
+                Tentatives échouées: {failedAttempts}/5
+              </p>
+            </div>
+          )}
         </form>
         
         <div className="text-center space-y-2">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import AdminGuard from '../../components/admin/AdminGuard';
 import { Loader2, Home, Newspaper, Calendar, Users, Building2, MessageSquare, LogOut, Menu, X, Bell, Activity, FolderOpen, Globe, Database, Book, Tag, Award, Layers, Image, Video, Mail, UserCheck, Settings, Gamepad2, Navigation, LayoutGrid as Layout, Clock, Target, Share2, BarChart3, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -216,11 +217,12 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.aside
+    <AdminGuard>
+      <div className="min-h-screen bg-gray-100 flex">
+        {/* Sidebar */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.aside
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             exit={{ x: -280 }}
@@ -409,14 +411,15 @@ const AdminLayout: React.FC = () => {
         </main>
       </div>
 
-      {/* Overlay for mobile sidebar */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-    </div>
+        {/* Overlay for mobile sidebar */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </div>
+    </AdminGuard>
   );
 };
 
