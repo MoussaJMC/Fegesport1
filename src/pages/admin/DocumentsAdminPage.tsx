@@ -9,7 +9,10 @@ interface OfficialDocument {
   title_en: string;
   description: string;
   description_en: string;
-  document_type: 'statuts' | 'reglement' | 'other';
+  document_type: 'statuts-fr' | 'statuts-en' | 'reglement-fr' | 'reglement-en' | 'rapport-annuel' | 'plan-strategique' | 'programme-jeunes';
+  icon: string;
+  lang: string;
+  group_name: string;
   file_url: string;
   file_size: number;
   is_active: boolean;
@@ -28,7 +31,10 @@ interface DocumentFormData {
   title_en: string;
   description: string;
   description_en: string;
-  document_type: 'statuts' | 'reglement' | 'other';
+  document_type: 'statuts-fr' | 'statuts-en' | 'reglement-fr' | 'reglement-en' | 'rapport-annuel' | 'plan-strategique' | 'programme-jeunes';
+  icon: string;
+  lang: string;
+  group_name: string;
   file_url: string;
   version: string;
   version_number: string;
@@ -52,7 +58,10 @@ export default function DocumentsAdminPage() {
     title_en: '',
     description: '',
     description_en: '',
-    document_type: 'statuts',
+    document_type: 'statuts-fr',
+    icon: '📋',
+    lang: 'FR',
+    group_name: 'Textes Fondateurs',
     file_url: '',
     version: '',
     version_number: '1.0',
@@ -107,6 +116,9 @@ export default function DocumentsAdminPage() {
       description: document.description,
       description_en: document.description_en,
       document_type: document.document_type,
+      icon: document.icon,
+      lang: document.lang,
+      group_name: document.group_name,
       file_url: document.file_url,
       version: document.version,
       version_number: document.version_number,
@@ -125,7 +137,10 @@ export default function DocumentsAdminPage() {
       title_en: '',
       description: '',
       description_en: '',
-      document_type: 'statuts',
+      document_type: 'statuts-fr',
+      icon: '📋',
+      lang: 'FR',
+      group_name: 'Textes Fondateurs',
       file_url: '',
       version: '',
       version_number: '1.0',
@@ -145,6 +160,9 @@ export default function DocumentsAdminPage() {
       description: document.description,
       description_en: document.description_en,
       document_type: document.document_type,
+      icon: document.icon,
+      lang: document.lang,
+      group_name: document.group_name,
       file_url: '',
       version: '',
       version_number: '',
@@ -165,7 +183,10 @@ export default function DocumentsAdminPage() {
       title_en: '',
       description: '',
       description_en: '',
-      document_type: 'statuts',
+      document_type: 'statuts-fr',
+      icon: '📋',
+      lang: 'FR',
+      group_name: 'Textes Fondateurs',
       file_url: '',
       version: '',
       version_number: '1.0',
@@ -328,15 +349,48 @@ export default function DocumentsAdminPage() {
 
   const getDocumentTypeName = (type: string) => {
     switch (type) {
-      case 'statuts':
-        return 'Statuts';
-      case 'reglement':
-        return 'Règlement Intérieur';
-      case 'other':
-        return 'Autre';
+      case 'statuts-fr':
+        return 'Statuts (FR)';
+      case 'statuts-en':
+        return 'Statutes (EN)';
+      case 'reglement-fr':
+        return 'Règlement Intérieur (FR)';
+      case 'reglement-en':
+        return 'Internal Regulations (EN)';
+      case 'rapport-annuel':
+        return 'Rapport Annuel';
+      case 'plan-strategique':
+        return 'Plan Stratégique';
+      case 'programme-jeunes':
+        return 'Programme Jeunes';
       default:
         return type;
     }
+  };
+
+  const renderLanguageBadge = (lang: string) => {
+    if (lang === "FR/EN") {
+      return (
+        <div className="inline-flex gap-0.5 ml-2">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-l-full bg-[#C0392B] text-white">
+            FR
+          </span>
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-r-full bg-[#2E75B6] text-white">
+            EN
+          </span>
+        </div>
+      );
+    }
+
+    const bgColor = lang === "FR" ? "#C0392B" : "#2E75B6";
+    return (
+      <span
+        className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white ml-2"
+        style={{ backgroundColor: bgColor }}
+      >
+        {lang}
+      </span>
+    );
   };
 
   if (loading) {
@@ -459,13 +513,94 @@ export default function DocumentsAdminPage() {
                 </label>
                 <select
                   value={formData.document_type}
-                  onChange={(e) => setFormData({ ...formData, document_type: e.target.value as any })}
+                  onChange={(e) => {
+                    const type = e.target.value as any;
+                    let icon = '📋';
+                    let lang = 'FR';
+                    let group = 'Textes Fondateurs';
+
+                    if (type.includes('statuts')) {
+                      icon = '📋';
+                      lang = type.endsWith('-en') ? 'EN' : 'FR';
+                      group = 'Textes Fondateurs';
+                    } else if (type.includes('reglement')) {
+                      icon = '📜';
+                      lang = type.endsWith('-en') ? 'EN' : 'FR';
+                      group = 'Textes Fondateurs';
+                    } else if (type === 'rapport-annuel') {
+                      icon = '📊';
+                      lang = 'FR';
+                      group = 'Rapports & Plans';
+                    } else if (type === 'plan-strategique') {
+                      icon = '🎯';
+                      lang = 'FR';
+                      group = 'Rapports & Plans';
+                    } else if (type === 'programme-jeunes') {
+                      icon = '🌍';
+                      lang = 'FR/EN';
+                      group = 'Rapports & Plans';
+                    }
+
+                    setFormData({ ...formData, document_type: type, icon, lang, group_name: group });
+                  }}
                   className="input"
                   required
                 >
-                  <option value="statuts">Statuts</option>
-                  <option value="reglement">Règlement Intérieur</option>
-                  <option value="other">Autre</option>
+                  <optgroup label="Textes Fondateurs">
+                    <option value="statuts-fr">Statuts de la Fédération (FR)</option>
+                    <option value="statuts-en">Federation Statutes (EN)</option>
+                    <option value="reglement-fr">Règlement Intérieur (FR)</option>
+                    <option value="reglement-en">Internal Regulations (EN)</option>
+                  </optgroup>
+                  <optgroup label="Rapports & Plans">
+                    <option value="rapport-annuel">Rapport Annuel (FR)</option>
+                    <option value="plan-strategique">Plan Stratégique (FR)</option>
+                    <option value="programme-jeunes">Programme Développement Jeunes (FR/EN)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icône
+                </label>
+                <input
+                  type="text"
+                  value={formData.icon}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  className="input"
+                  placeholder="📋"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Langue *
+                </label>
+                <select
+                  value={formData.lang}
+                  onChange={(e) => setFormData({ ...formData, lang: e.target.value })}
+                  className="input"
+                  required
+                >
+                  <option value="FR">Français (FR)</option>
+                  <option value="EN">English (EN)</option>
+                  <option value="FR/EN">Bilingue (FR/EN)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Groupe *
+                </label>
+                <select
+                  value={formData.group_name}
+                  onChange={(e) => setFormData({ ...formData, group_name: e.target.value })}
+                  className="input"
+                  required
+                >
+                  <option value="Textes Fondateurs">Textes Fondateurs</option>
+                  <option value="Rapports & Plans">Rapports & Plans</option>
                 </select>
               </div>
 
@@ -645,7 +780,9 @@ export default function DocumentsAdminPage() {
 
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl">{doc.icon}</span>
                           <h3 className="text-lg font-bold">{doc.title}</h3>
+                          {renderLanguageBadge(doc.lang)}
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-primary-100 text-primary-700">
                             {getDocumentTypeName(doc.document_type)}
                           </span>
@@ -660,6 +797,11 @@ export default function DocumentsAdminPage() {
                               Masqué
                             </span>
                           )}
+                        </div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">
+                            {doc.group_name}
+                          </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-2">{doc.title_en}</p>
                         {doc.description && (
