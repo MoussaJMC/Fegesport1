@@ -255,6 +255,30 @@ export default function DocumentsAdminPage() {
         </div>
       </div>
 
+      {publishedCount === 0 && (
+        <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <AlertCircle className="w-8 h-8 text-yellow-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-yellow-900 mb-2">
+                Aucun document uploadé pour le moment
+              </h3>
+              <p className="text-yellow-800 mb-4">
+                Pour ajouter des documents officiels au site, utilisez les boutons <strong className="text-[#C0392B]">"UPLOAD PDF"</strong> rouge dans le tableau ci-dessous.
+              </p>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-yellow-800">
+                <li>Cliquez sur le bouton <strong className="text-[#C0392B]">"UPLOAD PDF"</strong> rouge pour un document</li>
+                <li>Sélectionnez un fichier PDF sur votre ordinateur (max 20MB)</li>
+                <li>Une fois uploadé, cliquez sur le bouton <strong className="text-green-600">"Publier"</strong> vert</li>
+                <li>Le document apparaîtra instantanément sur la page "À propos" du site</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border-2 border-[#C0392B] rounded-lg p-6">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -285,7 +309,7 @@ export default function DocumentsAdminPage() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -349,20 +373,20 @@ export default function DocumentsAdminPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       <label
-                        className={`btn-secondary text-xs flex items-center gap-1 cursor-pointer ${
+                        className={`px-4 py-2 bg-[#C0392B] hover:bg-[#A13023] text-white rounded-lg text-xs font-medium flex items-center gap-2 cursor-pointer transition-colors ${
                           uploading === doc.id ? 'opacity-50 pointer-events-none' : ''
                         }`}
-                        title="Upload"
+                        title="Cliquez pour uploader un fichier PDF"
                       >
                         {uploading === doc.id ? (
                           <>
                             <Loader className="w-4 h-4 animate-spin" />
-                            Upload...
+                            Upload en cours...
                           </>
                         ) : (
                           <>
                             <Upload className="w-4 h-4" />
-                            Upload
+                            UPLOAD PDF
                           </>
                         )}
                         <input
@@ -377,10 +401,10 @@ export default function DocumentsAdminPage() {
                       <button
                         onClick={() => togglePublish(doc)}
                         disabled={!doc.file_url && !doc.is_published}
-                        className={`btn-secondary text-xs flex items-center gap-1 ${
+                        className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ${
                           !doc.file_url && !doc.is_published ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
-                        title={doc.is_published ? 'Dépublier' : 'Publier'}
+                        title={doc.is_published ? 'Retirer du site' : 'Publier sur le site'}
                       >
                         {doc.is_published ? (
                           <>
@@ -398,10 +422,10 @@ export default function DocumentsAdminPage() {
                       <button
                         onClick={() => handleDelete(doc)}
                         disabled={!doc.file_url}
-                        className={`p-2 text-red-600 hover:text-red-700 rounded-lg hover:bg-red-50 ${
-                          !doc.file_url ? 'opacity-50 cursor-not-allowed' : ''
+                        className={`p-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors ${
+                          !doc.file_url ? 'opacity-30 cursor-not-allowed' : ''
                         }`}
-                        title="Supprimer"
+                        title="Supprimer définitivement le fichier"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

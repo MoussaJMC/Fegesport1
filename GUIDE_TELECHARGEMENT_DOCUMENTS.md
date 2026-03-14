@@ -1,49 +1,48 @@
-# Guide de téléchargement des documents officiels
+# Guide de Téléchargement des Documents - Version Améliorée
 
-## Problème résolu
-Le système de documents officiels est maintenant complètement fonctionnel avec téléchargement intégré.
+## Ce qui a été amélioré
 
-## Comment télécharger vos documents PDF
+### Boutons ULTRA VISIBLES
+Les boutons ont été redesignés pour être impossibles à manquer :
 
-### Étape 1 : Accéder à l'administration
+1. **Bouton "UPLOAD PDF"** :
+   - Couleur : ROUGE VIF (#C0392B - couleur FEGESPORT)
+   - Texte : "UPLOAD PDF" en MAJUSCULES blanches
+   - Icône : 📤 (flèche vers le haut)
+   - Taille : Grande, avec padding généreux
+   - Effet hover : Plus foncé quand vous passez la souris
+
+2. **Bouton "Publier"** :
+   - Couleur : VERT (#059669)
+   - Texte : "Publier" avec icône œil
+   - Désactivé (gris) tant que le fichier n'est pas uploadé
+
+3. **Bouton "Supprimer"** :
+   - Couleur : ROUGE pour suppression
+   - Icône : 🗑️ (poubelle)
+   - Désactivé (gris) tant que le fichier n'est pas uploadé
+
+## Comment Accéder à la Page
+
 1. Connectez-vous à `/admin/login`
-2. Allez sur `/admin/documents`
+2. Dans le menu latéral GAUCHE, cliquez sur **"Documents Officiels"** (icône 📄)
+3. Ou allez directement à : `http://localhost:5173/admin/documents`
 
-### Étape 2 : Modifier un document existant
-1. Trouvez le document que vous voulez mettre à jour
-2. Cliquez sur le bouton **"Modifier"** (icône crayon)
+## Ce Que Vous DEVEZ Voir
 
-### Étape 3 : Télécharger le PDF
-1. Dans le formulaire, cherchez la section **"Fichier PDF"**
-2. Cliquez sur le bouton **"Sélectionner le fichier PDF"**
-3. Choisissez votre fichier PDF (max 50MB)
-4. Attendez que le téléchargement se termine
-5. Vous verrez une coche verte **"Fichier sélectionné"** quand c'est prêt
-6. L'URL du fichier s'affichera automatiquement en dessous
+- Un titre "Documents Officiels" en haut
+- Une boîte JAUNE avec instructions (si aucun doc uploadé)
+- Une barre de progression rouge "0 / 7 documents publiés"
+- Un TABLEAU avec 7 lignes
+- Dans chaque ligne, 3 boutons dans la colonne "Actions" :
+  - **ROUGE** avec "UPLOAD PDF" (toujours actif)
+  - **VERT** avec "Publier" (désactivé jusqu'à upload)
+  - **ROUGE** poubelle (désactivé jusqu'à upload)
 
-### Étape 4 : Enregistrer
-1. Remplissez les autres champs si nécessaire
-2. Cliquez sur **"Enregistrer"**
+## Comment Utiliser
 
-## Résultat
-- Le document sera visible sur la page `/about`
-- Les utilisateurs pourront le consulter dans le visualiseur sécurisé
-- Le PDF sera protégé contre le téléchargement
-
-## Où sont stockés les fichiers ?
-Les fichiers sont stockés dans le bucket Supabase `official-documents` :
-- Limite : 50MB par fichier
-- Format accepté : PDF uniquement
-- Accès : Public en lecture, admins peuvent modifier
-
-## Que faire en cas d'erreur ?
-Si vous voyez toujours une erreur après avoir téléchargé un fichier :
-1. Vérifiez que le fichier est bien un PDF valide
-2. Vérifiez que le fichier ne dépasse pas 50MB
-3. Assurez-vous d'avoir cliqué sur "Enregistrer" après le téléchargement
-4. Actualisez la page `/about` pour voir les changements
-
-## Important
-- Les anciens documents avec des URLs externes (africau.edu, etc.) afficheront un message d'alerte
-- Vous devez remplacer ces URLs par de vrais fichiers PDF via le système de téléchargement
-- Une fois téléchargé, le PDF sera accessible immédiatement
+1. Cliquez sur le bouton **ROUGE "UPLOAD PDF"**
+2. Sélectionnez un fichier PDF (max 20MB)
+3. Le fichier s'uploade automatiquement
+4. Cliquez sur le bouton **VERT "Publier"**
+5. Le document apparaît sur la page "À propos"
