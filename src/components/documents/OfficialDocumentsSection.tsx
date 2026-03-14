@@ -5,6 +5,7 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { supabase } from '../../lib/supabase';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 interface OfficialDocument {
   id: string;
@@ -161,7 +162,7 @@ const OfficialDocumentsSection: React.FC = () => {
                 }}
                 onContextMenu={(e) => e.preventDefault()}
               >
-                <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                <Worker workerUrl={pdfjsWorker}>
                   <Viewer
                     fileUrl={selectedDocument.file_url}
                     plugins={[defaultLayoutPluginInstance]}
