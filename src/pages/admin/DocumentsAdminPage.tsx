@@ -52,11 +52,21 @@ export default function DocumentsAdminPage() {
         .select('*')
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching documents:', error);
+        toast.error(`Erreur: ${error.message}`);
+        throw error;
+      }
+
+      console.log('Documents loaded:', data?.length || 0);
       setDocuments(data || []);
-    } catch (error) {
+
+      if (!data || data.length === 0) {
+        toast.error('Aucun document trouvé dans la base de données');
+      }
+    } catch (error: any) {
       console.error('Error fetching documents:', error);
-      toast.error('Erreur lors du chargement des documents');
+      toast.error(error.message || 'Erreur lors du chargement des documents');
     } finally {
       setLoading(false);
     }
@@ -310,6 +320,26 @@ export default function DocumentsAdminPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden">
+        {documents.length === 0 && !loading && (
+          <div className="p-8 text-center bg-red-50 border-b-2 border-red-200">
+            <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-red-900 mb-2">
+              ERREUR : Aucun document chargé depuis la base de données
+            </h3>
+            <p className="text-red-800 mb-4">
+              Les données existent dans la base mais ne peuvent pas être récupérées.
+              Vérifiez la console du navigateur (F12) pour plus de détails.
+            </p>
+            <div className="text-left bg-white p-4 rounded border border-red-300 max-w-2xl mx-auto">
+              <p className="text-sm text-gray-700 mb-2 font-semibold">Diagnostic :</p>
+              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                <li>Vérifiez que vous êtes bien connecté en tant qu'admin</li>
+                <li>Ouvrez la console (F12) et cherchez les erreurs RLS</li>
+                <li>Votre email admin doit être dans la liste autorisée</li>
+              </ul>
+            </div>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
