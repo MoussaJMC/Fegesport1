@@ -1,24 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FileText, Lock } from 'lucide-react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { supabase } from '../../lib/supabase';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 interface OfficialDocument {
   id: string;
-  title: string;
-  document_type: string;
-  file_url: string;
-  description: string | null;
+  label: string;
+  description: string;
+  icon: string;
+  url: string;
 }
 
+const officialDocuments: OfficialDocument[] = [
+  {
+    id: "statuts",
+    label: "Statuts de la Fédération",
+    description: "Statuts officiels de la FEGESPORT",
+    icon: "📋",
+    url: "",
+  },
+  {
+    id: "reglement",
+    label: "Règlement Intérieur",
+    description: "Règlement intérieur de la FEGESPORT",
+    icon: "📜",
+    url: "",
+  },
+  {
+    id: "reconnaissance-serproma",
+    label: "Reconnaissance SERPROMA",
+    description: "Arrêté de reconnaissance officielle — 2013",
+    icon: "🏛️",
+    url: "",
+  },
+  {
+    id: "reconnaissance-conakry",
+    label: "Reconnaissance Ville de Conakry",
+    description: "Attestation de reconnaissance — 2018",
+    icon: "🏙️",
+    url: "",
+  },
+  {
+    id: "rapport-audit-2024",
+    label: "Rapport d'Audit 2024",
+    description: "Rapport d'audit administratif — Ministère des Sports",
+    icon: "🔍",
+    url: "",
+  },
+  {
+    id: "rapport-activites",
+    label: "Rapport d'Activités",
+    description: "Rapport annuel d'activités FEGESPORT",
+    icon: "📊",
+    url: "",
+  },
+  {
+    id: "convention-easports",
+    label: "Convention EA Sports",
+    description: "Accord-cadre EA Sports — exploitation FIFA en Guinée — 2018",
+    icon: "🎮",
+    url: "",
+  },
+  {
+    id: "attestation-iesf",
+    label: "Attestation IESF",
+    description: "Certificat d'affiliation — International Esports Federation",
+    icon: "🌍",
+    url: "",
+  },
+  {
+    id: "attestation-gef",
+    label: "Attestation GEF",
+    description: "Certificat de siège au conseil — Global Esports Federation",
+    icon: "🏆",
+    url: "",
+  },
+];
+
 const OfficialDocumentsSection: React.FC = () => {
-  const [documents, setDocuments] = useState<OfficialDocument[]>([]);
-  const [selectedDocument, setSelectedDocument] = useState<OfficialDocument | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const pdfCache = useRef(new Map<string, string>());
+
+  const selectedDocument = officialDocuments[selectedIndex];
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     renderToolbar: (Toolbar) => (
@@ -66,47 +132,21 @@ const OfficialDocumentsSection: React.FC = () => {
     ),
   });
 
+  // Prefetch next document
   useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  const fetchDocuments = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('official_documents')
-        .select('id, title, document_type, file_url, description')
-        .eq('is_active', true)
-        .eq('is_current_version', true)
-        .order('display_order');
-
-      if (error) throw error;
-
-      setDocuments(data || []);
-      if (data && data.length > 0) {
-        setSelectedDocument(data[0]);
-      }
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    } finally {
-      setLoading(false);
+    const nextIndex = (selectedIndex + 1) % officialDocuments.length;
+    const nextDoc = officialDocuments[nextIndex];
+    if (nextDoc.url && !pdfCache.current.has(nextDoc.id)) {
+      fetch(nextDoc.url, { method: 'GET' })
+        .then(() => pdfCache.current.set(nextDoc.id, nextDoc.url))
+        .catch(() => {});
     }
+  }, [selectedIndex]);
+
+  const getFileUrl = (doc: OfficialDocument) => {
+    if (!doc.url) return null;
+    return doc.url;
   };
-
-  if (loading) {
-    return (
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (documents.length === 0) {
-    return null;
-  }
 
   return (
     <section className="py-16 bg-gray-50">
@@ -120,26 +160,41 @@ const OfficialDocumentsSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {documents.map((doc) => (
+        {/* Grid Layout for Document Tabs */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {officialDocuments.map((doc, index) => (
               <button
                 key={doc.id}
-                onClick={() => setSelectedDocument(doc)}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-                  selectedDocument?.id === doc.id
-                    ? 'bg-primary-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+                onClick={() => setSelectedIndex(index)}
+                className={`p-4 rounded-lg transition-all duration-200 text-left ${
+                  selectedIndex === index
+                    ? 'bg-[#C0392B] text-white shadow-lg border-2 border-[#C0392B]'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
                 }`}
               >
-                <FileText className="w-5 h-5" />
-                {doc.title}
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">{doc.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-semibold text-sm mb-1 ${
+                      selectedIndex === index ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {doc.label}
+                    </h3>
+                    <p className={`text-xs ${
+                      selectedIndex === index ? 'text-white/90' : 'text-gray-600'
+                    }`}>
+                      {doc.description}
+                    </p>
+                  </div>
+                </div>
               </button>
             ))}
           </div>
         </div>
 
-        {selectedDocument && (
+        {/* PDF Viewer or Placeholder */}
+        {selectedDocument.url ? (
           <div className="bg-white rounded-lg shadow-xl overflow-hidden">
             <div className="relative">
               <div className="absolute top-4 right-4 z-10 bg-red-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-lg">
@@ -147,11 +202,15 @@ const OfficialDocumentsSection: React.FC = () => {
                 Lecture seule
               </div>
 
-              {selectedDocument.description && (
-                <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
-                  <p className="text-gray-700 text-sm">{selectedDocument.description}</p>
+              <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{selectedDocument.icon}</span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{selectedDocument.label}</h3>
+                    <p className="text-gray-600 text-sm">{selectedDocument.description}</p>
+                  </div>
                 </div>
-              )}
+              </div>
 
               <div
                 className="pdf-viewer-wrapper"
@@ -164,10 +223,62 @@ const OfficialDocumentsSection: React.FC = () => {
               >
                 <Worker workerUrl={pdfjsWorker}>
                   <Viewer
-                    fileUrl={selectedDocument.file_url}
+                    key={selectedDocument.id}
+                    fileUrl={getFileUrl(selectedDocument)!}
                     plugins={[defaultLayoutPluginInstance]}
+                    renderLoader={(percentages: number) => (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          height: '500px',
+                          gap: '16px',
+                        }}
+                      >
+                        <div style={{ fontSize: '14px', color: '#555' }}>
+                          Chargement... {Math.round(percentages)}%
+                        </div>
+                        <div
+                          style={{
+                            width: '240px',
+                            height: '6px',
+                            background: '#e0e0e0',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${percentages}%`,
+                              height: '100%',
+                              background: '#C0392B',
+                              borderRadius: '3px',
+                              transition: 'width 0.2s ease',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   />
                 </Worker>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="text-6xl mb-4">{selectedDocument.icon}</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {selectedDocument.label}
+              </h3>
+              <p className="text-gray-600 mb-6">{selectedDocument.description}</p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-800 flex items-center justify-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Document en cours de numérisation — disponible prochainement
+                </p>
               </div>
             </div>
           </div>
