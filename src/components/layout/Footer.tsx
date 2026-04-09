@@ -1,18 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Twitter, Instagram, Youtube, Mail } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, Globe } from 'lucide-react';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 
 const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { getSetting } = useSiteSettings();
-  
+  const lang = i18n.language === 'fr' ? 'fr' : 'en';
   const currentYear = new Date().getFullYear();
-  
-  // Get contact info from database
+
   const contactInfo = getSetting('contact_info', {
-    address: "Conakry, Guinée",
+    address: "Conakry, Guinee",
     postal_code: "BP 12345",
     email: "contact@fegesport224.org",
     phone: "+224 625878764",
@@ -24,131 +23,165 @@ const Footer: React.FC = () => {
     }
   });
 
-  // Get navigation settings for footer links
   const navigationSettings = getSetting('main_navigation', {
     brand_text: "FEGESPORT",
     items: []
   });
-  
-  // Get translated label for navigation items
+
   const getTranslatedLabel = (label: string): string => {
-    // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, '');
-    
-    // Check if we have a translation for this key
     const translationKey = `navigation.${key}`;
-    const hasTranslation = i18n.exists(translationKey);
-    
-    return hasTranslation ? t(translationKey) : label;
+    return i18n.exists(translationKey) ? t(translationKey) : label;
   };
-  
+
+  const socialLinks = [
+    { url: contactInfo.social_media?.facebook, icon: Facebook, label: 'Facebook' },
+    { url: contactInfo.social_media?.twitter, icon: Twitter, label: 'Twitter' },
+    { url: contactInfo.social_media?.instagram, icon: Instagram, label: 'Instagram' },
+    { url: contactInfo.social_media?.youtube, icon: Youtube, label: 'YouTube' },
+  ].filter(link => link.url);
+
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="container-custom py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Federation Info */}
-          <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4">{navigationSettings.brand_text || "FEGESPORT"}</h3>
-            <p className="text-gray-300 mb-4">
-              {i18n.language === 'fr' ? 'Fédération Guinéenne d\'Esport' : 'Guinean Esports Federation'}
+    <footer className="bg-dark-950 text-light-100 border-t border-dark-700">
+      {/* Main footer content */}
+      <div className="container-custom py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+
+          {/* Column 1 — Federation Identity */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-fed-red-500 flex items-center justify-center">
+                <span className="text-white font-bold text-sm font-heading">FGE</span>
+              </div>
+              <span className="text-xl font-bold font-heading text-white">
+                {navigationSettings.brand_text || "FEGESPORT"}
+              </span>
+            </div>
+            <p className="text-light-400 text-sm leading-relaxed mb-6">
+              {lang === 'fr'
+                ? 'Federation Guineenne d\'Esport. Structurer, developper et representer l\'esport en Republique de Guinee.'
+                : 'Guinean Esports Federation. Structuring, developing and representing esports in the Republic of Guinea.'}
             </p>
-            <div className="flex space-x-4">
-              {contactInfo.social_media?.facebook && (
-                <a href={contactInfo.social_media.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Facebook size={20} />
+            <div className="flex space-x-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-light-400 hover:text-fed-red-500 hover:border-fed-red-500/30 transition-all duration-200"
+                  aria-label={social.label}
+                >
+                  <social.icon size={16} />
                 </a>
-              )}
-              {contactInfo.social_media?.twitter && (
-                <a href={contactInfo.social_media.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Twitter size={20} />
-                </a>
-              )}
-              {contactInfo.social_media?.instagram && (
-                <a href={contactInfo.social_media.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Instagram size={20} />
-                </a>
-              )}
-              {contactInfo.social_media?.youtube && (
-                <a href={contactInfo.social_media.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <Youtube size={20} />
-                </a>
-              )}
+              ))}
             </div>
           </div>
-          
-          {/* Quick Links */}
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('navigation.home')}</h3>
-            <ul className="space-y-2">
-              {navigationSettings.items?.slice(0, 4).map((item: any) => (
+
+          {/* Column 2 — Navigation */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
+              {lang === 'fr' ? 'Navigation' : 'Navigation'}
+            </h4>
+            <ul className="space-y-2.5">
+              {navigationSettings.items?.slice(0, 6).map((item: any) => (
                 <li key={item.path}>
-                  <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
+                  <Link
+                    to={item.path}
+                    className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  >
                     {getTranslatedLabel(item.label)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-          
-          {/* Resources */}
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('navigation.resources')}</h3>
-            <ul className="space-y-2">
-              {navigationSettings.items?.slice(4).map((item: any) => (
+
+          {/* Column 3 — Resources */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
+              {lang === 'fr' ? 'Ressources' : 'Resources'}
+            </h4>
+            <ul className="space-y-2.5">
+              {navigationSettings.items?.slice(6).map((item: any) => (
                 <li key={item.path}>
-                  <Link to={item.path} className="text-gray-300 hover:text-white transition-colors">
+                  <Link
+                    to={item.path}
+                    className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  >
                     {getTranslatedLabel(item.label)}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link to="/privacy" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/resources" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
+                  {lang === 'fr' ? 'Documents officiels' : 'Official Documents'}
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
                   {t('footer.privacy')}
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-gray-300 hover:text-white transition-colors">
+                <Link to="/terms" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
                   {t('footer.terms')}
                 </Link>
               </li>
             </ul>
           </div>
-          
-          {/* Contact */}
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-semibold mb-4">{t('navigation.contact')}</h3>
-            <address className="not-italic text-gray-300">
-              <p className="mb-2">{contactInfo.address}</p>
-              {contactInfo.postal_code && (
-                <p className="mb-2">{contactInfo.postal_code}</p>
+
+          {/* Column 4 — Contact */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
+              {lang === 'fr' ? 'Contact' : 'Contact'}
+            </h4>
+            <address className="not-italic space-y-3">
+              {contactInfo.address && (
+                <div className="flex items-start gap-2.5 text-light-400 text-sm">
+                  <MapPin size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
+                  <span>{contactInfo.address}</span>
+                </div>
               )}
               {contactInfo.email && (
-                <div className="flex items-center mb-2">
-                  <Mail size={16} className="mr-2" />
-                  <a href={`mailto:${contactInfo.email}`} className="hover:text-white transition-colors break-all">
+                <div className="flex items-start gap-2.5 text-light-400 text-sm">
+                  <Mail size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
+                  <a href={`mailto:${contactInfo.email}`} className="hover:text-fed-gold-500 transition-colors break-all">
                     {contactInfo.email}
                   </a>
                 </div>
               )}
               {contactInfo.phone && (
-                <p className="mb-2">{contactInfo.phone}</p>
+                <div className="flex items-start gap-2.5 text-light-400 text-sm">
+                  <Phone size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
+                  <a href={`tel:${contactInfo.phone}`} className="hover:text-fed-gold-500 transition-colors">
+                    {contactInfo.phone}
+                  </a>
+                </div>
               )}
+              <div className="flex items-start gap-2.5 text-light-400 text-sm">
+                <Globe size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
+                <span>fegesport224.org</span>
+              </div>
             </address>
           </div>
         </div>
-        
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0 text-center md:text-left">
-            {t('footer.rights').replace('2025', currentYear.toString())}
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-dark-800">
+        <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-light-400 text-xs text-center md:text-left">
+            &copy; {currentYear} FEGESPORT — {lang === 'fr' ? 'Federation Guineenne d\'Esport. Tous droits reserves.' : 'Guinean Esports Federation. All rights reserved.'}
           </p>
-          <div className="flex space-x-4">
-            <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
+          <div className="flex items-center gap-6">
+            <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
               {t('footer.privacy')}
             </Link>
-            <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link to="/terms" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
               {t('footer.terms')}
             </Link>
           </div>
