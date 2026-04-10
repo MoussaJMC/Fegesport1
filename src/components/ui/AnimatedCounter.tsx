@@ -18,15 +18,16 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   icon,
 }) => {
   const [count, setCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [lastAnimatedEnd, setLastAnimatedEnd] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Track visibility
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          animateCount();
+        if (entry.isIntersecting) {
+          setIsVisible(true);
         }
       },
       { threshold: 0.3 }
@@ -37,11 +38,18 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
     }
 
     return () => observer.disconnect();
-  }, [hasAnimated, end]);
+  }, []);
 
-  const animateCount = () => {
+  // Animate when visible AND end value changes (or first load)
+  useEffect(() => {
+    if (isVisible && end > 0 && end !== lastAnimatedEnd) {
+      setLastAnimatedEnd(end);
+      animateCount(end);
+    }
+  }, [isVisible, end]);
+
+  const animateCount = (targetEnd: number) => {
     const startTime = performance.now();
-    const startValue = 0;
 
     const step = (currentTime: number) => {
       const elapsed = currentTime - startTime;
@@ -49,7 +57,7 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
 
       // Ease out cubic
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      const currentValue = Math.floor(startValue + (end - startValue) * easeOut);
+      const currentValue = Math.floor(targetEnd * easeOut);
 
       setCount(currentValue);
 
