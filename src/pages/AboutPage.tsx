@@ -1,9 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Award, Shield, Users, Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import OfficialDocumentsSection from '../components/documents/OfficialDocumentsSection';
+
+// Lazy-load PDF-heavy component to prevent "The operation is insecure" crash
+// caused by pdfjs worker initialization at module import time
+const OfficialDocumentsSection = lazy(() => import('../components/documents/OfficialDocumentsSection'));
+
+// Simple error boundary to isolate PDF viewer crashes from the rest of the page
+class ErrorBoundarySimple extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error) { console.error('Documents section error:', error.message); }
+  render() {
+    if (this.state.hasError) return null; // Silently hide broken section
+    return this.props.children;
+  }
+}
 
 interface LeadershipMember {
   id: string;
@@ -274,8 +291,18 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Official Documents - New PDF Viewer Section */}
-      <OfficialDocumentsSection />
+      {/* Official Documents - Lazy loaded to prevent PDF worker crash */}
+      <Suspense fallback={
+        <div className="section bg-gray-50 text-center">
+          <div className="container-custom">
+            <p className="text-gray-500">Chargement des documents...</p>
+          </div>
+        </div>
+      }>
+        <ErrorBoundarySimple>
+          <OfficialDocumentsSection />
+        </ErrorBoundarySimple>
+      </Suspense>
 
       {/* Leadership */}
       <section className="section bg-gray-50">
