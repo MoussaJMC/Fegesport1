@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface ContactFormData {
   name: string;
@@ -24,8 +25,9 @@ const contactSchema = z.object({
 });
 
 const ContactPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const { getSetting } = useSiteSettings();
   const [sent, setSent] = useState(false);
 

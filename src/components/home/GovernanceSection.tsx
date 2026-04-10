@@ -5,6 +5,8 @@ import { ArrowRight, Shield, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import SectionHeader from '../ui/SectionHeader';
+import { getLeadershipTranslation } from '../../utils/translations';
+import { useLanguage } from '../../hooks/useLanguage';
 
 /**
  * GovernanceSection — Bureau Executif de la FEGESPORT
@@ -26,9 +28,10 @@ interface LeadershipMember {
 
 const GovernanceSection: React.FC = () => {
   const { i18n } = useTranslation();
+  const { currentLanguage } = useLanguage();
   const [members, setMembers] = useState<LeadershipMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const lang = currentLanguage;
 
   useEffect(() => {
     fetchLeadership();
@@ -59,17 +62,13 @@ const GovernanceSection: React.FC = () => {
   };
 
   const getMemberName = (member: LeadershipMember): string => {
-    if (lang === 'en' && member.translations?.en?.name) {
-      return member.translations.en.name;
-    }
-    return member.name;
+    const translated = getLeadershipTranslation(member.translations, lang);
+    return translated.name || member.name;
   };
 
   const getMemberPosition = (member: LeadershipMember): string => {
-    if (lang === 'en' && member.translations?.en?.position) {
-      return member.translations.en.position;
-    }
-    return member.position;
+    const translated = getLeadershipTranslation(member.translations, lang);
+    return translated.position || member.position;
   };
 
   const isPresident = (member: LeadershipMember): boolean => {

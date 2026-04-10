@@ -5,6 +5,7 @@ import { Globe, ExternalLink } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';
 import { supabase } from '../../lib/supabase';
 import { INTERNATIONAL_AFFILIATIONS } from '../../styles/design-tokens';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface Affiliation {
   id: string;
@@ -18,7 +19,8 @@ interface Affiliation {
 
 const InternationalSection: React.FC = () => {
   const { i18n } = useTranslation();
-  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [affiliations, setAffiliations] = useState<Affiliation[]>([...INTERNATIONAL_AFFILIATIONS]);
   const [sectionTitle, setSectionTitle] = useState({
     fr: 'Representation Internationale',

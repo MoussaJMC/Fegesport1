@@ -5,6 +5,8 @@ import { ArrowRight, Handshake } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import SectionHeader from '../ui/SectionHeader';
+import { useLanguage } from '../../hooks/useLanguage';
+import { getPartnerTranslation } from '../../utils/translations';
 
 interface Partner {
   id: string;

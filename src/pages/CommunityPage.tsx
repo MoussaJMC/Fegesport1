@@ -7,6 +7,7 @@ import { fetchCommunityStats, subscribeToCommunityStats } from '../lib/community
 import { supabase } from '../lib/supabase';
 import SectionHeader from '../components/ui/SectionHeader';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface CommunityStats {
   players: number;
@@ -35,8 +36,9 @@ interface Partner {
 }
 
 const CommunityPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [stats, setStats] = useState<CommunityStats>({ players: 0, clubs: 0, partners: 0 });
   const [loading, setLoading] = useState(true);
   const [players, setPlayers] = useState<Member[]>([]);

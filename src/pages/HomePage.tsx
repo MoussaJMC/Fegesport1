@@ -22,6 +22,7 @@ import PartnersShowcase from '../components/home/PartnersShowcase';
 import { latestNews } from '../data/newsData';
 import { upcomingEvents } from '../data/eventsData';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useLanguage } from '../hooks/useLanguage';
 
 const HomePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -37,7 +38,8 @@ const HomePage: React.FC = () => {
     partners: 0
   });
 
-  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
 
   const defaultLogoSettings = {
     main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
