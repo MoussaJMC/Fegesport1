@@ -273,27 +273,33 @@ const AboutPage: React.FC = () => {
                     viewport={{ once: true }}
                     className={`card overflow-hidden ${isPresident(member) ? 'border-fed-gold-500/50' : ''}`}
                   >
-                    {/* Photo */}
-                    <div className="relative h-48 bg-dark-700 flex items-center justify-center overflow-hidden">
-                      {member.image_url ? (
-                        <img
-                          src={member.image_url}
-                          alt={getMemberName(member)}
-                          className="w-full h-full object-cover object-top"
-                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                        />
-                      ) : (
-                        <Users className="text-dark-700" size={64} />
-                      )}
+                    {/* Photo circle + Content */}
+                    <div className="p-6 pt-8 text-center">
+                      <div className={`w-28 h-28 rounded-full mx-auto mb-4 overflow-hidden border-3 ${
+                        isPresident(member) ? 'border-fed-gold-500' : 'border-dark-700'
+                      } shadow-lg`}>
+                        {member.image_url ? (
+                          <img
+                            src={member.image_url}
+                            alt={getMemberName(member)}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-dark-700 flex items-center justify-center">
+                            <Users className="text-light-400" size={36} />
+                          </div>
+                        )}
+                      </div>
                       {isPresident(member) && (
-                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-fed-gold-500/90 text-dark-950 text-xs font-bold">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-fed-gold-500/15 text-fed-gold-500 text-xs font-bold border border-fed-gold-500/30 mb-2">
                           {lang === 'fr' ? 'President' : 'President'}
-                        </div>
+                        </span>
                       )}
                     </div>
 
-                    {/* Content */}
-                    <div className="p-5">
+                    {/* Info */}
+                    <div className="px-5 pb-5 text-center">
                       <h3 className="text-lg font-bold text-white font-heading mb-1">
                         {getMemberName(member)}
                       </h3>
