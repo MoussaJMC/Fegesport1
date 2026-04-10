@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, ChevronDown, User, Video } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, User, Video, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
@@ -30,31 +30,23 @@ const Navbar: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { getSetting, loading: settingsLoading } = useSiteSettings();
 
-  // Get settings from database
   const logoSettings = getSetting('site_logo', {
     main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
     alt_text: "FEGESPORT Logo",
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     link: "/"
   });
-
-  // Debug logo loading
-  useEffect(() => {
-    if (!settingsLoading && logoSettings) {
-      console.log('Logo settings loaded:', logoSettings);
-    }
-  }, [settingsLoading, logoSettings]);
 
   const navigationSettings = getSetting('main_navigation', {
     brand_text: "FEGESPORT",
     items: [
       { label: "Accueil", path: "/", order: 1 },
-      { label: "À propos", path: "/about", order: 2 },
-      { label: "Actualités", path: "/news", order: 3 },
-      { label: "Adhésion", path: "/membership", order: 4, submenu: [
-        { label: "Adhésion", path: "/membership" },
-        { label: "Communauté", path: "/membership/community" }
+      { label: "A propos", path: "/about", order: 2 },
+      { label: "Actualites", path: "/news", order: 3 },
+      { label: "Adhesion", path: "/membership", order: 4, submenu: [
+        { label: "Adhesion", path: "/membership" },
+        { label: "Communaute", path: "/membership/community" }
       ]},
       { label: "eLeague", path: "/leg", order: 4.5 },
       { label: "Ressources", path: "/resources", order: 5 },
@@ -70,106 +62,87 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
     setIsOpen(false);
     setMembershipMenuOpen(false);
+    setLangMenuOpen(false);
   }, [location]);
 
-  // Build navigation items from database settings
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClick = () => {
+      setLangMenuOpen(false);
+      setMembershipMenuOpen(false);
+    };
+    if (langMenuOpen || membershipMenuOpen) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [langMenuOpen, membershipMenuOpen]);
+
   const navItems = React.useMemo(() => {
     const items = [...(navigationSettings.items || [])];
 
-    // Add DIRECT link if it doesn't exist
     if (!items.find(item => item.path === '/direct')) {
-      items.push({
-        label: 'DIRECT',
-        path: '/direct',
-        order: items.length + 1
-      });
+      items.push({ label: 'DIRECT', path: '/direct', order: items.length + 1 });
     }
-
-    // Add LEG link if it doesn't exist
     if (!items.find(item => item.path === '/leg')) {
-      items.push({
-        label: 'LEG',
-        path: '/leg',
-        order: items.length + 1
-      });
+      items.push({ label: 'eLeague', path: '/leg', order: items.length + 1 });
     }
 
-    // Filter only enabled items (default to true if enabled field doesn't exist)
     const enabledItems = items.filter(item => item.enabled !== false);
-
-    // Sort by order
     enabledItems.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // Add admin link if authenticated
-    if (isAuthenticated) {
-      enabledItems.push({
-        label: 'Administration',
-        path: '/admin',
-        order: 999
-      });
-    }
-
     return enabledItems;
-  }, [navigationSettings.items, isAuthenticated]);
+  }, [navigationSettings.items]);
 
-  // Get translated label for navigation items
   const getTranslatedLabel = (label: string): string => {
-    // Special case for DIRECT, LEG and eLeague which should keep their specific format
     if (label === 'DIRECT') return 'DIRECT';
     if (label === 'LEG') return 'LEG';
     if (label === 'eLeague') return 'eLeague';
 
-    // Convert label to lowercase and remove accents for matching with translation keys
     const key = label.toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, '');
 
-    // Check if we have a translation for this key
     const translationKey = `navigation.${key}`;
-    const hasTranslation = i18n.exists(translationKey);
-
-    return hasTranslation ? t(translationKey) : label;
+    return i18n.exists(translationKey) ? t(translationKey) : label;
   };
 
-  // Handle logo click to always scroll to top and navigate to home
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate('/');
   };
 
-  // Show loading state or fallback if settings are loading
+  const isActive = (path: string): boolean => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
+  };
+
+  // Separate DIRECT from main nav items
+  const mainNavItems = navItems.filter(item => item.path !== '/direct');
+  const directItem = navItems.find(item => item.path === '/direct');
+
+  // Loading skeleton
   if (settingsLoading) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 bg-secondary-900 shadow-md py-2">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-dark-950 py-3">
         <nav className="container-custom">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="h-12 w-12 bg-gray-300 rounded animate-pulse"></div>
-              <div className="h-6 w-32 bg-gray-300 rounded animate-pulse"></div>
+          <div className="flex items-center justify-between h-14">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 bg-dark-800 rounded-lg animate-pulse" />
+              <div className="h-5 w-28 bg-dark-800 rounded animate-pulse" />
             </div>
             <div className="hidden md:flex space-x-4">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                <div key={i} className="h-4 w-16 bg-dark-800 rounded animate-pulse" />
               ))}
             </div>
           </div>
@@ -181,287 +154,327 @@ const Navbar: React.FC = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-secondary-900 shadow-md py-2' 
+        scrolled
+          ? 'bg-dark-950/95 backdrop-blur-xl border-b border-dark-700/50 py-2'
           : 'bg-transparent py-4'
       }`}
     >
       <nav className="container-custom">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+        <div className="flex items-center justify-between h-14">
+          {/* ============ LOGO ============ */}
           <Link
             to={logoSettings.link || "/"}
-            className="flex items-center space-x-2"
+            className="flex items-center gap-3 group"
             onClick={handleLogoClick}
           >
             {logoSettings.main_logo ? (
               <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "Logo"}
-                className="rounded object-cover cursor-pointer"
-                style={{
-                  width: logoSettings.width || 48,
-                  height: logoSettings.height || 48
-                }}
-                onError={(e) => {
-                  console.error('Logo failed to load:', logoSettings.main_logo);
-                  e.currentTarget.style.display = 'none';
-                }}
+                className={`rounded-lg object-cover transition-all duration-300 ${
+                  scrolled ? 'w-9 h-9' : 'w-10 h-10'
+                } border border-fed-gold-500/30 group-hover:border-fed-gold-500/60`}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ) : (
-              <div
-                className="bg-primary-600 rounded flex items-center justify-center cursor-pointer"
-                style={{
-                  width: logoSettings.width || 48,
-                  height: logoSettings.height || 48
-                }}
-              >
-                <span className="text-white font-bold text-xl">FGE</span>
+              <div className={`bg-fed-red-500 rounded-lg flex items-center justify-center ${
+                scrolled ? 'w-9 h-9' : 'w-10 h-10'
+              }`}>
+                <span className="text-white font-bold text-sm font-heading">FGE</span>
               </div>
             )}
-            <span className={`text-xl md:text-2xl font-bold cursor-pointer ${scrolled ? 'text-primary-500' : 'text-white'}`}>
+            <span className={`font-bold font-heading tracking-tight transition-all duration-300 ${
+              scrolled ? 'text-lg text-fed-gold-500' : 'text-xl text-white'
+            }`}>
               {navigationSettings.brand_text || "FEGESPORT"}
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center">
-            <div className="flex space-x-6">
-              {navItems.map((item) => (
-                <div key={item.path} className="relative group">
-                  {item.submenu ? (
+          {/* ============ DESKTOP NAVIGATION ============ */}
+          <div className="hidden lg:flex lg:items-center lg:gap-1">
+            {/* Main Nav Links */}
+            {mainNavItems.map((item) => (
+              <div key={item.path} className="relative" onClick={(e) => e.stopPropagation()}>
+                {item.submenu ? (
+                  <>
                     <button
                       onClick={() => setMembershipMenuOpen(!membershipMenuOpen)}
-                      className={`
-                        px-2 py-1 text-sm font-medium rounded-md transition-colors flex items-center
-                        ${location.pathname.startsWith(item.path)
-                          ? 'text-primary-500 border-b-2 border-primary-500' 
-                          : scrolled 
-                            ? 'text-gray-300 hover:text-primary-500' 
-                            : 'text-white hover:text-primary-300'
-                        }
-                      `}
+                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1 ${
+                        isActive(item.path)
+                          ? 'text-fed-red-500'
+                          : 'text-light-300 hover:text-white hover:bg-dark-800/50'
+                      }`}
                     >
                       {getTranslatedLabel(item.label)}
-                      <ChevronDown size={14} className="ml-1" />
+                      <ChevronDown size={13} className={`transition-transform duration-200 ${membershipMenuOpen ? 'rotate-180' : ''}`} />
+                      {isActive(item.path) && (
+                        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-fed-red-500 rounded-full" />
+                      )}
                     </button>
-                  ) : item.path === '/direct' ? (
-                    <Link
-                      to={item.path}
-                      className={`
-                        px-2 py-1 text-sm font-medium rounded-md transition-colors flex items-center
-                        ${location.pathname === item.path 
-                          ? 'text-primary-500 border-b-2 border-primary-500' 
-                          : scrolled 
-                            ? 'text-gray-300 hover:text-primary-500' 
-                            : 'text-white hover:text-primary-300'
-                        }
-                      `}
-                    >
-                      <Video size={16} className="mr-1" />
-                      {getTranslatedLabel(item.label)}
-                    </Link>
-                  ) : (
-                    <Link
-                      to={item.path}
-                      className={`
-                        px-2 py-1 text-sm font-medium rounded-md transition-colors
-                        ${location.pathname === item.path 
-                          ? 'text-primary-500 border-b-2 border-primary-500' 
-                          : scrolled 
-                            ? 'text-gray-300 hover:text-primary-500' 
-                            : 'text-white hover:text-primary-300'
-                        }
-                      `}
-                    >
-                      {getTranslatedLabel(item.label)}
-                    </Link>
-                  )}
-                  {item.submenu && membershipMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute left-0 mt-2 w-48 bg-secondary-800 rounded-md shadow-lg py-1 z-50"
-                    >
-                      {item.submenu.map((subItem: SubNavItem) => (
-                        <Link
-                          key={subItem.path}
-                          to={subItem.path}
-                          className="block px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
+                    <AnimatePresence>
+                      {membershipMenuOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute left-0 mt-1 w-52 bg-dark-800 border border-dark-700 rounded-xl shadow-xl shadow-dark-950/50 py-1.5 z-50 overflow-hidden"
                         >
-                          {getTranslatedLabel(subItem.label)}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </div>
-              ))}
-            </div>
+                          {item.submenu.map((subItem: SubNavItem) => (
+                            <Link
+                              key={subItem.path}
+                              to={subItem.path}
+                              className={`block px-4 py-2.5 text-sm transition-colors ${
+                                location.pathname === subItem.path
+                                  ? 'text-fed-red-500 bg-fed-red-500/5'
+                                  : 'text-light-300 hover:text-white hover:bg-dark-700'
+                              }`}
+                            >
+                              {getTranslatedLabel(subItem.label)}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      isActive(item.path)
+                        ? 'text-fed-red-500'
+                        : 'text-light-300 hover:text-white hover:bg-dark-800/50'
+                    }`}
+                  >
+                    {getTranslatedLabel(item.label)}
+                    {isActive(item.path) && (
+                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-fed-red-500 rounded-full" />
+                    )}
+                  </Link>
+                )}
+              </div>
+            ))}
 
-            {/* Language Selector */}
-            <div className="relative ml-6">
-              <button
-                onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  scrolled ? 'text-gray-300 hover:text-primary-500' : 'text-white hover:text-primary-300'
+            {/* Separator */}
+            <div className="w-px h-5 bg-dark-700 mx-1" />
+
+            {/* DIRECT Badge */}
+            {directItem && (
+              <Link
+                to="/direct"
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 ${
+                  isActive('/direct')
+                    ? 'bg-fed-red-500 text-white'
+                    : 'bg-fed-red-500/15 text-fed-red-400 hover:bg-fed-red-500/25'
                 }`}
               >
-                <Globe size={18} className="mr-1" />
-                <span className="uppercase mr-1">{i18n.language}</span>
-                <ChevronDown size={14} />
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fed-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-fed-red-500" />
+                </span>
+                DIRECT
+              </Link>
+            )}
+
+            {/* Language Selector */}
+            <div className="relative ml-1" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-full bg-dark-800/50 border border-dark-700/50 text-light-300 hover:text-white hover:border-dark-700 transition-all"
+              >
+                <Globe size={14} />
+                <span className="uppercase text-xs">{i18n.language}</span>
               </button>
 
-              {langMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-0 mt-2 w-40 bg-secondary-800 rounded-md shadow-lg py-1 z-50"
-                >
-                  <button
-                    onClick={() => changeLanguage('fr')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
+              <AnimatePresence>
+                {langMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-1 w-36 bg-dark-800 border border-dark-700 rounded-xl shadow-xl shadow-dark-950/50 py-1.5 z-50 overflow-hidden"
                   >
-                    Français
-                  </button>
-                  <button
-                    onClick={() => changeLanguage('en')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-secondary-700 hover:text-primary-500"
-                  >
-                    English
-                  </button>
-                </motion.div>
-              )}
+                    <button
+                      onClick={() => changeLanguage('fr')}
+                      className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                        i18n.language === 'fr' ? 'text-fed-gold-500 bg-fed-gold-500/5' : 'text-light-300 hover:text-white hover:bg-dark-700'
+                      }`}
+                    >
+                      Francais
+                    </button>
+                    <button
+                      onClick={() => changeLanguage('en')}
+                      className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                        i18n.language === 'en' ? 'text-fed-gold-500 bg-fed-gold-500/5' : 'text-light-300 hover:text-white hover:bg-dark-700'
+                      }`}
+                    >
+                      English
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Admin Icon */}
             {isAuthenticated && (
               <Link
                 to="/admin"
-                className={`ml-4 p-2 rounded-full transition-colors ${
-                  scrolled ? 'text-gray-300 hover:text-primary-500' : 'text-white hover:text-primary-300'
-                }`}
+                className="ml-1 p-2 rounded-lg text-light-400 hover:text-fed-gold-500 hover:bg-dark-800/50 transition-all"
+                title="Administration"
               >
-                <User size={20} />
+                <Shield size={18} />
               </Link>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* ============ MOBILE MENU BUTTON ============ */}
+          <div className="lg:hidden flex items-center gap-2">
+            {/* Mobile DIRECT badge */}
+            {directItem && (
+              <Link
+                to="/direct"
+                className="flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-fed-red-500/15 text-fed-red-400"
+              >
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fed-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fed-red-500" />
+                </span>
+                LIVE
+              </Link>
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`inline-flex items-center justify-center p-2 rounded-md transition-colors ${
-                scrolled ? 'text-gray-300 hover:text-primary-500' : 'text-white hover:text-primary-300'
-              }`}
+              className="p-2 rounded-lg text-light-300 hover:text-white hover:bg-dark-800/50 transition-colors"
               aria-expanded={isOpen}
               aria-label="Toggle navigation menu"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* ============ MOBILE NAVIGATION ============ */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-secondary-900 rounded-b-lg shadow-lg mobile-nav-container"
+              transition={{ duration: 0.2 }}
+              className="lg:hidden mt-2 bg-dark-950 border border-dark-700 rounded-2xl shadow-2xl shadow-dark-950/50 mobile-nav-container overflow-hidden"
             >
-              <div className="px-2 pt-2 pb-3 space-y-1">
+              <div className="px-3 py-4 space-y-1">
                 {navItems.map((item) => (
                   <div key={item.path}>
                     {item.submenu ? (
                       <>
                         <button
                           onClick={() => setMembershipMenuOpen(!membershipMenuOpen)}
-                          className={`
-                            w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center justify-between
-                            ${location.pathname.startsWith(item.path)
-                              ? 'bg-secondary-800 text-primary-500'
-                              : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                            }
-                          `}
+                          className={`w-full text-left px-4 py-3 rounded-xl text-base font-medium flex items-center justify-between transition-colors ${
+                            isActive(item.path)
+                              ? 'bg-fed-red-500/10 text-fed-red-500'
+                              : 'text-light-300 hover:bg-dark-800 hover:text-white'
+                          }`}
                         >
                           {getTranslatedLabel(item.label)}
-                          <ChevronDown size={14} className={`transform transition-transform ${membershipMenuOpen ? 'rotate-180' : ''}`} />
+                          <ChevronDown size={14} className={`transition-transform duration-200 ${membershipMenuOpen ? 'rotate-180' : ''}`} />
                         </button>
-                        {membershipMenuOpen && (
-                          <div className="pl-4 space-y-1">
-                            {item.submenu.map((subItem: SubNavItem) => (
-                              <Link
-                                key={subItem.path}
-                                to={subItem.path}
-                                className={`
-                                  block px-3 py-2 rounded-md text-sm font-medium
-                                  ${location.pathname === subItem.path
-                                    ? 'bg-secondary-800 text-primary-500'
-                                    : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                                  }
-                                `}
-                              >
-                                {getTranslatedLabel(subItem.label)}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
+                        <AnimatePresence>
+                          {membershipMenuOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-4 space-y-0.5 py-1">
+                                {item.submenu.map((subItem: SubNavItem) => (
+                                  <Link
+                                    key={subItem.path}
+                                    to={subItem.path}
+                                    className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                                      location.pathname === subItem.path
+                                        ? 'bg-fed-red-500/10 text-fed-red-500'
+                                        : 'text-light-400 hover:bg-dark-800 hover:text-white'
+                                    }`}
+                                  >
+                                    {getTranslatedLabel(subItem.label)}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </>
                     ) : item.path === '/direct' ? (
                       <Link
                         to={item.path}
-                        className={`
-                          block px-3 py-2 rounded-md text-base font-medium flex items-center
-                          ${location.pathname === item.path
-                            ? 'bg-secondary-800 text-primary-500'
-                            : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                          }
-                        `}
+                        className={`flex items-center gap-2 px-4 py-3 rounded-xl text-base font-semibold transition-colors ${
+                          isActive(item.path)
+                            ? 'bg-fed-red-500 text-white'
+                            : 'bg-fed-red-500/10 text-fed-red-400 hover:bg-fed-red-500/20'
+                        }`}
                       >
-                        <Video size={18} className="mr-2" />
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fed-red-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-fed-red-500" />
+                        </span>
                         {getTranslatedLabel(item.label)}
                       </Link>
                     ) : (
                       <Link
                         to={item.path}
-                        className={`
-                          block px-3 py-2 rounded-md text-base font-medium
-                          ${location.pathname === item.path
-                            ? 'bg-secondary-800 text-primary-500'
-                            : 'text-gray-300 hover:bg-secondary-800 hover:text-primary-500'
-                          }
-                        `}
+                        className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                          isActive(item.path)
+                            ? 'bg-fed-red-500/10 text-fed-red-500'
+                            : 'text-light-300 hover:bg-dark-800 hover:text-white'
+                        }`}
                       >
                         {getTranslatedLabel(item.label)}
                       </Link>
                     )}
                   </div>
                 ))}
-                
+
+                {/* Admin link mobile */}
+                {isAuthenticated && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl text-base font-medium text-fed-gold-500 hover:bg-dark-800 transition-colors"
+                  >
+                    <Shield size={18} />
+                    Administration
+                  </Link>
+                )}
+
+                {/* Divider */}
+                <div className="divider-full my-3" />
+
                 {/* Mobile Language Selector */}
-                <div className="pt-2 pb-1">
-                  <p className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <div className="flex items-center gap-2 px-3">
+                  <Globe size={14} className="text-light-400" />
+                  <span className="text-xs text-light-400 uppercase tracking-wider font-semibold">
                     {i18n.language === 'fr' ? 'Langue' : 'Language'}
-                  </p>
+                  </span>
+                </div>
+                <div className="flex gap-2 px-3">
                   <button
                     onClick={() => changeLanguage('fr')}
-                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                      i18n.language === 'fr' 
-                        ? 'bg-secondary-800 text-primary-500' 
-                        : 'text-gray-300 hover:bg-secondary-800'
+                    className={`flex-1 text-center px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      i18n.language === 'fr'
+                        ? 'bg-fed-gold-500/10 text-fed-gold-500 border border-fed-gold-500/20'
+                        : 'bg-dark-800 text-light-400 hover:text-white'
                     }`}
                   >
-                    Français
+                    Francais
                   </button>
                   <button
                     onClick={() => changeLanguage('en')}
-                    className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                      i18n.language === 'en' 
-                        ? 'bg-secondary-800 text-primary-500' 
-                        : 'text-gray-300 hover:bg-secondary-800'
+                    className={`flex-1 text-center px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      i18n.language === 'en'
+                        ? 'bg-fed-gold-500/10 text-fed-gold-500 border border-fed-gold-500/20'
+                        : 'bg-dark-800 text-light-400 hover:text-white'
                     }`}
                   >
                     English
