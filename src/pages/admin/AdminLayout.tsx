@@ -102,7 +102,7 @@ const AdminLayout: React.FC = () => {
           notifications.push({
             id: `event-${event.id}`,
             type: 'event',
-            title: 'ÃvÃ©nement Ã  venir',
+            title: 'Evenement a venir',
             message: `${event.title} - ${new Date(event.date).toLocaleDateString('fr-FR')}`,
             time: getRelativeTime(event.created_at),
             read: true
@@ -123,7 +123,7 @@ const AdminLayout: React.FC = () => {
         {
           id: 'fallback-1',
           type: 'message',
-          title: 'SystÃ¨me',
+          title: 'Systeme',
           message: 'Impossible de charger les notifications',
           time: 'maintenant',
           read: false
@@ -161,17 +161,16 @@ const AdminLayout: React.FC = () => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'member': return <Users size={16} className="text-blue-500" />;
-      case 'message': return <MessageSquare size={16} className="text-green-500" />;
-      case 'event': return <Calendar size={16} className="text-purple-500" />;
-      case 'partner': return <Building2 size={16} className="text-orange-500" />;
-      default: return <Bell size={16} className="text-gray-500" />;
+      case 'member': return <Users size={16} className="text-accent-blue-400" />;
+      case 'message': return <MessageSquare size={16} className="text-emerald-400" />;
+      case 'event': return <Calendar size={16} className="text-purple-400" />;
+      case 'partner': return <Building2 size={16} className="text-fed-gold-500" />;
+      default: return <Bell size={16} className="text-light-400" />;
     }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // === MENU GROUPÃ PAR CATÃGORIES ===
   const menuGroups: MenuGroup[] = [
     {
       label: 'Tableau de bord',
@@ -185,7 +184,7 @@ const AdminLayout: React.FC = () => {
     {
       label: 'Contenu',
       items: [
-        { icon: Newspaper, label: 'ActualitÃ©s', path: '/admin/news' },
+        { icon: Newspaper, label: 'Actualites', path: '/admin/news' },
         { icon: Globe, label: 'Pages', path: '/admin/pages' },
         { icon: Image, label: 'Diaporama', path: '/admin/slideshow' },
         { icon: Layers, label: 'Cartes', path: '/admin/cards' },
@@ -196,10 +195,10 @@ const AdminLayout: React.FC = () => {
       ]
     },
     {
-      label: 'ÃvÃ©nements',
+      label: 'Evenements',
       items: [
-        { icon: Calendar, label: 'ÃvÃ©nements', path: '/admin/events' },
-        { icon: Clock, label: 'ÃvÃ©nements Ã  Venir', path: '/admin/upcoming-events' },
+        { icon: Calendar, label: 'Evenements', path: '/admin/events' },
+        { icon: Clock, label: 'Evenements a Venir', path: '/admin/upcoming-events' },
         { icon: UserCheck, label: 'Inscriptions', path: '/admin/registrations' },
       ]
     },
@@ -211,10 +210,10 @@ const AdminLayout: React.FC = () => {
       ]
     },
     {
-      label: 'CommunautÃ©',
+      label: 'Communaute',
       items: [
         { icon: Users, label: 'Membres', path: '/admin/members' },
-        { icon: Tag, label: 'Types d\'AdhÃ©sion', path: '/admin/membership-types' },
+        { icon: Tag, label: 'Types d\'Adhesion', path: '/admin/membership-types' },
         { icon: Award, label: 'Notre Direction', path: '/admin/leadership' },
         { icon: Clock, label: 'Notre Histoire', path: '/admin/history' },
         { icon: Building2, label: 'Partenaires', path: '/admin/partners' },
@@ -232,8 +231,8 @@ const AdminLayout: React.FC = () => {
     {
       label: 'Configuration',
       items: [
-        { icon: Settings, label: 'ParamÃ¨tres Site', path: '/admin/settings' },
-        { icon: Share2, label: 'RÃ©seaux Sociaux', path: '/admin/social-media' },
+        { icon: Settings, label: 'Parametres Site', path: '/admin/settings' },
+        { icon: Share2, label: 'Reseaux Sociaux', path: '/admin/social-media' },
         { icon: Navigation, label: 'Gestion du Menu', path: '/admin/menu' },
         { icon: Layout, label: 'Gestion du Footer', path: '/admin/footer' },
       ]
@@ -249,8 +248,8 @@ const AdminLayout: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      <div className="min-h-screen flex items-center justify-center bg-dark-950">
+        <Loader2 className="w-8 h-8 animate-spin text-fed-red-500" />
       </div>
     );
   }
@@ -269,8 +268,10 @@ const AdminLayout: React.FC = () => {
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-gray-50 flex">
-        {/* Sidebar */}
+      <div className="min-h-screen bg-dark-950 flex admin-dark">
+        {/* ================================================
+            SIDEBAR — Dark federation theme
+            ================================================ */}
         <AnimatePresence>
           {isSidebarOpen && (
             <motion.aside
@@ -278,22 +279,22 @@ const AdminLayout: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-72 bg-gray-900 fixed h-full z-20 lg:relative flex flex-col"
+              className="w-72 bg-dark-950 border-r border-dark-700 fixed h-full z-20 lg:relative flex flex-col"
             >
               {/* Sidebar Header */}
-              <div className="p-5 flex items-center justify-between border-b border-gray-700/50">
+              <div className="p-5 flex items-center justify-between border-b border-dark-700">
                 <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
+                  <div className="w-9 h-9 bg-fed-red-500 rounded-lg flex items-center justify-center shadow-lg shadow-fed-red-500/20">
                     <Shield className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-base font-bold text-white leading-tight">FEGESPORT</h1>
-                    <p className="text-xs text-gray-400">Administration</p>
+                    <h1 className="text-base font-bold text-white leading-tight font-heading">FEGESPORT</h1>
+                    <p className="text-xs text-fed-gold-500 font-medium">Administration</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="lg:hidden text-gray-400 hover:text-white transition-colors"
+                  className="lg:hidden text-light-400 hover:text-white transition-colors"
                 >
                   <X size={20} />
                 </button>
@@ -310,7 +311,7 @@ const AdminLayout: React.FC = () => {
                       <button
                         onClick={() => toggleGroup(group.label)}
                         className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider rounded-md transition-colors ${
-                          hasActiveItem ? 'text-primary-400' : 'text-gray-500 hover:text-gray-300'
+                          hasActiveItem ? 'text-fed-gold-500' : 'text-light-400 hover:text-light-100'
                         }`}
                       >
                         {group.label}
@@ -335,16 +336,16 @@ const AdminLayout: React.FC = () => {
                                 <Link
                                   key={item.path}
                                   to={item.path}
-                                  className={`flex items-center px-3 py-2 my-0.5 rounded-lg text-sm transition-colors ${
+                                  className={`flex items-center px-3 py-2 my-0.5 rounded-lg text-sm transition-all duration-200 ${
                                     isActive
-                                      ? 'bg-primary-600/20 text-primary-400 font-medium'
-                                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                      ? 'bg-fed-red-500/15 text-fed-red-400 font-medium border border-fed-red-500/20'
+                                      : 'text-light-300 hover:bg-dark-800 hover:text-white'
                                   }`}
                                 >
-                                  <item.icon className={`w-4 h-4 mr-3 flex-shrink-0 ${isActive ? 'text-primary-400' : 'text-gray-500'}`} />
+                                  <item.icon className={`w-4 h-4 mr-3 flex-shrink-0 ${isActive ? 'text-fed-red-400' : 'text-light-400'}`} />
                                   <span className="truncate">{item.label}</span>
                                   {isActive && (
-                                    <div className="ml-auto w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                                    <div className="ml-auto w-1.5 h-1.5 bg-fed-red-500 rounded-full" />
                                   )}
                                 </Link>
                               );
@@ -358,33 +359,42 @@ const AdminLayout: React.FC = () => {
               </nav>
 
               {/* Sidebar Footer */}
-              <div className="p-3 border-t border-gray-700/50">
+              <div className="p-3 border-t border-dark-700">
+                <Link
+                  to="/"
+                  className="flex items-center w-full px-3 py-2 text-light-400 hover:bg-dark-800 hover:text-fed-gold-500 rounded-lg transition-colors text-sm mb-1"
+                >
+                  <Globe className="w-4 h-4 mr-3" />
+                  Voir le site
+                </Link>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center w-full px-3 py-2.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors text-sm"
+                  className="flex items-center w-full px-3 py-2.5 text-light-400 hover:bg-fed-red-500/10 hover:text-fed-red-400 rounded-lg transition-colors text-sm"
                 >
                   <LogOut className="w-4 h-4 mr-3" />
-                  DÃ©connexion
+                  Deconnexion
                 </button>
               </div>
             </motion.aside>
           )}
         </AnimatePresence>
 
-        {/* Main Content */}
+        {/* ================================================
+            MAIN CONTENT
+            ================================================ */}
         <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
           {/* Top Bar */}
-          <header className="bg-white border-b border-gray-200 h-16 flex items-center px-4 lg:px-6 sticky top-0 z-10">
+          <header className="bg-dark-900 border-b border-dark-700 h-16 flex items-center px-4 lg:px-6 sticky top-0 z-10">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-gray-500 hover:text-gray-700 mr-4 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="text-light-400 hover:text-white mr-4 p-1.5 rounded-lg hover:bg-dark-800 transition-colors"
             >
               <Menu size={22} />
             </button>
 
             {/* Current page indicator */}
             <div className="hidden sm:block">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-light-100">
                 {menuGroups
                   .flatMap(g => g.items)
                   .find(item => item.path === location.pathname)?.label || 'Administration'}
@@ -402,7 +412,7 @@ const AdminLayout: React.FC = () => {
                     fetchNotifications();
                   }
                 }}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg relative transition-colors"
+                className="p-2 text-light-400 hover:text-white hover:bg-dark-800 rounded-lg relative transition-colors"
                 disabled={notificationLoading}
               >
                 {notificationLoading ? (
@@ -411,7 +421,7 @@ const AdminLayout: React.FC = () => {
                   <Bell size={20} />
                 )}
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 h-5 w-5 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold ring-2 ring-white">
+                  <span className="absolute -top-0.5 -right-0.5 h-5 w-5 bg-fed-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold ring-2 ring-dark-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -425,20 +435,20 @@ const AdminLayout: React.FC = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden"
+                    className="absolute right-0 mt-2 w-80 bg-dark-800 rounded-xl shadow-xl border border-dark-700 z-50 overflow-hidden"
                   >
-                    <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                    <div className="p-4 border-b border-dark-700">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                        <h3 className="text-sm font-semibold text-white">Notifications</h3>
                         <button
                           onClick={() => setShowNotifications(false)}
-                          className="text-gray-400 hover:text-gray-600 p-0.5 rounded"
+                          className="text-light-400 hover:text-white p-0.5 rounded"
                         >
                           <X size={16} />
                         </button>
                       </div>
                       {unreadCount > 0 && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-fed-gold-500 mt-1">
                           {unreadCount} nouvelle{unreadCount > 1 ? 's' : ''}
                         </p>
                       )}
@@ -448,8 +458,8 @@ const AdminLayout: React.FC = () => {
                         notifications.map((notification) => (
                           <div
                             key={notification.id}
-                            className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                              !notification.read ? 'bg-blue-50/50' : ''
+                            className={`px-4 py-3 border-b border-dark-700/50 hover:bg-dark-700/50 transition-colors ${
+                              !notification.read ? 'bg-fed-red-500/5' : ''
                             }`}
                           >
                             <div className="flex items-start space-x-3">
@@ -458,20 +468,20 @@ const AdminLayout: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                  <p className="text-sm font-medium text-white truncate">
                                     {notification.title}
                                   </p>
-                                  <p className="text-[11px] text-gray-400 flex-shrink-0 ml-2">
+                                  <p className="text-[11px] text-light-400 flex-shrink-0 ml-2">
                                     {notification.time}
                                   </p>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                                <p className="text-xs text-light-400 mt-0.5 line-clamp-2">
                                   {notification.message}
                                 </p>
                               </div>
                               {!notification.read && (
                                 <div className="flex-shrink-0 mt-1.5">
-                                  <div className="w-2 h-2 bg-primary-500 rounded-full" />
+                                  <div className="w-2 h-2 bg-fed-red-500 rounded-full" />
                                 </div>
                               )}
                             </div>
@@ -479,16 +489,16 @@ const AdminLayout: React.FC = () => {
                         ))
                       ) : (
                         <div className="p-8 text-center">
-                          <Bell className="mx-auto h-10 w-10 text-gray-300" />
-                          <p className="mt-2 text-sm text-gray-500">Aucune notification</p>
+                          <Bell className="mx-auto h-10 w-10 text-dark-700" />
+                          <p className="mt-2 text-sm text-light-400">Aucune notification</p>
                         </div>
                       )}
                     </div>
                     {notifications.length > 0 && (
-                      <div className="p-2.5 border-t border-gray-100 bg-gray-50/50">
+                      <div className="p-2.5 border-t border-dark-700">
                         <button
                           onClick={() => setShowNotifications(false)}
-                          className="w-full text-center text-xs text-primary-600 hover:text-primary-700 font-medium py-1 rounded hover:bg-primary-50 transition-colors"
+                          className="w-full text-center text-xs text-fed-gold-500 hover:text-fed-gold-400 font-medium py-1 rounded hover:bg-dark-700 transition-colors"
                         >
                           Fermer les notifications
                         </button>
@@ -501,11 +511,11 @@ const AdminLayout: React.FC = () => {
           </header>
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 lg:p-6">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-dark-900 p-4 lg:p-6">
             <React.Suspense
               fallback={
                 <div className="flex items-center justify-center min-h-[400px]">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+                  <Loader2 className="w-8 h-8 animate-spin text-fed-red-500" />
                 </div>
               }
             >
@@ -517,7 +527,7 @@ const AdminLayout: React.FC = () => {
         {/* Overlay for mobile sidebar */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-10 lg:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-10 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
