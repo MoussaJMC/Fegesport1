@@ -227,9 +227,7 @@ const LoginPage: React.FC = () => {
       }
 
       clearErrors();
-      console.log('LoginPage: calling login()...');
       await login(data.email, data.password);
-      console.log('LoginPage: login() succeeded! Redirecting to', from || '/admin');
 
       // Success: reset failed attempts
       setFailedAttempts(0);
@@ -239,7 +237,7 @@ const LoginPage: React.FC = () => {
       // Hard redirect to force full page reload with fresh auth state.
       window.location.href = from || '/admin';
     } catch (error: any) {
-      console.error('LoginPage: login() FAILED:', error.message);
+      console.error('Login error:', error);
 
       // Security: Increment failed attempts
       const newAttempts = failedAttempts + 1;
