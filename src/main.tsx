@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
+import './styles/admin-theme.css';
 import './utils/i18n';
 
 const mount = () => {

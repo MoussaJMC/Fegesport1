@@ -78,11 +78,11 @@ export default function AdminGuard({ children, requireSuperadmin = false }: Admi
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-dark-950">
         <div className="text-center">
-          <Loader className="w-12 h-12 animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Vérification des accès administrateur...</p>
-          <p className="text-sm text-gray-500 mt-2">Authentification en cours</p>
+          <Loader className="w-12 h-12 animate-spin text-fed-red-500 mx-auto mb-4" />
+          <p className="text-light-100 font-medium">Verification des acces administrateur...</p>
+          <p className="text-sm text-light-400 mt-2">Authentification en cours</p>
         </div>
       </div>
     );

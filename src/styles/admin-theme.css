@@ -1,0 +1,164 @@
+/* =================================================================
+   FEGESPORT ADMIN THEME — Dark Federation Override
+
+   This file globally overrides the light-theme classes used in
+   admin pages (bg-white, bg-gray-*, text-gray-*, border-gray-*)
+   to match the dark federation design system.
+
+   Applied ONLY within the admin layout context.
+   ================================================================= */
+
+/* --- Card / Panel backgrounds --- */
+.admin-dark .bg-white {
+  background-color: #1E293B !important; /* dark-800 */
+}
+
+.admin-dark .bg-gray-50,
+.admin-dark .bg-gray-100 {
+  background-color: #0F172A !important; /* dark-900 */
+}
+
+/* --- Text colors --- */
+.admin-dark .text-gray-900,
+.admin-dark .text-gray-800 {
+  color: #F1F5F9 !important; /* light-100 */
+}
+
+.admin-dark .text-gray-700,
+.admin-dark .text-gray-600 {
+  color: #CBD5E1 !important; /* light-300 */
+}
+
+.admin-dark .text-gray-500,
+.admin-dark .text-gray-400 {
+  color: #94A3B8 !important; /* light-400 */
+}
+
+.admin-dark .text-gray-300 {
+  color: #64748B !important; /* slate-500 */
+}
+
+/* --- Borders --- */
+.admin-dark .border-gray-200,
+.admin-dark .border-gray-300 {
+  border-color: #334155 !important; /* dark-700 */
+}
+
+.admin-dark .border-gray-100 {
+  border-color: #1E293B !important; /* dark-800 */
+}
+
+/* --- Form inputs --- */
+.admin-dark input,
+.admin-dark select,
+.admin-dark textarea {
+  background-color: #0F172A !important;
+  border-color: #334155 !important;
+  color: #F1F5F9 !important;
+}
+
+.admin-dark input::placeholder,
+.admin-dark select::placeholder,
+.admin-dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+.admin-dark input:focus,
+.admin-dark select:focus,
+.admin-dark textarea:focus {
+  border-color: #DC2626 !important;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15) !important;
+}
+
+/* --- Shadows (darken for dark theme) --- */
+.admin-dark .shadow,
+.admin-dark .shadow-md,
+.admin-dark .shadow-lg,
+.admin-dark .shadow-xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* --- Table rows --- */
+.admin-dark .hover\:bg-gray-50:hover {
+  background-color: #1E293B !important; /* dark-800 */
+}
+
+.admin-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+
+/* --- Modals --- */
+.admin-dark .bg-black.bg-opacity-50,
+.admin-dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* --- Status badges (preserve their colors) --- */
+.admin-dark .bg-green-100 { background-color: rgba(16, 185, 129, 0.15) !important; }
+.admin-dark .bg-red-100 { background-color: rgba(220, 38, 38, 0.15) !important; }
+.admin-dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15) !important; }
+.admin-dark .bg-yellow-100 { background-color: rgba(245, 158, 11, 0.15) !important; }
+.admin-dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.15) !important; }
+.admin-dark .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15) !important; }
+
+/* --- Primary button overrides --- */
+.admin-dark .bg-primary-600 {
+  background-color: #DC2626 !important;
+}
+.admin-dark .bg-primary-600:hover,
+.admin-dark .hover\:bg-primary-700:hover {
+  background-color: #B91C1C !important;
+}
+.admin-dark .text-primary-600,
+.admin-dark .text-primary-500 {
+  color: #DC2626 !important;
+}
+.admin-dark .text-primary-400 {
+  color: #F87171 !important;
+}
+
+/* --- Blue button overrides --- */
+.admin-dark .bg-blue-600 {
+  background-color: #3B82F6 !important;
+}
+.admin-dark .bg-blue-600:hover,
+.admin-dark .hover\:bg-blue-700:hover {
+  background-color: #2563EB !important;
+}
+
+/* --- Scrollbar --- */
+.admin-dark ::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-dark ::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+.admin-dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+.admin-dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* --- Upload/drop zones --- */
+.admin-dark .border-dashed {
+  border-color: #334155 !important;
+}
+.admin-dark .border-dashed:hover {
+  border-color: #DC2626 !important;
+}
+
+/* --- Alert info boxes --- */
+.admin-dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+.admin-dark .bg-yellow-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+.admin-dark .bg-red-50 {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+}
+.admin-dark .bg-green-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
