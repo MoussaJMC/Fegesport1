@@ -234,24 +234,10 @@ const LoginPage: React.FC = () => {
       setIsLocked(false);
       setLockoutTime(null);
 
-      // Wait for auth state to propagate via onAuthStateChange
-      // before navigating — prevents race condition where AdminLayout
-      // sees isAuthenticated=false and redirects back to login
-      await new Promise<void>((resolve) => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-          if (event === 'SIGNED_IN') {
-            subscription.unsubscribe();
-            resolve();
-          }
-        });
-        // Fallback: resolve after 1s even if event not received (session may already exist)
-        setTimeout(() => {
-          subscription.unsubscribe();
-          resolve();
-        }, 1000);
-      });
-
-      navigate(from, { replace: true });
+      // Hard redirect to force full page reload with fresh auth state.
+      // React router navigate() causes race conditions where AdminLayout
+      // renders before auth state propagates, redirecting back to login.
+      window.location.href = from || '/admin';
     } catch (error: any) {
       console.error('Login error:', error);
 
