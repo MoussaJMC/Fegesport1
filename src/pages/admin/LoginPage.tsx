@@ -227,7 +227,9 @@ const LoginPage: React.FC = () => {
       }
 
       clearErrors();
+      console.log('LoginPage: calling login()...');
       await login(data.email, data.password);
+      console.log('LoginPage: login() succeeded! Redirecting to', from || '/admin');
 
       // Success: reset failed attempts
       setFailedAttempts(0);
@@ -235,11 +237,9 @@ const LoginPage: React.FC = () => {
       setLockoutTime(null);
 
       // Hard redirect to force full page reload with fresh auth state.
-      // React router navigate() causes race conditions where AdminLayout
-      // renders before auth state propagates, redirecting back to login.
       window.location.href = from || '/admin';
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('LoginPage: login() FAILED:', error.message);
 
       // Security: Increment failed attempts
       const newAttempts = failedAttempts + 1;

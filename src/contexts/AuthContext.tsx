@@ -46,16 +46,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      // First check if the service is accessible
+      console.log('AuthContext.login: checking health...');
       const isHealthy = await checkServiceHealth();
+      console.log('AuthContext.login: health =', isHealthy);
       if (!isHealthy) {
         throw new Error('Le service d\'authentification n\'est pas accessible. Veuillez vérifier votre connexion internet et réessayer.');
       }
 
+      console.log('AuthContext.login: signing in with', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
+      console.log('AuthContext.login: result =', { user: data?.user?.email, error: error?.message });
 
       if (error) {
         // Enhanced error handling with more specific messages

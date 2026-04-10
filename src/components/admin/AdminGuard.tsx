@@ -3,130 +3,119 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Loader } from 'lucide-react';
 
-interface AdminUser {
-  id: string;
-  email: string;
-  role: 'admin' | 'superadmin';
-  is_active: boolean;
-}
-
 interface AdminGuardProps {
   children: React.ReactNode;
   requireSuperadmin?: boolean;
 }
 
 export default function AdminGuard({ children, requireSuperadmin = false }: AdminGuardProps) {
-  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkAdminAccess();
-  }, []);
+    let cancelled = false;
 
-  const checkAdminAccess = async () => {
-    try {
-      // 1. Check if user is authenticated
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const verify = async () => {
+      try {
+        // 1. Get current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-      if (authError || !user) {
-        console.error('AdminGuard: Auth error or no user', authError);
-        await supabase.auth.signOut();
-        navigate('/admin/login');
-        return;
-      }
+        if (sessionError || !session?.user) {
+          console.error('AdminGuard: No session', sessionError);
+          if (!cancelled) {
+            navigate('/admin/login', { replace: true });
+          }
+          return;
+        }
 
-      console.log('AdminGuard: User authenticated:', user.email, 'ID:', user.id);
+        const user = session.user;
+        console.log('AdminGuard: Session found for', user.email);
 
-      // 2. Check if user is in admin_users table — try by user_id first, then by email
-      let adminData = null;
-      let adminError = null;
+        // 2. Check admin_users — try user_id, then email
+        let isAdmin = false;
 
-      // Try by user_id
-      const result1 = await supabase
-        .from('admin_users')
-        .select('id, email, role, is_active')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (result1.data) {
-        adminData = result1.data;
-        console.log('AdminGuard: Found admin by user_id:', adminData);
-      } else {
-        console.log('AdminGuard: Not found by user_id, trying email...', result1.error?.message);
-
-        // Fallback: try by email
-        const result2 = await supabase
+        const { data: byUserId } = await supabase
           .from('admin_users')
           .select('id, email, role, is_active')
-          .eq('email', user.email)
+          .eq('user_id', user.id)
+          .eq('is_active', true)
           .maybeSingle();
 
-        if (result2.data) {
-          adminData = result2.data;
-          console.log('AdminGuard: Found admin by email:', adminData);
-
-          // Update user_id for future lookups
-          await supabase
-            .from('admin_users')
-            .update({ user_id: user.id })
-            .eq('email', user.email);
-          console.log('AdminGuard: Updated user_id in admin_users');
+        if (byUserId) {
+          console.log('AdminGuard: Found by user_id:', byUserId.email);
+          isAdmin = true;
         } else {
-          adminError = result2.error;
-          console.error('AdminGuard: Not found by email either:', result2.error?.message);
+          // Fallback: check by email
+          const { data: byEmail } = await supabase
+            .from('admin_users')
+            .select('id, email, role, is_active')
+            .eq('email', user.email)
+            .eq('is_active', true)
+            .maybeSingle();
+
+          if (byEmail) {
+            console.log('AdminGuard: Found by email:', byEmail.email);
+            isAdmin = true;
+            // Auto-fix: update user_id
+            await supabase
+              .from('admin_users')
+              .update({ user_id: user.id })
+              .eq('id', byEmail.id);
+          } else {
+            console.log('AdminGuard: Not found in admin_users. Checking with RPC...');
+            // Last resort: maybe RLS blocks SELECT — try a different approach
+            try {
+              const { data: rpcResult } = await supabase.rpc('is_admin');
+              if (rpcResult === true) {
+                console.log('AdminGuard: is_admin() returned true');
+                isAdmin = true;
+              }
+            } catch (e) {
+              console.log('AdminGuard: is_admin() not available');
+            }
+          }
+        }
+
+        if (!isAdmin) {
+          console.error('AdminGuard: User is not admin, signing out');
+          await supabase.auth.signOut();
+          if (!cancelled) {
+            navigate('/admin/login', { replace: true });
+          }
+          return;
+        }
+
+        console.log('AdminGuard: ACCESS GRANTED');
+        if (!cancelled) {
+          setVerified(true);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('AdminGuard: Unexpected error:', error);
+        if (!cancelled) {
+          navigate('/admin/login', { replace: true });
         }
       }
+    };
 
-      if (!adminData) {
-        console.error('AdminGuard: Not an admin user:', user.email);
-        await supabase.auth.signOut();
-        navigate('/admin/login');
-        return;
-      }
+    verify();
 
-      // 3. Check if admin is active
-      if (!adminData.is_active) {
-        console.error('AdminGuard: Admin account is deactivated:', adminData.email);
-        await supabase.auth.signOut();
-        navigate('/admin/login');
-        return;
-      }
-
-      // 4. Check if superadmin required
-      if (requireSuperadmin && adminData.role !== 'superadmin') {
-        console.error('AdminGuard: Superadmin access required');
-        navigate('/admin');
-        return;
-      }
-
-      // 5. All checks passed
-      console.log('AdminGuard: Access granted for', adminData.email, 'role:', adminData.role);
-      setAdminUser(adminData as AdminUser);
-      setLoading(false);
-
-    } catch (error) {
-      console.error('AdminGuard: Error checking admin access:', error);
-      await supabase.auth.signOut();
-      navigate('/admin/login');
-    }
-  };
+    return () => { cancelled = true; };
+  }, [navigate]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-950">
         <div className="text-center">
           <Loader className="w-12 h-12 animate-spin text-fed-red-500 mx-auto mb-4" />
-          <p className="text-light-100 font-medium">Verification des acces administrateur...</p>
-          <p className="text-sm text-light-400 mt-2">Authentification en cours</p>
+          <p className="text-light-100 font-medium">Verification des acces...</p>
         </div>
       </div>
     );
   }
 
-  if (!adminUser) {
-    return null;
-  }
+  if (!verified) return null;
 
   return <>{children}</>;
 }
