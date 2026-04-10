@@ -213,10 +213,10 @@ const LEGPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-dark-950 text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-500 mx-auto mb-4"></div>
-          <p className="text-xl text-gray-400">Chargement des données LEG...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-fed-red-500 mx-auto mb-4"></div>
+          <p className="text-xl text-light-400">Chargement des donnees LEG...</p>
         </div>
       </div>
     );
@@ -225,18 +225,18 @@ const LEGPage: React.FC = () => {
   // Si pas de données, afficher un message
   if (disciplines.length === 0 && clubs.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-dark-950 text-white flex items-center justify-center">
         <div className="text-center max-w-2xl px-4">
-          <Trophy className="w-24 h-24 mx-auto mb-6 text-gray-600" />
-          <h2 className="text-3xl font-black mb-4 text-gray-300">
-            LEG en Préparation
+          <Trophy className="w-24 h-24 mx-auto mb-6 text-dark-700" />
+          <h2 className="text-3xl font-black mb-4 text-light-100 font-heading">
+            LEG en Preparation
           </h2>
-          <p className="text-xl text-gray-400 mb-6">
-            La League eSport de Guinée est en cours de configuration. Les disciplines et clubs seront bientôt disponibles.
+          <p className="text-xl text-light-400 mb-6">
+            La League eSport de Guinee est en cours de configuration. Les disciplines et clubs seront bientot disponibles.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 rounded-lg font-bold transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-fed-red-500 hover:bg-fed-red-600 rounded-xl font-bold transition-all hover:scale-105 shadow-lg shadow-fed-red-500/20"
           >
             <ArrowLeft className="w-5 h-5" />
             Retour à l'accueil
@@ -247,40 +247,21 @@ const LEGPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+    <div className="min-h-screen bg-dark-950 text-white overflow-hidden">
       {/* Back to Home Button */}
       <Link
         to="/"
-        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 rounded-lg font-bold text-white shadow-lg shadow-green-500/30 transition-all hover:scale-105 hover:shadow-xl hover:shadow-green-500/50"
+        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-3 bg-dark-800 border border-dark-700 hover:border-fed-red-500/30 rounded-xl font-semibold text-light-300 hover:text-white shadow-lg transition-all hover:scale-105"
       >
-        <ArrowLeft className="w-5 h-5" />
-        <Home className="w-5 h-5" />
-        <span className="hidden sm:inline">Menu</span>
+        <ArrowLeft className="w-4 h-4" />
+        <Home className="w-4 h-4" />
+        <span className="hidden sm:inline text-sm">Accueil</span>
       </Link>
 
-      {/* Animated Background Particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-900/20 via-transparent to-transparent"></div>
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-green-400 rounded-full"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              opacity: Math.random()
-            }}
-            animate={{
-              y: [null, Math.random() * window.innerHeight],
-              opacity: [null, Math.random(), 0]
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        ))}
+      {/* Background Accents (optimized — no 50 particles) */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-fed-red-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-fed-gold-500/5 rounded-full blur-3xl" />
       </div>
 
       {/* Hero Section */}
@@ -301,14 +282,14 @@ const LEGPage: React.FC = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="space-y-6"
           >
-            {/* Guinea Flag Colors Accent */}
-            <div className="flex justify-center items-center space-x-2 mb-6">
-              <div className="w-16 h-2 bg-red-600 rounded"></div>
-              <div className="w-16 h-2 bg-yellow-400 rounded"></div>
-              <div className="w-16 h-2 bg-green-600 rounded"></div>
+            {/* Federation accent line */}
+            <div className="flex justify-center items-center gap-1 mb-6">
+              <div className="w-12 h-1 bg-fed-red-500 rounded-full"></div>
+              <div className="w-12 h-1 bg-fed-gold-500 rounded-full"></div>
+              <div className="w-12 h-1 bg-fed-red-500 rounded-full"></div>
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-black mb-4 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl">
+            <h1 className="text-6xl md:text-8xl font-black mb-4 bg-gradient-to-r from-fed-red-500 via-fed-gold-400 to-fed-red-500 bg-clip-text text-transparent drop-shadow-2xl font-heading">
               LEG
             </h1>
 
@@ -322,14 +303,14 @@ const LEGPage: React.FC = () => {
                 League eSport de Guinée
               </h2>
               <div className="flex flex-wrap justify-center gap-4 text-xl md:text-2xl font-semibold">
-                <span className="flex items-center gap-2 bg-green-600/20 border border-green-500 px-4 py-2 rounded-lg backdrop-blur-sm">
-                  <Trophy className="w-6 h-6" /> 8 Clubs
+                <span className="flex items-center gap-2 bg-fed-red-500/15 border border-fed-red-500/30 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <Trophy className="w-6 h-6 text-fed-red-400" /> 8 Clubs
                 </span>
-                <span className="flex items-center gap-2 bg-yellow-600/20 border border-yellow-500 px-4 py-2 rounded-lg backdrop-blur-sm">
-                  <Gamepad2 className="w-6 h-6" /> 5 Disciplines
+                <span className="flex items-center gap-2 bg-fed-gold-500/15 border border-fed-gold-500/30 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <Gamepad2 className="w-6 h-6 text-fed-gold-400" /> 5 Disciplines
                 </span>
-                <span className="flex items-center gap-2 bg-red-600/20 border border-red-500 px-4 py-2 rounded-lg backdrop-blur-sm">
-                  <Flame className="w-6 h-6" /> 1 Nation
+                <span className="flex items-center gap-2 bg-accent-blue-500/15 border border-accent-blue-500/30 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <Flame className="w-6 h-6 text-accent-blue-400" /> 1 Nation
                 </span>
               </div>
             </motion.div>
@@ -338,11 +319,11 @@ const LEGPage: React.FC = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto"
+              className="text-xl md:text-2xl text-light-300 max-w-3xl mx-auto"
             >
               Rejoins la révolution : <span className="text-purple-400 font-bold">Stratégie</span>,
               <span className="text-red-400 font-bold"> FPS</span>,
-              <span className="text-green-400 font-bold"> Football</span>,
+              <span className="text-fed-red-400 font-bold"> Football</span>,
               <span className="text-orange-400 font-bold"> Racing</span>,
               <span className="text-pink-400 font-bold"> Fighting</span>
             </motion.p>
@@ -355,35 +336,26 @@ const LEGPage: React.FC = () => {
             >
               <button
                 onClick={() => scrollToSection('map')}
-                className="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 rounded-lg font-bold text-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50"
+                className="px-8 py-4 bg-fed-red-500 hover:bg-fed-red-600 rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-fed-red-500/20 flex items-center gap-2"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Map className="w-5 h-5" />
-                  Plonge dans la Carte
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                <Map className="w-5 h-5" />
+                Explorer la Carte
               </button>
 
               <button
                 onClick={() => scrollToSection('clubs')}
-                className="group relative px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg font-bold text-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50"
+                className="px-8 py-4 border-2 border-fed-gold-500 text-fed-gold-500 hover:bg-fed-gold-500 hover:text-dark-950 rounded-xl font-bold text-lg transition-all hover:scale-105 flex items-center gap-2"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Top Clubs
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                <Users className="w-5 h-5" />
+                Voir les Clubs
               </button>
 
               <button
                 onClick={() => scrollToSection('tournaments')}
-                className="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-lg font-bold text-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
+                className="px-8 py-4 bg-dark-800 border border-dark-700 hover:border-fed-red-500/30 text-light-100 rounded-xl font-bold text-lg transition-all hover:scale-105 flex items-center gap-2"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Twitch className="w-5 h-5" />
-                  Lives & Tournois
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                <Twitch className="w-5 h-5" />
+                Tournois
               </button>
             </motion.div>
           </motion.div>
@@ -395,11 +367,11 @@ const LEGPage: React.FC = () => {
             transition={{ delay: 1.5, repeat: Infinity, duration: 2 }}
             className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
           >
-            <div className="w-6 h-10 border-2 border-green-400 rounded-full flex justify-center">
+            <div className="w-6 h-10 border-2 border-fed-gold-500/50 rounded-full flex justify-center">
               <motion.div
                 animate={{ y: [0, 12, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="w-1 h-3 bg-green-400 rounded-full mt-2"
+                className="w-1 h-3 bg-fed-gold-500 rounded-full mt-2"
               ></motion.div>
             </div>
           </motion.div>
@@ -408,7 +380,7 @@ const LEGPage: React.FC = () => {
 
       {/* Disciplines Overview */}
       {disciplines.length > 0 && (
-        <section className="relative py-20 bg-gradient-to-b from-black to-gray-900">
+        <section className="relative py-20 bg-dark-950">
           <div className="container mx-auto px-4">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -416,7 +388,7 @@ const LEGPage: React.FC = () => {
               viewport={{ once: true }}
               className="text-4xl md:text-6xl font-black text-center mb-16"
             >
-              <span className="bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-fed-red-500 to-fed-gold-500 bg-clip-text text-transparent">
                 {disciplines.length} Discipline{disciplines.length > 1 ? 's' : ''} de Combat
               </span>
             </motion.h2>
@@ -430,7 +402,7 @@ const LEGPage: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05, rotateY: 5 }}
-                className="group relative bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700 rounded-xl p-6 cursor-pointer overflow-hidden"
+                className="group relative bg-dark-800 border-2 border-dark-700 rounded-xl p-6 cursor-pointer overflow-hidden"
                 style={{ borderColor: discipline.color }}
                 onClick={() => setSelectedDiscipline(discipline.id)}
               >
@@ -447,14 +419,14 @@ const LEGPage: React.FC = () => {
                   </h3>
                   <div className="space-y-2">
                     {discipline.games.map((game, i) => (
-                      <div key={i} className="text-sm text-gray-400 bg-black/30 rounded px-2 py-1">
+                      <div key={i} className="text-sm text-light-400 bg-dark-950/30 rounded px-2 py-1">
                         {game}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="absolute top-2 right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-sm">
+                <div className="absolute top-2 right-2 w-8 h-8 bg-fed-red-500 rounded-full flex items-center justify-center text-black font-bold text-sm">
                   {clubs.filter(c => c.is_active).length}
                 </div>
               </motion.div>
@@ -465,7 +437,7 @@ const LEGPage: React.FC = () => {
       )}
 
       {/* Interactive Map Section */}
-      <section id="map" className="relative py-20 bg-gradient-to-b from-gray-900 to-black">
+      <section id="map" className="relative py-20 bg-dark-900">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -478,14 +450,14 @@ const LEGPage: React.FC = () => {
             </span>
           </motion.h2>
 
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border-2 border-green-500 shadow-2xl shadow-green-500/20">
+          <div className="bg-gradient-to-br from-dark-800 to-dark-900 rounded-2xl p-8 border-2 border-fed-red-500 shadow-2xl shadow-fed-red-500/20">
             <GuineaMap clubs={clubs} onClubClick={setSelectedClub} />
           </div>
         </div>
       </section>
 
       {/* Clubs Section */}
-      <section id="clubs" className="relative py-20 bg-gradient-to-b from-black to-gray-900">
+      <section id="clubs" className="relative py-20 bg-dark-950">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -507,7 +479,7 @@ const LEGPage: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -10, rotateY: 5 }}
-                className="group relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden border-2 cursor-pointer"
+                className="group relative bg-gradient-to-br from-dark-800 to-dark-900 rounded-xl overflow-hidden border-2 cursor-pointer"
                 style={{ borderColor: club.color }}
                 onClick={() => setSelectedClub(club)}
               >
@@ -534,7 +506,7 @@ const LEGPage: React.FC = () => {
                     <h3 className="text-2xl font-black text-white mb-1 drop-shadow-lg">
                       {club.name}
                     </h3>
-                    <p className="text-sm text-gray-300 flex items-center gap-1">
+                    <p className="text-sm text-light-300 flex items-center gap-1">
                       <Map className="w-4 h-4" />
                       {club.city}, {club.region}
                     </p>
@@ -543,32 +515,32 @@ const LEGPage: React.FC = () => {
 
                 <div className="p-6 space-y-4">
                   {/* Leader Info */}
-                  <div className="bg-black/30 rounded-lg p-3">
-                    <p className="text-xs text-gray-400 mb-1">Représentant Fédéral</p>
+                  <div className="bg-dark-950/30 rounded-lg p-3">
+                    <p className="text-xs text-light-400 mb-1">Représentant Fédéral</p>
                     <p className="text-sm font-bold" style={{ color: club.color }}>
                       {club.leader_name}
                     </p>
-                    <p className="text-xs text-gray-500 italic mt-1">
+                    <p className="text-xs text-light-400 italic mt-1">
                       "{club.leader_quote || 'Ensemble vers la victoire'}"
                     </p>
                   </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-black/30 rounded p-2">
+                    <div className="bg-dark-950/30 rounded p-2">
                       <Trophy className="w-4 h-4 mx-auto mb-1 text-yellow-400" />
                       <p className="text-lg font-bold">{club.trophies}</p>
-                      <p className="text-xs text-gray-400">Trophées</p>
+                      <p className="text-xs text-light-400">Trophées</p>
                     </div>
-                    <div className="bg-black/30 rounded p-2">
-                      <TrendingUp className="w-4 h-4 mx-auto mb-1 text-green-400" />
+                    <div className="bg-dark-950/30 rounded p-2">
+                      <TrendingUp className="w-4 h-4 mx-auto mb-1 text-fed-red-400" />
                       <p className="text-lg font-bold">{club.win_rate}%</p>
-                      <p className="text-xs text-gray-400">Victoires</p>
+                      <p className="text-xs text-light-400">Victoires</p>
                     </div>
-                    <div className="bg-black/30 rounded p-2">
+                    <div className="bg-dark-950/30 rounded p-2">
                       <Users className="w-4 h-4 mx-auto mb-1 text-blue-400" />
                       <p className="text-lg font-bold">{(club.stream_viewers / 1000).toFixed(1)}K</p>
-                      <p className="text-xs text-gray-400">Viewers</p>
+                      <p className="text-xs text-light-400">Viewers</p>
                     </div>
                   </div>
 
@@ -605,7 +577,7 @@ const LEGPage: React.FC = () => {
       </section>
 
       {/* Rankings Section */}
-      <section id="rankings" className="relative py-20 bg-gradient-to-b from-gray-900 to-black">
+      <section id="rankings" className="relative py-20 bg-dark-900">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -625,8 +597,8 @@ const LEGPage: React.FC = () => {
                 onClick={() => setSelectedDiscipline('all')}
                 className={`px-6 py-3 rounded-lg font-bold transition-all ${
                   selectedDiscipline === 'all'
-                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/50'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-fed-red-500/30'
+                    : 'bg-dark-800 text-light-400 hover:bg-dark-700'
                 }`}
               >
                 <Crown className="w-5 h-5 inline mr-2" />
@@ -639,7 +611,7 @@ const LEGPage: React.FC = () => {
                 className={`px-6 py-3 rounded-lg font-bold transition-all ${
                   selectedDiscipline === disc.id
                     ? `text-white shadow-lg`
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    : 'bg-dark-800 text-light-400 hover:bg-dark-700'
                 }`}
                 style={
                   selectedDiscipline === disc.id
@@ -658,16 +630,16 @@ const LEGPage: React.FC = () => {
           )}
 
           {/* Rankings Table */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border-2 border-gray-700 shadow-2xl overflow-x-auto">
+          <div className="bg-gradient-to-br from-dark-800 to-dark-900 rounded-2xl p-8 border-2 border-dark-700 shadow-2xl overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="text-left py-4 px-4 text-gray-400 font-bold">Rang</th>
-                  <th className="text-left py-4 px-4 text-gray-400 font-bold">Club</th>
-                  <th className="text-left py-4 px-4 text-gray-400 font-bold">Région</th>
-                  <th className="text-center py-4 px-4 text-gray-400 font-bold">Trophées</th>
-                  <th className="text-center py-4 px-4 text-gray-400 font-bold">Win Rate</th>
-                  <th className="text-center py-4 px-4 text-gray-400 font-bold">Viewers</th>
+                <tr className="border-b border-dark-700">
+                  <th className="text-left py-4 px-4 text-light-400 font-bold">Rang</th>
+                  <th className="text-left py-4 px-4 text-light-400 font-bold">Club</th>
+                  <th className="text-left py-4 px-4 text-light-400 font-bold">Région</th>
+                  <th className="text-center py-4 px-4 text-light-400 font-bold">Trophées</th>
+                  <th className="text-center py-4 px-4 text-light-400 font-bold">Win Rate</th>
+                  <th className="text-center py-4 px-4 text-light-400 font-bold">Viewers</th>
                 </tr>
               </thead>
               <tbody>
@@ -678,7 +650,7 @@ const LEGPage: React.FC = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
-                    className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors cursor-pointer"
+                    className="border-b border-dark-700 hover:bg-dark-800/50 transition-colors cursor-pointer"
                     onClick={() => setSelectedClub(club)}
                   >
                     <td className="py-4 px-4">
@@ -686,13 +658,13 @@ const LEGPage: React.FC = () => {
                         {index < 3 ? (
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black ${
                             index === 0 ? 'bg-yellow-400 text-black' :
-                            index === 1 ? 'bg-gray-400 text-black' :
+                            index === 1 ? 'bg-light-400 text-black' :
                             'bg-orange-600 text-white'
                           }`}>
                             {index + 1}
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-gray-400">
+                          <div className="w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center font-bold text-light-400">
                             {index + 1}
                           </div>
                         )}
@@ -706,11 +678,11 @@ const LEGPage: React.FC = () => {
                         ></div>
                         <div>
                           <p className="font-bold text-white">{club.name}</p>
-                          <p className="text-xs text-gray-400">{club.city}</p>
+                          <p className="text-xs text-light-400">{club.city}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-gray-300">{club.region}</td>
+                    <td className="py-4 px-4 text-light-300">{club.region}</td>
                     <td className="py-4 px-4 text-center">
                       <span className="inline-flex items-center gap-1 text-yellow-400 font-bold">
                         <Trophy className="w-4 h-4" />
@@ -719,13 +691,13 @@ const LEGPage: React.FC = () => {
                     </td>
                     <td className="py-4 px-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="w-16 h-2 bg-dark-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-green-400 to-green-600"
                             style={{ width: `${club.win_rate}%` }}
                           ></div>
                         </div>
-                        <span className="text-green-400 font-bold">
+                        <span className="text-fed-red-400 font-bold">
                           {club.win_rate}%
                         </span>
                       </div>
@@ -742,7 +714,7 @@ const LEGPage: React.FC = () => {
       </section>
 
       {/* Tournaments Section */}
-      <section id="tournaments" className="relative py-20 bg-gradient-to-b from-black to-gray-900">
+      <section id="tournaments" className="relative py-20 bg-dark-950">
         <div className="container mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -790,52 +762,52 @@ const LEGPage: React.FC = () => {
                   </div>
                 </div>
               ) : nextTournament && (
-                <div className="bg-black/30 rounded-xl p-6 mb-6 text-center">
+                <div className="bg-dark-950/30 rounded-xl p-6 mb-6 text-center">
                   <Gamepad2 className="w-16 h-16 mx-auto mb-2 text-red-400" />
                   <h4 className="text-xl font-bold text-white">{nextTournament.title}</h4>
                   {nextTournament.discipline && (
-                    <p className="text-sm text-gray-400 mt-1">{nextTournament.discipline.name}</p>
+                    <p className="text-sm text-light-400 mt-1">{nextTournament.discipline.name}</p>
                   )}
                 </div>
               )}
 
               <div className="space-y-4">
-                <div className="bg-black/50 rounded-lg p-6 text-center">
+                <div className="bg-dark-950/50 rounded-lg p-6 text-center">
                   {timeRemaining.expired ? (
                     <div>
                       <p className="text-2xl font-bold text-red-400 mb-2">Tournoi Terminé</p>
-                      <p className="text-sm text-gray-400">Consultez les résultats prochainement</p>
+                      <p className="text-sm text-light-400">Consultez les résultats prochainement</p>
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm text-gray-400 mb-2">Démarre dans</p>
+                      <p className="text-sm text-light-400 mb-2">Démarre dans</p>
                       <div className="flex justify-center gap-4">
                         <div>
                           <p className="text-4xl font-black text-red-400">
                             {String(timeRemaining.days).padStart(2, '0')}
                           </p>
-                          <p className="text-xs text-gray-400">JOURS</p>
+                          <p className="text-xs text-light-400">JOURS</p>
                         </div>
-                        <div className="text-4xl text-gray-600">:</div>
+                        <div className="text-4xl text-light-400">:</div>
                         <div>
                           <p className="text-4xl font-black text-red-400">
                             {String(timeRemaining.hours).padStart(2, '0')}
                           </p>
-                          <p className="text-xs text-gray-400">HEURES</p>
+                          <p className="text-xs text-light-400">HEURES</p>
                         </div>
-                        <div className="text-4xl text-gray-600">:</div>
+                        <div className="text-4xl text-light-400">:</div>
                         <div>
                           <p className="text-4xl font-black text-red-400">
                             {String(timeRemaining.minutes).padStart(2, '0')}
                           </p>
-                          <p className="text-xs text-gray-400">MINUTES</p>
+                          <p className="text-xs text-light-400">MINUTES</p>
                         </div>
-                        <div className="text-4xl text-gray-600">:</div>
+                        <div className="text-4xl text-light-400">:</div>
                         <div>
                           <p className="text-4xl font-black text-red-400">
                             {String(timeRemaining.seconds).padStart(2, '0')}
                           </p>
-                          <p className="text-xs text-gray-400">SECONDES</p>
+                          <p className="text-xs text-light-400">SECONDES</p>
                         </div>
                       </div>
                     </>
@@ -846,26 +818,26 @@ const LEGPage: React.FC = () => {
                   <>
                     <div className="space-y-2">
                       {nextTournament.discipline && (
-                        <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                          <span className="text-gray-400">Discipline</span>
+                        <div className="flex justify-between items-center p-3 bg-dark-950/30 rounded-lg">
+                          <span className="text-light-400">Discipline</span>
                           <span className="font-bold text-white">{nextTournament.discipline.name}</span>
                         </div>
                       )}
-                      <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                        <span className="text-gray-400">Format</span>
+                      <div className="flex justify-between items-center p-3 bg-dark-950/30 rounded-lg">
+                        <span className="text-light-400">Format</span>
                         <span className="font-bold text-white">{nextTournament.max_teams} Équipes - {nextTournament.format}</span>
                       </div>
                       {nextTournament.prize_pool && (
-                        <div className="flex justify-between items-center p-3 bg-black/30 rounded-lg">
-                          <span className="text-gray-400">Prize Pool</span>
+                        <div className="flex justify-between items-center p-3 bg-dark-950/30 rounded-lg">
+                          <span className="text-light-400">Prize Pool</span>
                           <span className="font-bold text-yellow-400">
                             {nextTournament.prize_pool.toLocaleString('fr-FR')} GNF
                           </span>
                         </div>
                       )}
                       {nextTournament.description && (
-                        <div className="p-3 bg-black/30 rounded-lg">
-                          <p className="text-sm text-gray-300">{nextTournament.description}</p>
+                        <div className="p-3 bg-dark-950/30 rounded-lg">
+                          <p className="text-sm text-light-300">{nextTournament.description}</p>
                         </div>
                       )}
                     </div>
@@ -880,9 +852,9 @@ const LEGPage: React.FC = () => {
                   </>
                 ) : (
                   <div className="text-center py-8">
-                    <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-500" />
-                    <p className="text-gray-400">Aucun tournoi prévu pour le moment</p>
-                    <p className="text-sm text-gray-500 mt-2">Revenez bientôt pour découvrir nos prochaines compétitions</p>
+                    <Calendar className="w-16 h-16 mx-auto mb-4 text-light-400" />
+                    <p className="text-light-400">Aucun tournoi prévu pour le moment</p>
+                    <p className="text-sm text-light-400 mt-2">Revenez bientôt pour découvrir nos prochaines compétitions</p>
                   </div>
                 )}
               </div>
@@ -908,14 +880,14 @@ const LEGPage: React.FC = () => {
                 {clubs.slice(0, 4).map((club, index) => {
                   const discipline = disciplines.length > 0 ? disciplines[index % disciplines.length] : null;
                   return (
-                    <div key={club.id} className="bg-black/50 rounded-lg p-4 hover:bg-black/70 transition-colors cursor-pointer">
+                    <div key={club.id} className="bg-dark-950/50 rounded-lg p-4 hover:bg-dark-950/70 transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl">
                           {discipline?.icon || '🎮'}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-bold text-white mb-1">{club.name}</h4>
-                          <p className="text-sm text-gray-400">{discipline?.name || 'eSport'} - Match amical</p>
+                          <p className="text-sm text-light-400">{discipline?.name || 'eSport'} - Match amical</p>
                         <div className="flex items-center gap-2 mt-1">
                           <Users className="w-4 h-4 text-red-400" />
                           <span className="text-sm text-red-400 font-bold">
@@ -948,7 +920,7 @@ const LEGPage: React.FC = () => {
       </section>
 
       {/* Community Section */}
-      <section className="relative py-20 bg-gradient-to-b from-gray-900 to-black">
+      <section className="relative py-20 bg-dark-900">
         <div className="container mx-auto px-4 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -956,7 +928,7 @@ const LEGPage: React.FC = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-black mb-8"
           >
-            <span className="bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-fed-red-500 to-fed-gold-500 bg-clip-text text-transparent">
               Rejoins la Communauté
             </span>
           </motion.h2>
@@ -966,7 +938,7 @@ const LEGPage: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto"
+            className="text-xl text-light-300 mb-12 max-w-2xl mx-auto"
           >
             Plus de 50,000 gamers guinéens unis. Trouve ton club, participe aux tournois, et écris l'histoire de l'eSport en Guinée.
           </motion.p>
@@ -1035,7 +1007,7 @@ const LEGPage: React.FC = () => {
             )}
             <Link
               to="/membership"
-              className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50"
+              className="group px-8 py-4 bg-gradient-to-r from-fed-red-500 to-fed-red-600 rounded-lg font-bold text-lg text-white transform transition-all hover:scale-105 hover:shadow-2xl hover:shadow-fed-red-500/30"
             >
               <Users className="w-5 h-5 inline mr-2" />
               Adhérer
@@ -1050,24 +1022,24 @@ const LEGPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setShowTournamentModal(false)}
         >
           <motion.div
             initial={{ scale: 0.9, y: 50 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 50 }}
-            className="bg-gradient-to-br from-gray-900 to-black border-2 border-red-500 rounded-2xl p-8 max-w-2xl w-full my-8"
+            className="bg-gradient-to-br from-dark-950 to-dark-900 border-2 border-red-500 rounded-2xl p-8 max-w-2xl w-full my-8"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-4xl font-black text-white mb-2">Inscription au Tournoi</h3>
-                <p className="text-gray-400">CS:GO - National Cup</p>
+                <p className="text-light-400">CS:GO - National Cup</p>
               </div>
               <button
                 onClick={() => setShowTournamentModal(false)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-light-400 hover:text-white transition-colors"
               >
                 <X className="w-8 h-8" />
               </button>
@@ -1084,55 +1056,55 @@ const LEGPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedClub(null)}
         >
           <motion.div
             initial={{ scale: 0.9, y: 50 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 50 }}
-            className="bg-gradient-to-br from-gray-900 to-black border-2 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-gradient-to-br from-dark-950 to-dark-900 border-2 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             style={{ borderColor: selectedClub.color }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-4xl font-black text-white mb-2">{selectedClub.name}</h3>
-                <p className="text-gray-400">{selectedClub.city}, {selectedClub.region}</p>
+                <p className="text-light-400">{selectedClub.city}, {selectedClub.region}</p>
               </div>
               <button
                 onClick={() => setSelectedClub(null)}
-                className="text-gray-400 hover:text-white text-2xl"
+                className="text-light-400 hover:text-white text-2xl"
               >
                 ×
               </button>
             </div>
 
             {/* Leader Section */}
-            <div className="bg-black/50 rounded-lg p-6 mb-6">
-              <p className="text-sm text-gray-400 mb-2">Représentant Fédéral</p>
+            <div className="bg-dark-950/50 rounded-lg p-6 mb-6">
+              <p className="text-sm text-light-400 mb-2">Représentant Fédéral</p>
               <p className="text-xl font-bold mb-2" style={{ color: selectedClub.color }}>
                 {selectedClub.leader_name}
               </p>
-              <p className="text-gray-300 italic">"{selectedClub.leader_quote || 'Ensemble vers la victoire'}"</p>
+              <p className="text-light-300 italic">"{selectedClub.leader_quote || 'Ensemble vers la victoire'}"</p>
             </div>
 
             {/* Club Stats */}
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-black/30 rounded-lg p-4 text-center">
+              <div className="bg-dark-950/30 rounded-lg p-4 text-center">
                 <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
                 <p className="text-2xl font-bold">{selectedClub.trophies}</p>
-                <p className="text-sm text-gray-400">Trophées</p>
+                <p className="text-sm text-light-400">Trophées</p>
               </div>
-              <div className="bg-black/30 rounded-lg p-4 text-center">
-                <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-400" />
+              <div className="bg-dark-950/30 rounded-lg p-4 text-center">
+                <TrendingUp className="w-8 h-8 mx-auto mb-2 text-fed-red-400" />
                 <p className="text-2xl font-bold">{selectedClub.win_rate}%</p>
-                <p className="text-sm text-gray-400">Win Rate</p>
+                <p className="text-sm text-light-400">Win Rate</p>
               </div>
-              <div className="bg-black/30 rounded-lg p-4 text-center">
+              <div className="bg-dark-950/30 rounded-lg p-4 text-center">
                 <Users className="w-8 h-8 mx-auto mb-2 text-blue-400" />
                 <p className="text-2xl font-bold">{(selectedClub.stream_viewers / 1000).toFixed(1)}K</p>
-                <p className="text-sm text-gray-400">Viewers</p>
+                <p className="text-sm text-light-400">Viewers</p>
               </div>
             </div>
 
@@ -1169,22 +1141,22 @@ const LEGPage: React.FC = () => {
       <SponsorsCarousel />
 
       {/* Footer */}
-      <footer className="relative py-12 bg-black border-t border-gray-800">
+      <footer className="relative py-12 bg-dark-950 border-t border-dark-700">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-between items-center gap-8">
             <div>
-              <h3 className="text-3xl font-black bg-gradient-to-r from-green-400 to-yellow-400 bg-clip-text text-transparent mb-2">
+              <h3 className="text-3xl font-black bg-gradient-to-r from-fed-red-500 to-fed-gold-500 bg-clip-text text-transparent mb-2">
                 LEG
               </h3>
-              <p className="text-gray-400">League eSport de Guinée</p>
+              <p className="text-light-400">League eSport de Guinée</p>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-12 h-2 bg-red-600 rounded"></div>
               <div className="w-12 h-2 bg-yellow-400 rounded"></div>
-              <div className="w-12 h-2 bg-green-600 rounded"></div>
+              <div className="w-12 h-2 bg-fed-red-500 rounded"></div>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+          <div className="mt-8 pt-8 border-t border-dark-700 text-center text-light-400 text-sm">
             <p>© 2026 FEGESPORT - Tous droits réservés | Propulsé par la passion du gaming guinéen</p>
           </div>
         </div>
