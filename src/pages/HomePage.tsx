@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Trophy, Users, ChevronRight } from 'lucide-react';
+import { ArrowRight, Calendar, Trophy, Users, ChevronRight, Gamepad2, Award, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { fetchCommunityStats, subscribeToCommunityStats } from '../lib/communityStats';
@@ -12,6 +12,11 @@ import EventCard from '../components/events/EventCard';
 import NewsletterSection from '../components/newsletter/NewsletterSection';
 import CardGrid from '../components/cards/CardGrid';
 import Slideshow from '../components/slideshow/Slideshow';
+import SectionHeader from '../components/ui/SectionHeader';
+import AnimatedCounter from '../components/ui/AnimatedCounter';
+import GovernanceSection from '../components/home/GovernanceSection';
+import InternationalSection from '../components/home/InternationalSection';
+import PartnersShowcase from '../components/home/PartnersShowcase';
 
 // Data (fallback)
 import { latestNews } from '../data/newsData';
@@ -32,6 +37,8 @@ const HomePage: React.FC = () => {
     partners: 0
   });
 
+  const lang = i18n.language === 'fr' ? 'fr' : 'en';
+
   const defaultLogoSettings = {
     main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
     alt_text: "FEGESPORT Logo",
@@ -42,13 +49,13 @@ const HomePage: React.FC = () => {
 
   const logoSettings = getSetting('site_logo', defaultLogoSettings);
 
+  // === DATA FETCHING (preserved from original) ===
   useEffect(() => {
     let isMounted = true;
     let channel: any = null;
 
     const initializeData = async () => {
       if (!isMounted) return;
-
       setLoading(true);
       setError(null);
 
@@ -62,9 +69,7 @@ const HomePage: React.FC = () => {
       } catch (err) {
         console.error('Error initializing data:', err);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -72,10 +77,7 @@ const HomePage: React.FC = () => {
 
     try {
       channel = subscribeToCommunityStats(() => {
-        if (isMounted) {
-          console.log('Community stats changed, refreshing...');
-          fetchStats();
-        }
+        if (isMounted) fetchStats();
       });
     } catch (err) {
       console.error('Error subscribing to community stats:', err);
@@ -84,11 +86,7 @@ const HomePage: React.FC = () => {
     return () => {
       isMounted = false;
       if (channel) {
-        try {
-          channel.unsubscribe();
-        } catch (err) {
-          console.error('Error unsubscribing:', err);
-        }
+        try { channel.unsubscribe(); } catch (err) { /* silent */ }
       }
     };
   }, []);
@@ -101,10 +99,7 @@ const HomePage: React.FC = () => {
         .eq('slug', 'home')
         .maybeSingle();
 
-      if (pageError) {
-        console.error('Error fetching home page:', pageError);
-        return;
-      }
+      if (pageError) { console.error('Error fetching home page:', pageError); return; }
 
       if (pageData) {
         const { data: sections, error: sectionsError } = await supabase
@@ -114,16 +109,10 @@ const HomePage: React.FC = () => {
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
 
-        if (sectionsError) {
-          console.error('Error fetching page sections:', sectionsError);
-          return;
-        }
-
+        if (sectionsError) { console.error('Error fetching page sections:', sectionsError); return; }
         setPageSections(sections || []);
       }
-    } catch (error) {
-      console.error('Error in fetchPageData:', error);
-    }
+    } catch (error) { console.error('Error in fetchPageData:', error); }
   };
 
   const fetchLatestNews = async () => {
@@ -135,13 +124,9 @@ const HomePage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(3);
 
-      if (error) {
-        console.error('Error fetching news:', error);
-        return;
-      }
+      if (error) { console.error('Error fetching news:', error); return; }
 
       if (data && data.length > 0) {
-        // Map database fields to NewsItem format
         const mappedNews = data.map(item => ({
           id: item.id,
           title: item.title,
@@ -150,23 +135,18 @@ const HomePage: React.FC = () => {
           date: new Date(item.created_at).toISOString().split('T')[0],
           image: item.image_url || 'https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg',
           category: item.category,
-          author: {
-            name: 'FEGESPORT',
-          },
+          author: { name: 'FEGESPORT' },
           tags: [],
           translations: item.translations
         }));
         setNews(mappedNews);
       }
-    } catch (error) {
-      console.error('Error in fetchLatestNews:', error);
-    }
+    } catch (error) { console.error('Error in fetchLatestNews:', error); }
   };
 
   const fetchUpcomingEvents = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -176,14 +156,9 @@ const HomePage: React.FC = () => {
         .order('date', { ascending: true })
         .limit(4);
 
-      if (error) {
-        console.error('Error fetching events:', error);
-        setEvents([]);
-        return;
-      }
+      if (error) { console.error('Error fetching events:', error); setEvents([]); return; }
 
       if (data && data.length > 0) {
-        // Map database fields to EventItem format
         const mappedEvents = data.map(item => ({
           id: item.id,
           title: item.title,
@@ -202,359 +177,382 @@ const HomePage: React.FC = () => {
       } else {
         setEvents([]);
       }
-    } catch (error) {
-      console.error('Error in fetchUpcomingEvents:', error);
-      setEvents([]);
-    }
+    } catch (error) { console.error('Error in fetchUpcomingEvents:', error); setEvents([]); }
   };
 
   const fetchStats = async () => {
     try {
-      console.log('Fetching community stats...');
       const communityStats = await fetchCommunityStats();
-      console.log('Community stats received:', communityStats);
       setStats(communityStats);
-    } catch (error) {
-      console.error('Error fetching community stats:', error);
-    }
+    } catch (error) { console.error('Error fetching community stats:', error); }
   };
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { 
-      day: 'numeric', 
-      month: i18n.language === 'fr' ? 'long' : 'short', 
-      year: 'numeric' 
+    return date.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+      day: 'numeric',
+      month: lang === 'fr' ? 'long' : 'short',
+      year: 'numeric'
     });
   };
 
-  // Find specific sections by key
-  const getSection = (key: string) => {
-    return pageSections.find(section => section.section_key === key);
-  };
-
+  const getSection = (key: string) => pageSections.find(section => section.section_key === key);
   const heroSection = getSection('hero');
-  const aboutSection = getSection('about');
-  const statsSection = getSection('stats');
 
-  // Simple loading state for mobile
+  // === LOADING STATE ===
   if (loading || settingsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-900 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-dark-950 px-4">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-base">Chargement...</p>
+          <div className="w-16 h-16 border-4 border-fed-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-light-300 text-base">
+            {lang === 'fr' ? 'Chargement...' : 'Loading...'}
+          </p>
         </div>
       </div>
     );
   }
 
+  // === RENDER ===
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative bg-secondary-900 py-20 md:py-32 min-h-[80vh] flex items-center justify-center">
+      {/* ============================================================
+          SECTION 1 — HERO INSTITUTIONNEL
+          Objective: First impression of national authority
+          ============================================================ */}
+      <section className="relative bg-dark-950 min-h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Background image */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{
             backgroundImage: `url("${heroSection?.image_url || "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"}")`,
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-secondary-900/90 via-secondary-900/95 to-secondary-900"></div>
-        <div className="container-custom relative z-10 text-center px-4">
-          <div className="mb-8">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-950/80 via-dark-950/90 to-dark-950" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-950 to-transparent" />
+
+        {/* Decorative elements */}
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-fed-red-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-fed-gold-500/5 rounded-full blur-3xl" />
+
+        <div className="container-custom relative z-10 text-center px-4 py-20 md:py-32">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
             {logoSettings.main_logo ? (
               <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "FEGESPORT Logo"}
-                className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 object-cover"
+                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl shadow-fed-gold-500/10 mb-6 object-cover"
                 onError={(e) => {
-                  console.error('Hero logo failed to load:', logoSettings.main_logo);
                   e.currentTarget.style.display = 'none';
                 }}
                 loading="eager"
               />
             ) : (
-              <div className="w-20 h-20 sm:w-28 sm:h-28 mx-auto rounded-full border-4 border-primary-500 shadow-lg mb-6 bg-primary-600 flex items-center justify-center">
-                <span className="text-white font-bold text-2xl sm:text-3xl">FGE</span>
+              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl mb-6 bg-dark-800 flex items-center justify-center">
+                <span className="text-fed-gold-500 font-bold text-2xl sm:text-3xl font-heading">FGE</span>
               </div>
             )}
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">
+          </motion.div>
+
+          {/* Overline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <span className="overline block mb-4">
+              {lang === 'fr' ? 'FEDERATION GUINEENNE D\'ESPORT' : 'GUINEAN ESPORTS FEDERATION'}
+            </span>
+          </motion.div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-hero font-heading text-white mb-6"
+          >
             {t('home.hero.title')}
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-300">
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-light-300"
+          >
             {t('home.hero.subtitle')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/membership"
-              className="btn bg-primary-600 hover:bg-primary-700 text-white text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 rounded-full"
-            >
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link to="/membership" className="btn btn-primary text-lg px-8 py-4 shadow-lg shadow-fed-red-500/20">
               {t('home.hero.cta')}
             </Link>
-            <Link
-              to="/about"
-              className="btn bg-secondary-800 hover:bg-secondary-700 text-white text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 rounded-full"
-            >
+            <Link to="/about" className="btn btn-secondary text-lg px-8 py-4">
               {t('common.learnMore')}
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Slideshow Section */}
-      <section className="section bg-secondary-800">
+      {/* ============================================================
+          SECTION 2 — SLIDESHOW MOMENTS
+          Objective: Visual proof of activity
+          ============================================================ */}
+      <section className="section bg-section-alt">
         <div className="container-custom">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-4">NOS MEILLEURS MOMENTS</h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto"></div>
-          </div>
-          
-          <Slideshow 
-            autoplay={true} 
-            interval={5000} 
-            showArrows={true} 
+          <SectionHeader
+            overline={lang === 'fr' ? 'NOS ACTIVITES' : 'OUR ACTIVITIES'}
+            title={lang === 'fr' ? 'Moments Forts' : 'Highlights'}
+            dividerColor="red"
+          />
+
+          <Slideshow
+            autoplay={true}
+            interval={5000}
+            showArrows={true}
             showDots={true}
             height="h-[500px]"
-            className="mb-8"
+            className="mb-8 rounded-xl overflow-hidden"
           />
-          
+
           <div className="text-center">
-            <Link to="/direct" className="inline-flex items-center text-primary-500 hover:text-primary-400 font-medium">
-              Regarder nos streams en direct <ArrowRight size={16} className="ml-2" />
+            <Link to="/direct" className="inline-flex items-center text-fed-red-500 hover:text-fed-red-400 font-medium transition-colors">
+              {lang === 'fr' ? 'Regarder nos streams en direct' : 'Watch our live streams'}
+              <ArrowRight size={16} className="ml-2" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="section bg-secondary-900 text-white">
+      {/* ============================================================
+          SECTION 3 — MISSION & VALEURS
+          Objective: Who we are
+          ============================================================ */}
+      <section className="section bg-section-dark">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t('home.about.title')}</h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-lg max-w-3xl mx-auto text-gray-300">{t('home.about.description')}</p>
-          </div>
+          <SectionHeader
+            overline={lang === 'fr' ? 'NOTRE MISSION' : 'OUR MISSION'}
+            title={t('home.about.title')}
+            description={t('home.about.description')}
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            <motion.div 
-              className="bg-secondary-800 p-6 rounded-lg text-center"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Trophy className="text-primary-500" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.excellence')}</h3>
-              <p className="text-gray-400">{t('about.values.excellence_desc')}</p>
-            </motion.div>
-
-            <motion.div 
-              className="bg-secondary-800 p-6 rounded-lg text-center"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Users className="text-primary-500" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.inclusivity')}</h3>
-              <p className="text-gray-400">{t('about.values.inclusivity_desc')}</p>
-            </motion.div>
-
-            <motion.div 
-              className="bg-secondary-800 p-6 rounded-lg text-center"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-600/20 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Calendar className="text-primary-500" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.innovation')}</h3>
-              <p className="text-gray-400">{t('about.values.innovation_desc')}</p>
-            </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              {
+                icon: <Trophy size={28} />,
+                title: t('about.values.excellence'),
+                description: t('about.values.excellence_desc'),
+              },
+              {
+                icon: <Users size={28} />,
+                title: t('about.values.inclusivity'),
+                description: t('about.values.inclusivity_desc'),
+              },
+              {
+                icon: <Target size={28} />,
+                title: t('about.values.innovation'),
+                description: t('about.values.innovation_desc'),
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="card p-6 md:p-8 text-center group hover:border-fed-gold-500/30"
+              >
+                <div className="w-16 h-16 rounded-xl bg-fed-red-500/10 border border-fed-red-500/20 flex items-center justify-center mx-auto mb-5 text-fed-red-500 group-hover:bg-fed-red-500/20 transition-colors">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-white font-heading">{item.title}</h3>
+                <p className="text-light-400 leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
 
           <div className="text-center mt-10">
-            <Link to="/about" className="inline-flex items-center text-primary-500 hover:text-primary-400 font-medium">
+            <Link to="/about" className="inline-flex items-center text-fed-gold-500 hover:text-fed-gold-400 font-medium transition-colors">
               {t('common.learnMore')} <ArrowRight size={16} className="ml-2" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Cards Section */}
-      <section className="section bg-secondary-800">
-        <div className="container-custom">
-          <CardGrid 
-            title="ACTUALITÉS ET ÉVÉNEMENTS" 
-            showViewAll={true} 
-            viewAllLink="/news" 
-            limit={6}
+      {/* ============================================================
+          SECTION 4 — GOUVERNANCE
+          Objective: Who leads the federation
+          ============================================================ */}
+      <GovernanceSection />
+
+      {/* ============================================================
+          SECTION 5 — CHIFFRES CLES (Ecosysteme national)
+          Objective: Prove national structure
+          ============================================================ */}
+      <section className="section bg-section-dark relative overflow-hidden">
+        {/* Top gold line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fed-gold-500/40 to-transparent" />
+
+        {/* Background accent */}
+        <div className="absolute inset-0 bg-gradient-to-br from-fed-red-900/5 via-transparent to-fed-gold-700/5" />
+
+        <div className="container-custom relative z-10">
+          <SectionHeader
+            overline={lang === 'fr' ? 'L\'ESPORT EN GUINEE' : 'ESPORTS IN GUINEA'}
+            title={lang === 'fr' ? 'Notre Ecosysteme' : 'Our Ecosystem'}
+            description={
+              lang === 'fr'
+                ? 'Un ecosysteme esport national en pleine croissance, structure autour de clubs, joueurs et competitions.'
+                : 'A growing national esports ecosystem, structured around clubs, players and competitions.'
+            }
           />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <AnimatedCounter
+              end={stats.players}
+              suffix="+"
+              label={t('home.stats.players')}
+              icon={<Gamepad2 size={24} />}
+            />
+            <AnimatedCounter
+              end={stats.clubs}
+              label={t('home.stats.clubs')}
+              icon={<Award size={24} />}
+            />
+            <AnimatedCounter
+              end={stats.partners}
+              suffix="+"
+              label={t('home.stats.partners')}
+              icon={<Users size={24} />}
+            />
+          </div>
         </div>
       </section>
 
-      {/* Latest News Section */}
-      <section className="section bg-secondary-800">
+      {/* ============================================================
+          SECTION 6 — ACTUALITES
+          Objective: Recent activity proof
+          ============================================================ */}
+      <section className="section bg-section-alt">
         <div className="container-custom">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">{t('home.news.title')}</h2>
-            <Link to="/news" className="text-primary-500 hover:text-primary-400 font-medium flex items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12">
+            <div>
+              <span className="overline block">{lang === 'fr' ? 'ACTUALITES' : 'NEWS'}</span>
+              <h2 className="section-title mb-0">{t('home.news.title')}</h2>
+            </div>
+            <Link to="/news" className="text-fed-gold-500 hover:text-fed-gold-400 font-medium flex items-center mt-4 sm:mt-0 transition-colors">
               {t('home.news.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
 
           {news && news.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {news.slice(0, 3).map((newsItem) => (
                 <NewsCard key={newsItem.id} news={newsItem} />
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-400 py-12">
-              <p>Aucune actualité disponible pour le moment.</p>
+            <div className="text-center text-light-400 py-12 card p-8">
+              <p>{lang === 'fr' ? 'Aucune actualite disponible pour le moment.' : 'No news available at this time.'}</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* Upcoming Events Section */}
-      <section className="section bg-secondary-900">
+      {/* ============================================================
+          SECTION 7 — EVENEMENTS A VENIR
+          Objective: Active calendar
+          ============================================================ */}
+      <section className="section bg-section-dark">
         <div className="container-custom">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-4 sm:mb-0">{t('home.events.title')}</h2>
-            <Link to="/events" className="text-primary-500 hover:text-primary-400 font-medium flex items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12">
+            <div>
+              <span className="overline block">{lang === 'fr' ? 'CALENDRIER' : 'CALENDAR'}</span>
+              <h2 className="section-title mb-0">{t('home.events.title')}</h2>
+            </div>
+            <Link to="/events" className="text-fed-gold-500 hover:text-fed-gold-400 font-medium flex items-center mt-4 sm:mt-0 transition-colors">
               {t('home.events.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
 
           {events && events.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
               {events.slice(0, 4).map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-gradient-to-br from-green-900/50 to-blue-900/50 rounded-lg shadow-xl border-2 border-green-600">
-              <div className="max-w-2xl mx-auto px-6">
-                <div className="bg-secondary-800 rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6 border-2 border-green-500">
-                  <Calendar className="h-12 w-12 text-green-400" />
-                </div>
-
-                <h3 className="text-3xl font-bold text-white mb-3">
-                  Période de vacances
-                </h3>
-
-                <div className="space-y-4 text-gray-200">
-                  <p className="text-xl font-medium">
-                    Les activités sportives sont actuellement en pause
-                  </p>
-
-                  <div className="bg-secondary-800/80 rounded-lg p-6 shadow-sm border border-green-600">
-                    <div className="flex items-center justify-center gap-3 mb-3">
-                      <div className="w-16 h-16 bg-green-900/50 rounded-full flex items-center justify-center text-3xl border-2 border-green-500">
-                        🌙
-                      </div>
-                      <div className="text-left">
-                        <p className="font-semibold text-white">Mois sacré du Ramadan</p>
-                        <p className="text-sm text-gray-300">Période de jeûne et de recueillement</p>
-                      </div>
-                    </div>
-
-                    <p className="text-base leading-relaxed">
-                      Nous respectons cette période importante pour notre communauté.
-                      Tous les tournois, compétitions et événements sportifs reprendront
-                      après la fin du Ramadan.
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-6 shadow-md">
-                    <p className="font-semibold text-xl mb-2">
-                      📅 Reprise prochaine des activités
-                    </p>
-                    <p className="text-base">
-                      Le calendrier complet des tournois et événements sera publié
-                      dès la fin du mois de Ramadan. Restez connectés !
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-6 mt-6 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>En attente</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span>Planification en cours</span>
-                    </div>
-                  </div>
-                </div>
+            <div className="text-center py-12 card p-8">
+              <div className="w-16 h-16 rounded-full bg-dark-700 flex items-center justify-center mx-auto mb-4">
+                <Calendar className="text-light-400" size={28} />
               </div>
+              <h3 className="text-xl font-bold text-white mb-2 font-heading">
+                {lang === 'fr' ? 'Aucun evenement programme' : 'No upcoming events'}
+              </h3>
+              <p className="text-light-400 max-w-md mx-auto">
+                {lang === 'fr'
+                  ? 'Le calendrier des prochains evenements sera bientot disponible. Restez connectes !'
+                  : 'The upcoming events calendar will be available soon. Stay tuned!'}
+              </p>
             </div>
           )}
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="section bg-secondary-800">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-white">{t('home.stats.title')}</h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-          </div>
+      {/* ============================================================
+          SECTION 8 — REPRESENTATION INTERNATIONALE
+          Objective: International recognition
+          ============================================================ */}
+      <InternationalSection />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="bg-secondary-700 p-6 rounded-lg text-center"
-            >
-              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.players}+</div>
-              <div className="text-lg text-white">{t('home.stats.players')}</div>
-            </motion.div>
+      {/* ============================================================
+          SECTION 9 — PARTENAIRES
+          Objective: Institutional support proof
+          ============================================================ */}
+      <PartnersShowcase />
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-secondary-700 p-6 rounded-lg text-center"
-            >
-              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.clubs}</div>
-              <div className="text-lg text-white">{t('home.stats.clubs')}</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-secondary-700 p-6 rounded-lg text-center"
-            >
-              <div className="text-4xl font-bold text-primary-500 mb-2">{stats.partners}</div>
-              <div className="text-lg text-white">{t('home.stats.partners')}</div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
+      {/* ============================================================
+          SECTION 10 — NEWSLETTER
+          ============================================================ */}
       <NewsletterSection />
 
-      {/* Join Section */}
-      <section 
-        className="section relative bg-secondary-900 text-white"
+      {/* ============================================================
+          SECTION 11 — REJOINDRE LA FEDERATION (CTA FINAL)
+          Objective: Conversion
+          ============================================================ */}
+      <section
+        className="section relative overflow-hidden"
         style={{
           backgroundImage: 'url("https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundBlendMode: 'overlay',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900 via-secondary-900/90 to-secondary-900/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-950 via-dark-950/95 to-dark-950/90" />
         <div className="container-custom relative z-10 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{t('home.join.title')}</h2>
-          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 text-gray-300">{t('home.join.description')}</p>
-          <Link to="/membership" className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8 py-3 rounded-full">
+          <span className="overline block mb-4">{lang === 'fr' ? 'REJOIGNEZ-NOUS' : 'JOIN US'}</span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-white font-heading">
+            {t('home.join.title')}
+          </h2>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 text-light-300">
+            {t('home.join.description')}
+          </p>
+          <Link to="/membership" className="btn btn-primary text-lg px-10 py-4 shadow-lg shadow-fed-red-500/20">
             {t('home.join.cta')}
           </Link>
         </div>

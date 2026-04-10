@@ -2,30 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =================================================================
+   FEGESPORT DESIGN SYSTEM v2 — Federation Identity
+   Single source of truth: tailwind.config.js
+   CSS vars below are kept ONLY for legacy references.
+   ================================================================= */
+
 :root {
-  --primary: #1A56DB;
-  --secondary: #EF4444;
-  --accent: #8B5CF6;
+  /* Legacy vars (aligned with Tailwind — NO MORE CONFLICT) */
+  --primary: #DC2626;
+  --secondary: #111827;
+  --accent: #F59E0B;
   --success: #10B981;
   --warning: #F59E0B;
   --error: #DC2626;
-  --background: #F9FAFB;
-  --foreground: #111827;
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+
+  /* Federation Design Tokens */
+  --fed-red: #DC2626;
+  --fed-gold: #F59E0B;
+  --fed-dark: #0F172A;
+  --fed-surface: #1E293B;
 }
 
+/* =================================================================
+   BASE LAYER
+   ================================================================= */
 @layer base {
   html, body {
     @apply h-full;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 font-sans min-h-screen;
+    @apply bg-dark-950 text-light-100 font-sans min-h-screen;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold leading-tight;
+    @apply font-heading font-bold leading-tight;
   }
 
   h1 {
@@ -37,132 +53,185 @@
   }
 
   h3 {
-    @apply text-xl md:text-3xl;
+    @apply text-xl md:text-2xl;
   }
-  
+
   p {
     @apply leading-relaxed;
   }
 }
 
+/* =================================================================
+   COMPONENT LAYER
+   ================================================================= */
 @layer components {
+  /* --- Buttons --- */
   .btn {
-    @apply inline-flex items-center justify-center px-5 py-3 rounded-md font-medium transition-colors;
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all duration-200;
   }
-  
+
   .btn-primary {
-    @apply bg-blue-700 hover:bg-blue-800 text-white;
+    @apply bg-fed-red-500 hover:bg-fed-red-600 text-white shadow-lg;
   }
-  
+
   .btn-secondary {
-    @apply bg-red-600 hover:bg-red-700 text-white;
+    @apply border-2 border-fed-gold-500 text-fed-gold-500 hover:bg-fed-gold-500 hover:text-dark-950;
   }
-  
+
+  .btn-ghost {
+    @apply text-light-300 hover:text-white hover:bg-dark-800;
+  }
+
   .btn-accent {
-    @apply bg-purple-600 hover:bg-purple-700 text-white;
+    @apply bg-fed-gold-500 hover:bg-fed-gold-600 text-dark-950 font-bold;
   }
-  
+
   .btn-outline {
-    @apply border border-gray-300 hover:bg-gray-100 text-gray-900;
+    @apply border border-light-400 hover:bg-dark-800 text-light-100;
   }
-  
+
+  /* --- Layout --- */
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
-  
+
   .section {
-    @apply py-12 md:py-20;
+    @apply py-16 md:py-24;
   }
-  
+
+  .section-compact {
+    @apply py-12 md:py-16;
+  }
+
+  /* --- Cards --- */
   .card {
-    @apply bg-white rounded-lg overflow-hidden shadow-md transition-shadow hover:shadow-lg;
+    @apply bg-dark-800 border border-dark-700 rounded-xl overflow-hidden transition-all duration-300 hover:border-fed-red-500/30;
+  }
+
+  .card-elevated {
+    @apply card shadow-xl shadow-dark-950/50;
+  }
+
+  .card-featured {
+    @apply card border-l-4 border-l-fed-gold-500;
+  }
+
+  /* --- Section Headers --- */
+  .overline {
+    @apply text-fed-gold-500 text-xs font-semibold uppercase tracking-[0.2em] mb-3 font-heading;
+  }
+
+  .section-title {
+    @apply text-section-title font-heading uppercase tracking-wide text-white mb-4;
+  }
+
+  .divider-gold {
+    @apply w-20 h-1 bg-gradient-to-r from-fed-gold-500 to-fed-gold-400;
+  }
+
+  .divider-red {
+    @apply w-20 h-1 bg-fed-red-500;
+  }
+
+  .divider-full {
+    @apply w-full h-px bg-gradient-to-r from-transparent via-dark-700 to-transparent;
   }
 }
 
+/* =================================================================
+   UTILITY LAYER
+   ================================================================= */
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-fed-gold-400 to-fed-gold-600;
+  }
+
+  .text-gradient-red {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-fed-red-400 to-fed-red-600;
+  }
+
+  .bg-federation-gradient {
+    @apply bg-gradient-to-b from-dark-950 via-dark-900 to-dark-950;
+  }
+
+  .bg-section-alt {
+    @apply bg-dark-900;
+  }
+
+  .bg-section-dark {
+    @apply bg-dark-950;
+  }
+}
+
+/* =================================================================
+   GLOBAL STYLES
+   ================================================================= */
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Mobile responsiveness improvements */
+/* Mobile responsiveness */
 @media (max-width: 640px) {
   .section {
-    @apply py-8;
+    @apply py-10;
   }
-  
+
   .container-custom {
     @apply px-4;
   }
-  
-  h1 {
-    @apply text-3xl;
-  }
-  
-  h2 {
-    @apply text-2xl;
-  }
-  
-  h3 {
-    @apply text-xl;
-  }
-  
+
   .btn {
-    @apply px-4 py-2 text-sm;
+    @apply px-4 py-2.5 text-sm;
   }
 }
 
-/* Fix for mobile navigation */
+/* Mobile navigation */
 .mobile-nav-container {
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
 }
 
-/* Fix for long text in cards */
+/* Card text overflow */
 .card-title, .card-description {
   overflow-wrap: break-word;
   word-wrap: break-word;
   hyphens: auto;
 }
 
-/* Improve form elements on mobile */
+/* Form elements mobile */
 @media (max-width: 640px) {
   input, select, textarea {
     @apply text-base;
   }
 }
 
-/* Mobile optimizations */
+/* Touch optimizations */
 body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none;
-}
-
-/* Touch target improvements */
-.touch-manipulation {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
 button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Fix iOS viewport height */
+/* iOS viewport fix */
 @supports (-webkit-touch-callout: none) {
   .min-h-screen {
     min-height: -webkit-fill-available;
   }
 }
 
-/* Improve image loading */
+/* Image defaults */
 img {
   display: block;
   max-width: 100%;
   height: auto;
 }
 
-/* Reduce motion for users who prefer it */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
