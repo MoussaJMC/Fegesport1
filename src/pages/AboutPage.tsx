@@ -1,14 +1,14 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Award, Shield, Users, Globe } from 'lucide-react';
+import { Award, Shield, Users, Globe, Target, ChevronDown, ChevronUp, Loader2, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../hooks/useLanguage';
+import { getLeadershipTranslation } from '../utils/translations';
+import SectionHeader from '../components/ui/SectionHeader';
 
-// Lazy-load PDF-heavy component to prevent "The operation is insecure" crash
-// caused by pdfjs worker initialization at module import time
 const OfficialDocumentsSection = lazy(() => import('../components/documents/OfficialDocumentsSection'));
 
-// Simple error boundary to isolate PDF viewer crashes from the rest of the page
 class ErrorBoundarySimple extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean }
@@ -17,7 +17,7 @@ class ErrorBoundarySimple extends React.Component<
   static getDerivedStateFromError() { return { hasError: true }; }
   componentDidCatch(error: Error) { console.error('Documents section error:', error.message); }
   render() {
-    if (this.state.hasError) return null; // Silently hide broken section
+    if (this.state.hasError) return null;
     return this.props.children;
   }
 }
@@ -30,6 +30,7 @@ interface LeadershipMember {
   image_url: string;
   order: number;
   is_active: boolean;
+  translations?: any;
 }
 
 interface HistoryEntry {
@@ -45,10 +46,12 @@ interface HistoryEntry {
 }
 
 const AboutPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [leadershipTeam, setLeadershipTeam] = useState<LeadershipMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedBios, setExpandedBios] = useState<{ [key: string]: boolean }>({});
+  const [expandedBios, setExpandedBios] = useState<Record<string, boolean>>({});
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
 
@@ -60,27 +63,20 @@ const AboutPage: React.FC = () => {
   const fetchLeadershipTeam = async () => {
     try {
       setLoading(true);
-
-      // Try to fetch from Supabase
       const { data, error } = await supabase
         .from('leadership_team')
         .select('*')
         .eq('is_active', true)
         .order('order', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching leadership team:', error);
-        // If table doesn't exist or other error, use default data
-        setLeadershipTeam(getDefaultLeadershipTeam());
-      } else if (data && data.length > 0) {
-        setLeadershipTeam(data);
+      if (error || !data || data.length === 0) {
+        setLeadershipTeam([]);
       } else {
-        // No data found, use default data
-        setLeadershipTeam(getDefaultLeadershipTeam());
+        setLeadershipTeam(data);
       }
     } catch (error) {
-      console.error('Error in fetchLeadershipTeam:', error);
-      setLeadershipTeam(getDefaultLeadershipTeam());
+      console.error('Error fetching leadership:', error);
+      setLeadershipTeam([]);
     } finally {
       setLoading(false);
     }
@@ -98,204 +94,143 @@ const AboutPage: React.FC = () => {
       if (error) throw error;
       setHistoryEntries(data || []);
     } catch (error) {
-      console.error('Error fetching history entries:', error);
+      console.error('Error fetching history:', error);
       setHistoryEntries([]);
     } finally {
       setHistoryLoading(false);
     }
   };
 
-
   const formatYearRange = (start: number, end: number | null): string => {
-    if (end) {
-      return `${start}-${end}`;
-    }
-    return i18n.language === 'fr' ? `${start} - Aujourd'hui` : `${start} - Present`;
+    if (end) return `${start}-${end}`;
+    return lang === 'fr' ? `${start} - Aujourd'hui` : `${start} - Present`;
   };
 
-  const toggleBio = (memberId: string) => {
-    setExpandedBios(prev => ({
-      ...prev,
-      [memberId]: !prev[memberId]
-    }));
+  const toggleBio = (id: string) => {
+    setExpandedBios(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const truncateBio = (bio: string, maxLength: number = 300) => {
-    if (bio.length <= maxLength) return bio;
-    return bio.substring(0, maxLength);
+  const getMemberName = (m: LeadershipMember): string => {
+    const translated = getLeadershipTranslation(m.translations, lang);
+    return translated.name || m.name;
   };
 
-  const getDefaultLeadershipTeam = (): LeadershipMember[] => {
-    return [
-      {
-        id: '1',
-        name: 'Mamadou Diallo',
-        position: 'Président',
-        bio: 'Entrepreneur visionnaire et passionné d\'esport, Mamadou dirige la FEGESPORT avec l\'ambition de faire de la Guinée une référence de l\'esport en Afrique.',
-        image_url: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg',
-        order: 1,
-        is_active: true
-      },
-      {
-        id: '2',
-        name: 'Aïssata Camara',
-        position: 'Secrétaire Générale',
-        bio: 'Forte d\'une expérience de 15 ans dans l\'administration sportive, Aïssata coordonne l\'ensemble des activités de la fédération.',
-        image_url: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg',
-        order: 2,
-        is_active: true
-      },
-      {
-        id: '3',
-        name: 'Ibrahima Sow',
-        position: 'Directeur Technique',
-        bio: 'Ancien joueur professionnel et expert technique, Ibrahima supervise tous les aspects compétitifs et la formation des arbitres.',
-        image_url: 'https://images.pexels.com/photos/5792641/pexels-photo-5792641.jpeg',
-        order: 3,
-        is_active: true
-      },
-      {
-        id: '4',
-        name: 'Fatoumata Barry',
-        position: 'Directrice Marketing',
-        bio: 'Spécialiste en marketing digital, Fatoumata développe la stratégie de communication et les partenariats de la FEGESPORT.',
-        image_url: 'https://images.pexels.com/photos/2381469/pexels-photo-2381469.jpeg',
-        order: 4,
-        is_active: true
-      },
-      {
-        id: '5',
-        name: 'Sékou Condé',
-        position: 'Directeur des Compétitions',
-        bio: 'Expert en organisation d\'événements esport, Sékou coordonne l\'ensemble des compétitions nationales et internationales.',
-        image_url: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-        order: 5,
-        is_active: true
-      },
-      {
-        id: '6',
-        name: 'Mariama Touré',
-        position: 'Directrice du Développement',
-        bio: 'Chargée du développement des programmes jeunesse et de l\'expansion de l\'esport dans toutes les régions de Guinée.',
-        image_url: 'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg',
-        order: 6,
-        is_active: true
-      }
-    ];
+  const getMemberPosition = (m: LeadershipMember): string => {
+    const translated = getLeadershipTranslation(m.translations, lang);
+    return translated.position || m.position;
   };
+
+  const getMemberBio = (m: LeadershipMember): string => {
+    const translated = getLeadershipTranslation(m.translations, lang);
+    return translated.bio || m.bio;
+  };
+
+  const isPresident = (m: LeadershipMember): boolean => {
+    const pos = m.position.toLowerCase();
+    return pos.includes('president') || pos.includes('président') || m.order === 1;
+  };
+
+  const values = [
+    { icon: <Award size={28} />, title: t('about.values.excellence'), desc: t('about.values.excellence_desc') },
+    { icon: <Shield size={28} />, title: t('about.values.integrity'), desc: t('about.values.integrity_desc') },
+    { icon: <Users size={28} />, title: t('about.values.inclusivity'), desc: t('about.values.inclusivity_desc') },
+    { icon: <Target size={28} />, title: t('about.values.innovation'), desc: t('about.values.innovation_desc') },
+  ];
+
+  // Default history fallback
+  const defaultHistory: HistoryEntry[] = [
+    { id: '1', title_fr: 'Fondation', title_en: 'Foundation', description_fr: 'Creation de la FEGESPORT par un groupe de passionnes d\'esport guineens avec la vision de structurer et developper l\'ecosysteme esport national.', description_en: 'Creation of FEGESPORT by a group of passionate Guinean esports enthusiasts with the vision of structuring and developing the national esports ecosystem.', year_start: 2009, year_end: 2013, order_position: 1, is_active: true },
+    { id: '2', title_fr: 'Reconnaissance Officielle', title_en: 'Official Recognition', description_fr: 'Obtention de la reconnaissance officielle par le Ministere de la Jeunesse et des Sports, faisant de la FEGESPORT l\'organe officiel de gouvernance de l\'esport en Guinee.', description_en: 'Obtaining official recognition from the Ministry of Youth and Sports, making FEGESPORT the official esports governance body in Guinea.', year_start: 2017, year_end: null, order_position: 2, is_active: true },
+    { id: '3', title_fr: 'Premiers Championnats Nationaux', title_en: 'First National Championships', description_fr: 'Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport.', description_en: 'Organization of the first official national championships in multiple esports disciplines.', year_start: 2018, year_end: null, order_position: 3, is_active: true },
+    { id: '4', title_fr: 'Affiliation Internationale', title_en: 'International Affiliation', description_fr: 'Affiliation aux principales federations internationales d\'esport IESF & GEF, permettant aux equipes guineennes de participer aux competitions internationales.', description_en: 'Affiliation with major international esports federations IESF & GEF, enabling Guinean teams to compete internationally.', year_start: 2019, year_end: null, order_position: 4, is_active: true },
+  ];
+
+  const displayHistory = historyEntries.length > 0 ? historyEntries : defaultHistory;
 
   return (
     <div className="pt-20">
-      {/* Hero Section */}
-      <section className="bg-primary-700 text-white py-20">
-        <div className="container-custom">
+      {/* ============ HERO ============ */}
+      <section className="relative bg-dark-950 py-20 md:py-28 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-1/3 -left-32 w-96 h-96 bg-fed-red-500/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 -right-32 w-96 h-96 bg-fed-gold-500/5 rounded-full blur-3xl" />
+        </div>
+        <div className="container-custom relative z-10">
           <div className="max-w-3xl">
-            <h1 className="text-3xl md:text-5xl font-bold mb-6">{t('about.title')}</h1>
-            <p className="text-xl">
-              {t('about.subtitle')}
-            </p>
+            <span className="overline block mb-4">
+              {lang === 'fr' ? 'QUI SOMMES-NOUS' : 'WHO WE ARE'}
+            </span>
+            <h1 className="text-hero font-heading text-white mb-6">{t('about.title')}</h1>
+            <p className="text-lg md:text-xl text-light-300">{t('about.subtitle')}</p>
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="section bg-white">
+      {/* ============ MISSION & VISION ============ */}
+      <section className="section bg-section-alt">
         <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.mission.title')}</h2>
-              <div className="w-20 h-1 bg-primary-600 mb-6"></div>
-              <p className="text-base md:text-lg text-gray-700 mb-4">
-                {t('about.mission.description')}
-              </p>
-            </div>
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.vision.title')}</h2>
-              <div className="w-20 h-1 bg-primary-600 mb-6"></div>
-              <p className="text-base md:text-lg text-gray-700 mb-4">
-                {t('about.vision.description')}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="card p-6 md:p-8 border-l-4 border-l-fed-red-500"
+            >
+              <h2 className="text-2xl font-bold mb-4 text-white font-heading">{t('about.mission.title')}</h2>
+              <div className="divider-red mb-6" />
+              <p className="text-light-300 leading-relaxed">{t('about.mission.description')}</p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="card p-6 md:p-8 border-l-4 border-l-fed-gold-500"
+            >
+              <h2 className="text-2xl font-bold mb-4 text-white font-heading">{t('about.vision.title')}</h2>
+              <div className="divider-gold mb-6" />
+              <p className="text-light-300 leading-relaxed">{t('about.vision.description')}</p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="section bg-gray-50">
+      {/* ============ VALUES ============ */}
+      <section className="section bg-section-dark">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('about.values.title')}</h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-base md:text-lg max-w-3xl mx-auto">
-              {t('about.values.description')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
-            <motion.div 
-              className="card p-6"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                <Award className="text-primary-600" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.excellence')}</h3>
-              <p className="text-gray-600">
-                {t('about.values.excellence_desc')}
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="card p-6"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                <Shield className="text-primary-600" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.integrity')}</h3>
-              <p className="text-gray-600">
-                {t('about.values.integrity_desc')}
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="card p-6"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                <Users className="text-primary-600" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.inclusivity')}</h3>
-              <p className="text-gray-600">
-                {t('about.values.inclusivity_desc')}
-              </p>
-            </motion.div>
-
-            <motion.div 
-              className="card p-6"
-              whileHover={{ y: -10 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                <Globe className="text-primary-600" size={28} />
-              </div>
-              <h3 className="text-xl font-bold mb-3">{t('about.values.innovation')}</h3>
-              <p className="text-gray-600">
-                {t('about.values.innovation_desc')}
-              </p>
-            </motion.div>
+          <SectionHeader
+            overline={lang === 'fr' ? 'NOS VALEURS' : 'OUR VALUES'}
+            title={t('about.values.title')}
+            description={t('about.values.description')}
+            dividerColor="gold"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((val, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="card p-6 text-center group hover:border-fed-gold-500/30"
+              >
+                <div className="w-16 h-16 rounded-xl bg-fed-red-500/10 border border-fed-red-500/20 flex items-center justify-center mx-auto mb-5 text-fed-red-500 group-hover:bg-fed-red-500/20 transition-colors">
+                  {val.icon}
+                </div>
+                <h3 className="text-lg font-bold mb-3 text-white font-heading">{val.title}</h3>
+                <p className="text-light-400 text-sm leading-relaxed">{val.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Official Documents - Lazy loaded to prevent PDF worker crash */}
+      {/* ============ DOCUMENTS ============ */}
       <Suspense fallback={
-        <div className="section bg-gray-50 text-center">
+        <div className="section bg-section-alt text-center">
           <div className="container-custom">
-            <p className="text-gray-500">Chargement des documents...</p>
+            <Loader2 className="w-8 h-8 animate-spin text-fed-red-500 mx-auto" />
           </div>
         </div>
       }>
@@ -304,157 +239,146 @@ const AboutPage: React.FC = () => {
         </ErrorBoundarySimple>
       </Suspense>
 
-      {/* Leadership */}
-      <section className="section bg-gray-50">
+      {/* ============ LEADERSHIP ============ */}
+      <section className="section bg-section-alt">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Notre Direction</h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-            <p className="text-base md:text-lg max-w-3xl mx-auto">
-              La FEGESPORT est dirigée par une équipe de professionnels passionnés et engagés, apportant expertise 
-              et vision au développement de l'esport guinéen.
-            </p>
-          </div>
+          <SectionHeader
+            overline={lang === 'fr' ? 'NOTRE EQUIPE' : 'OUR TEAM'}
+            title={lang === 'fr' ? 'Notre Direction' : 'Our Leadership'}
+            description={
+              lang === 'fr'
+                ? 'La FEGESPORT est dirigee par une equipe de professionnels passionnes et engages.'
+                : 'FEGESPORT is led by a team of passionate and committed professionals.'
+            }
+            dividerColor="red"
+          />
 
           {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-10 h-10 animate-spin text-fed-red-500" />
+            </div>
+          ) : leadershipTeam.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {leadershipTeam.map((member, index) => {
+                const bio = getMemberBio(member);
+                const isLong = bio.length > 200;
+                const isExpanded = expandedBios[member.id];
+
+                return (
+                  <motion.div
+                    key={member.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: Math.min(index * 0.08, 0.4) }}
+                    viewport={{ once: true }}
+                    className={`card overflow-hidden ${isPresident(member) ? 'border-fed-gold-500/50' : ''}`}
+                  >
+                    {/* Photo */}
+                    <div className="relative h-48 bg-dark-700 flex items-center justify-center overflow-hidden">
+                      {member.image_url ? (
+                        <img
+                          src={member.image_url}
+                          alt={getMemberName(member)}
+                          className="w-full h-full object-cover object-top"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      ) : (
+                        <Users className="text-dark-700" size={64} />
+                      )}
+                      {isPresident(member) && (
+                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-fed-gold-500/90 text-dark-950 text-xs font-bold">
+                          {lang === 'fr' ? 'President' : 'President'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5">
+                      <h3 className="text-lg font-bold text-white font-heading mb-1">
+                        {getMemberName(member)}
+                      </h3>
+                      <span className={`inline-block text-sm font-medium mb-3 ${
+                        isPresident(member) ? 'text-fed-gold-500' : 'text-fed-red-400'
+                      }`}>
+                        {getMemberPosition(member)}
+                      </span>
+                      <p className="text-light-400 text-sm leading-relaxed">
+                        {isLong && !isExpanded ? bio.substring(0, 200) + '...' : bio}
+                      </p>
+                      {isLong && (
+                        <button
+                          onClick={() => toggleBio(member.id)}
+                          className="mt-2 text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium flex items-center gap-1 transition-colors"
+                        >
+                          {isExpanded ? (
+                            <><ChevronUp size={14} /> {lang === 'fr' ? 'Moins' : 'Less'}</>
+                          ) : (
+                            <><ChevronDown size={14} /> {lang === 'fr' ? 'Plus' : 'More'}</>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-              {leadershipTeam.map((member, index) => (
-                <motion.div
-                  key={member.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="card overflow-hidden text-center"
-                >
-                  <div className="pt-8 pb-4 px-6 bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                      <img
-                        src={member.image_url}
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://via.placeholder.com/150?text=Photo';
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-1 card-title">{member.name}</h3>
-                    <p className="text-primary-600 font-medium mb-4">{member.position}</p>
-                    <p className="text-gray-600 card-description text-sm text-justify">
-                      {expandedBios[member.id]
-                        ? member.bio
-                        : truncateBio(member.bio, 300)}
-                      {member.bio.length > 300 && !expandedBios[member.id] && '...'}
-                    </p>
-                    {member.bio.length > 300 && (
-                      <button
-                        onClick={() => toggleBio(member.id)}
-                        className="mt-3 text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors duration-200"
-                      >
-                        {expandedBios[member.id] ? 'Moins' : 'Plus'}
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+            <div className="text-center py-12 card p-8 max-w-md mx-auto">
+              <Users className="w-14 h-14 text-dark-700 mx-auto mb-4" />
+              <p className="text-light-400">
+                {lang === 'fr' ? 'Equipe de direction en cours de publication.' : 'Leadership team being published.'}
+              </p>
             </div>
           )}
         </div>
       </section>
 
-      {/* History */}
-      <section className="section bg-gray-50">
+      {/* ============ HISTORY TIMELINE ============ */}
+      <section className="section bg-section-dark">
         <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              {i18n.language === 'fr' ? 'Notre Histoire' : 'Our History'}
-            </h2>
-            <div className="w-24 h-1 bg-primary-600 mx-auto mb-6"></div>
-          </div>
+          <SectionHeader
+            overline={lang === 'fr' ? 'NOTRE PARCOURS' : 'OUR JOURNEY'}
+            title={lang === 'fr' ? 'Notre Histoire' : 'Our History'}
+            dividerColor="gold"
+          />
 
           {historyLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-10 h-10 animate-spin text-fed-red-500" />
             </div>
-          ) : historyEntries.length > 0 ? (
-            <div className="max-w-4xl mx-auto">
-              {historyEntries.map((entry, index) => (
+          ) : (
+            <div className="max-w-3xl mx-auto">
+              {displayHistory.map((entry, index) => (
                 <motion.div
                   key={entry.id}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className={`relative pl-8 ${index < historyEntries.length - 1 ? 'pb-12 border-l-2 border-primary-300' : ''}`}
+                  className={`relative pl-12 ${index < displayHistory.length - 1 ? 'pb-10 border-l-2 border-dark-700 ml-4' : 'ml-4'}`}
                 >
-                  <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                    {index + 1}
+                  {/* Timeline node */}
+                  <div className="absolute top-0 left-0 w-9 h-9 -translate-x-1/2 rounded-full bg-dark-800 border-2 border-fed-red-500 flex items-center justify-center">
+                    <Clock size={14} className="text-fed-red-500" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">
-                    {i18n.language === 'fr' ? entry.title_fr : entry.title_en} ({formatYearRange(entry.year_start, entry.year_end)})
+
+                  {/* Year badge */}
+                  <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-full bg-fed-gold-500/10 text-fed-gold-500 border border-fed-gold-500/20 mb-3">
+                    {formatYearRange(entry.year_start, entry.year_end)}
+                  </span>
+
+                  <h3 className="text-lg font-bold text-white mb-2 font-heading">
+                    {lang === 'fr' ? entry.title_fr : entry.title_en}
                   </h3>
-                  <p className="text-gray-600 mb-4">
-                    {i18n.language === 'fr' ? entry.description_fr : entry.description_en}
+                  <p className="text-light-400 text-sm leading-relaxed">
+                    {lang === 'fr' ? entry.description_fr : entry.description_en}
                   </p>
                 </motion.div>
               ))}
             </div>
-          ) : (
-            <div className="max-w-4xl mx-auto">
-              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                  1
-                </div>
-                <h3 className="text-xl font-bold mb-2">Fondation (2009-2013)</h3>
-                <p className="text-gray-600 mb-4">
-                  Création de la FEGESPORT par un groupe de passionnés d'esport guinéens avec la vision de structurer
-                  et développer l'écosystème esport national.
-                </p>
-              </div>
-
-              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                  2
-                </div>
-                <h3 className="text-xl font-bold mb-2">Reconnaissance Officielle (2017)</h3>
-                <p className="text-gray-600 mb-4">
-                  Obtention de la reconnaissance officielle par l'Administration du territoir (la ville de Conakry) puis le Ministère de la Jeunesse et des Sports, faisant de
-                  la FEGESPORT l'organe officiel de gouvernance de l'esport en Guinée.
-                </p>
-              </div>
-
-              <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                  3
-                </div>
-                <h3 className="text-xl font-bold mb-2">Premiers Championnats Nationaux (2018-Nos jours)</h3>
-                <p className="text-gray-600 mb-4">
-                  Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport,
-                  établissant les standards de compétition pour le pays.
-                </p>
-              </div>
-
-              <div className="relative pl-8">
-                <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
-                  4
-                </div>
-                <h3 className="text-xl font-bold mb-2">Affiliation Internationale (2019 - Nos jours)</h3>
-                <p className="text-gray-600 mb-4">
-                  Affiliation aux principales fédérations internationales d'esport ACDS, WESCO, IESF & GEF, permettant aux équipes guinéennes
-                  de participer aux compétitions internationales sous les couleurs nationales.
-                </p>
-              </div>
-            </div>
           )}
         </div>
       </section>
-
     </div>
   );
 };
