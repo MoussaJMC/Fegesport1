@@ -47,17 +47,23 @@ const CommunityPage: React.FC = () => {
     fetchMembers();
     fetchPartners();
 
-    // Subscribe to real-time updates for community stats
-    const channel = subscribeToCommunityStats(() => {
-      console.log('Community stats changed, refreshing...');
-      fetchStats();
-      fetchMembers();
-      fetchPartners();
-    });
+    // Subscribe to real-time updates (wrapped in try/catch to prevent
+    // "The operation is insecure" crash when localStorage is restricted)
+    let channel: any = null;
+    try {
+      channel = subscribeToCommunityStats(() => {
+        fetchStats();
+        fetchMembers();
+        fetchPartners();
+      });
+    } catch (err) {
+      console.error('Error subscribing to community stats:', err);
+    }
 
-    // Cleanup subscription on unmount
     return () => {
-      channel.unsubscribe();
+      if (channel) {
+        try { channel.unsubscribe(); } catch (e) { /* silent */ }
+      }
     };
   }, []);
 
