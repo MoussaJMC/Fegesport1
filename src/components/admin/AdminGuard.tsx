@@ -30,21 +30,56 @@ export default function AdminGuard({ children, requireSuperadmin = false }: Admi
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        console.error('Auth error:', authError);
+        console.error('AdminGuard: Auth error or no user', authError);
         await supabase.auth.signOut();
         navigate('/admin/login');
         return;
       }
 
-      // 2. Check if user is in admin_users table
-      const { data: adminData, error: adminError } = await supabase
+      console.log('AdminGuard: User authenticated:', user.email, 'ID:', user.id);
+
+      // 2. Check if user is in admin_users table — try by user_id first, then by email
+      let adminData = null;
+      let adminError = null;
+
+      // Try by user_id
+      const result1 = await supabase
         .from('admin_users')
         .select('id, email, role, is_active')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (adminError || !adminData) {
-        console.error('Not an admin user:', user.email);
+      if (result1.data) {
+        adminData = result1.data;
+        console.log('AdminGuard: Found admin by user_id:', adminData);
+      } else {
+        console.log('AdminGuard: Not found by user_id, trying email...', result1.error?.message);
+
+        // Fallback: try by email
+        const result2 = await supabase
+          .from('admin_users')
+          .select('id, email, role, is_active')
+          .eq('email', user.email)
+          .maybeSingle();
+
+        if (result2.data) {
+          adminData = result2.data;
+          console.log('AdminGuard: Found admin by email:', adminData);
+
+          // Update user_id for future lookups
+          await supabase
+            .from('admin_users')
+            .update({ user_id: user.id })
+            .eq('email', user.email);
+          console.log('AdminGuard: Updated user_id in admin_users');
+        } else {
+          adminError = result2.error;
+          console.error('AdminGuard: Not found by email either:', result2.error?.message);
+        }
+      }
+
+      if (!adminData) {
+        console.error('AdminGuard: Not an admin user:', user.email);
         await supabase.auth.signOut();
         navigate('/admin/login');
         return;
@@ -52,7 +87,7 @@ export default function AdminGuard({ children, requireSuperadmin = false }: Admi
 
       // 3. Check if admin is active
       if (!adminData.is_active) {
-        console.error('Admin account is deactivated:', adminData.email);
+        console.error('AdminGuard: Admin account is deactivated:', adminData.email);
         await supabase.auth.signOut();
         navigate('/admin/login');
         return;
@@ -60,17 +95,18 @@ export default function AdminGuard({ children, requireSuperadmin = false }: Admi
 
       // 4. Check if superadmin required
       if (requireSuperadmin && adminData.role !== 'superadmin') {
-        console.error('Superadmin access required');
-        navigate('/admin/dashboard');
+        console.error('AdminGuard: Superadmin access required');
+        navigate('/admin');
         return;
       }
 
       // 5. All checks passed
+      console.log('AdminGuard: Access granted for', adminData.email, 'role:', adminData.role);
       setAdminUser(adminData as AdminUser);
       setLoading(false);
 
     } catch (error) {
-      console.error('Error checking admin access:', error);
+      console.error('AdminGuard: Error checking admin access:', error);
       await supabase.auth.signOut();
       navigate('/admin/login');
     }
