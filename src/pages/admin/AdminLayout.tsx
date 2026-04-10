@@ -254,7 +254,9 @@ const AdminLayout: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated) {
+  // Only redirect to login if we're sure auth state has been resolved
+  // and user is truly not authenticated
+  if (!isAuthenticated && !isLoading) {
     return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
   }
 
