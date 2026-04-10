@@ -85,12 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Aucune donnée utilisateur retournée par Supabase');
       }
 
-      // Check if user has admin role in user_metadata
-      const isAdmin = data.user.user_metadata?.role === 'admin';
-      if (!isAdmin) {
-        await supabase.auth.signOut();
-        throw new Error('Accès non autorisé - Rôle administrateur requis');
-      }
+      // Admin role verification is handled by AdminGuard component
+      // which checks the admin_users table in Supabase.
+      // No need to check user_metadata here — it causes false rejections
+      // when user_metadata.role is not set but the user IS in admin_users table.
 
       toast.success('Connexion réussie');
     } catch (error: any) {

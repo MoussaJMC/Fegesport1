@@ -319,15 +319,18 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-dark-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            <Lock className="h-6 w-6 text-primary-600" />
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-fed-red-500/20 border border-fed-red-500/30">
+            <Lock className="h-6 w-6 text-fed-red-500" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-white font-heading">
             Administration FEGESPORT
           </h2>
+          <p className="mt-2 text-center text-sm text-light-400">
+            Panneau d'administration de la federation
+          </p>
         </div>
 
         {/* Connection Status */}
