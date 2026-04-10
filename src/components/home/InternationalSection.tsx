@@ -1,13 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Globe, ExternalLink } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';
+import { supabase } from '../../lib/supabase';
 import { INTERNATIONAL_AFFILIATIONS } from '../../styles/design-tokens';
+
+interface Affiliation {
+  id: string;
+  name: string;
+  shortName: string;
+  description_fr: string;
+  description_en: string;
+  logo?: string;
+  url: string;
+}
 
 const InternationalSection: React.FC = () => {
   const { i18n } = useTranslation();
   const lang = i18n.language === 'fr' ? 'fr' : 'en';
+  const [affiliations, setAffiliations] = useState<Affiliation[]>([...INTERNATIONAL_AFFILIATIONS]);
+  const [sectionTitle, setSectionTitle] = useState({
+    fr: 'Representation Internationale',
+    en: 'International Representation',
+  });
+  const [sectionDescription, setSectionDescription] = useState({
+    fr: 'La FEGESPORT represente la Guinee au sein des instances internationales de l\'esport, contribuant au developpement du sport electronique a l\'echelle mondiale.',
+    en: 'FEGESPORT represents Guinea within international esports bodies, contributing to the development of electronic sports on a global scale.',
+  });
+
+  useEffect(() => {
+    fetchInternationalData();
+  }, []);
+
+  const fetchInternationalData = async () => {
+    try {
+      // Look for "international" section in page_sections (linked to home page)
+      const { data: pageData } = await supabase
+        .from('pages')
+        .select('id')
+        .eq('slug', 'home')
+        .maybeSingle();
+
+      if (!pageData) return;
+
+      const { data: section } = await supabase
+        .from('page_sections')
+        .select('*')
+        .eq('page_id', pageData.id)
+        .eq('section_key', 'international')
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!section) return; // Keep hardcoded fallback
+
+      // Update title from section
+      if (section.title) {
+        setSectionTitle(prev => ({
+          ...prev,
+          fr: section.title,
+          ...(section.translations?.en?.title ? { en: section.translations.en.title } : {}),
+        }));
+      }
+
+      // Update description from section content
+      if (section.content) {
+        setSectionDescription(prev => ({
+          ...prev,
+          fr: section.content,
+          ...(section.translations?.en?.content ? { en: section.translations.en.content } : {}),
+        }));
+      }
+
+      // Update affiliations from settings JSON
+      // Expected format in settings: { affiliations: [ { id, name, shortName, description_fr, description_en, logo, url } ] }
+      if (section.settings?.affiliations && Array.isArray(section.settings.affiliations) && section.settings.affiliations.length > 0) {
+        setAffiliations(section.settings.affiliations);
+      }
+    } catch (error) {
+      console.error('Error fetching international section:', error);
+      // Keep hardcoded fallback on error
+    }
+  };
 
   return (
     <section className="section bg-section-alt relative overflow-hidden">
@@ -17,16 +91,12 @@ const InternationalSection: React.FC = () => {
       <div className="container-custom relative z-10">
         <SectionHeader
           overline={lang === 'fr' ? 'SUR LA SCENE MONDIALE' : 'ON THE WORLD STAGE'}
-          title={lang === 'fr' ? 'Representation Internationale' : 'International Representation'}
-          description={
-            lang === 'fr'
-              ? 'La FEGESPORT represente la Guinee au sein des instances internationales de l\'esport, contribuant au developpement du sport electronique a l\'echelle mondiale.'
-              : 'FEGESPORT represents Guinea within international esports bodies, contributing to the development of electronic sports on a global scale.'
-          }
+          title={lang === 'fr' ? sectionTitle.fr : sectionTitle.en}
+          description={lang === 'fr' ? sectionDescription.fr : sectionDescription.en}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {INTERNATIONAL_AFFILIATIONS.map((affiliation, index) => (
+        <div className={`grid grid-cols-1 ${affiliations.length >= 2 ? 'md:grid-cols-2' : ''} ${affiliations.length >= 3 ? 'lg:grid-cols-3' : ''} gap-8 max-w-5xl mx-auto`}>
+          {affiliations.map((affiliation, index) => (
             <motion.div
               key={affiliation.id}
               initial={{ opacity: 0, y: 20 }}
@@ -36,7 +106,7 @@ const InternationalSection: React.FC = () => {
               className="card-featured p-6 md:p-8 group"
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-14 h-14 rounded-xl bg-fed-gold-500/10 border border-fed-gold-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-fed-gold-500/20 transition-colors">
+                <div className="w-14 h-14 rounded-xl bg-fed-gold-500/10 border border-fed-gold-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-fed-gold-500/20 transition-colors overflow-hidden">
                   {affiliation.logo ? (
                     <img
                       src={affiliation.logo}
@@ -44,11 +114,10 @@ const InternationalSection: React.FC = () => {
                       className="w-10 h-10 object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement?.classList.add('fallback-icon');
                       }}
                     />
                   ) : null}
-                  <Globe className="text-fed-gold-500" size={24} />
+                  <Globe className={`text-fed-gold-500 ${affiliation.logo ? 'hidden' : ''}`} size={24} />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white font-heading mb-1">
@@ -62,7 +131,7 @@ const InternationalSection: React.FC = () => {
                 {lang === 'fr' ? affiliation.description_fr : affiliation.description_en}
               </p>
 
-              {affiliation.url !== '#' && (
+              {affiliation.url && affiliation.url !== '#' && (
                 <a
                   href={affiliation.url}
                   target="_blank"
