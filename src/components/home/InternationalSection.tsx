@@ -105,54 +105,51 @@ const InternationalSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.15 }}
               viewport={{ once: true }}
-              className="card-featured p-6 md:p-8 group"
+              className="card-featured overflow-hidden group"
             >
-              <div className="flex items-start gap-4 mb-4">
-                <div className={`rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors overflow-hidden ${
-                  affiliation.logo
-                    ? 'w-20 h-14 bg-white border-light-200 p-1'
-                    : 'w-14 h-14 bg-fed-gold-500/10 border-fed-gold-500/20 group-hover:bg-fed-gold-500/20'
-                }`}>
-                  {affiliation.logo ? (
-                    <img
-                      src={affiliation.logo}
-                      alt={affiliation.shortName}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.parentElement) {
-                          e.currentTarget.parentElement.classList.remove('bg-white', 'border-light-200', 'p-1.5');
-                          e.currentTarget.parentElement.classList.add('bg-fed-gold-500/10', 'border-fed-gold-500/20');
-                        }
-                      }}
-                    />
-                  ) : (
-                    <Globe className="text-fed-gold-500" size={24} />
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white font-heading mb-1">
-                    {affiliation.shortName}
-                  </h3>
-                  <p className="text-light-400 text-sm">{affiliation.name}</p>
+              {/* Logo area — full width, white bg */}
+              <div className="bg-white flex items-center justify-center p-4 h-24">
+                {affiliation.logo ? (
+                  <img
+                    src={affiliation.logo}
+                    alt={affiliation.shortName}
+                    className="max-h-full max-w-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextElementSibling) {
+                        (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : null}
+                <div className={`items-center justify-center gap-2 ${affiliation.logo ? 'hidden' : 'flex'}`}>
+                  <Globe className="text-fed-gold-600" size={32} />
+                  <span className="text-2xl font-bold text-dark-900 font-heading">{affiliation.shortName}</span>
                 </div>
               </div>
 
-              <p className="text-light-300 text-sm leading-relaxed mb-4">
-                {lang === 'fr' ? affiliation.description_fr : affiliation.description_en}
-              </p>
+              {/* Content */}
+              <div className="p-6">
+                <h3 className="text-lg font-bold text-white font-heading mb-1">
+                  {affiliation.shortName}
+                </h3>
+                <p className="text-light-400 text-sm mb-3">{affiliation.name}</p>
+                <p className="text-light-300 text-sm leading-relaxed mb-4">
+                  {lang === 'fr' ? affiliation.description_fr : affiliation.description_en}
+                </p>
 
-              {affiliation.url && affiliation.url !== '#' && (
-                <a
-                  href={affiliation.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium transition-colors"
-                >
-                  {lang === 'fr' ? 'Visiter le site officiel' : 'Visit official website'}
-                  <ExternalLink size={14} className="ml-1.5" />
-                </a>
-              )}
+                {affiliation.url && affiliation.url !== '#' && (
+                  <a
+                    href={affiliation.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium transition-colors"
+                  >
+                    {lang === 'fr' ? 'Visiter le site officiel' : 'Visit official website'}
+                    <ExternalLink size={14} className="ml-1.5" />
+                  </a>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>
