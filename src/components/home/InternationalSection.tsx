@@ -108,18 +108,27 @@ const InternationalSection: React.FC = () => {
               className="card-featured p-6 md:p-8 group"
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-14 h-14 rounded-xl bg-fed-gold-500/10 border border-fed-gold-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-fed-gold-500/20 transition-colors overflow-hidden">
+                <div className={`w-14 h-14 rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors overflow-hidden ${
+                  affiliation.logo
+                    ? 'bg-white border-light-200 p-1.5'
+                    : 'bg-fed-gold-500/10 border-fed-gold-500/20 group-hover:bg-fed-gold-500/20'
+                }`}>
                   {affiliation.logo ? (
                     <img
                       src={affiliation.logo}
                       alt={affiliation.shortName}
-                      className="w-10 h-10 object-contain"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.parentElement) {
+                          e.currentTarget.parentElement.classList.remove('bg-white', 'border-light-200', 'p-1.5');
+                          e.currentTarget.parentElement.classList.add('bg-fed-gold-500/10', 'border-fed-gold-500/20');
+                        }
                       }}
                     />
-                  ) : null}
-                  <Globe className={`text-fed-gold-500 ${affiliation.logo ? 'hidden' : ''}`} size={24} />
+                  ) : (
+                    <Globe className="text-fed-gold-500" size={24} />
+                  )}
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white font-heading mb-1">
