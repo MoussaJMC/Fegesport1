@@ -46,6 +46,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ page, onSave, onCancel }) => {
   });
   const [showSectionForm, setShowSectionForm] = useState(false);
   const [editingSection, setEditingSection] = useState<PageSection | null>(null);
+  const [settingsRaw, setSettingsRaw] = useState('{}');
+  const [settingsError, setSettingsError] = useState(false);
   const [sectionForm, setSectionForm] = useState<{
     section_key: string;
     section_type: PageSection['section_type'];
@@ -314,6 +316,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ page, onSave, onCancel }) => {
                 settings: {},
                 is_active: true
               });
+              setSettingsRaw('{}');
+              setSettingsError(false);
               setEditingSection(null);
               setShowSectionForm(true);
             }}
@@ -396,6 +400,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ page, onSave, onCancel }) => {
                           settings: section.settings || {},
                           is_active: section.is_active
                         });
+                        setSettingsRaw(JSON.stringify(section.settings || {}, null, 2));
+                        setSettingsError(false);
                         setEditingSection(section);
                         setShowSectionForm(true);
                       }}
@@ -541,6 +547,37 @@ const PageEditor: React.FC<PageEditorProps> = ({ page, onSave, onCancel }) => {
                   <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
                     Section active
                   </label>
+                </div>
+
+                {/* Settings JSON Editor — for international affiliations, etc. */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Parametres avances (JSON)
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Pour la section "international" : editez les affiliations ici. Format: {`{"affiliations": [...]}`}
+                  </p>
+                  <textarea
+                    value={settingsRaw}
+                    onChange={(e) => {
+                      setSettingsRaw(e.target.value);
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        setSectionForm({ ...sectionForm, settings: parsed });
+                        setSettingsError(false);
+                      } catch {
+                        setSettingsError(true);
+                      }
+                    }}
+                    rows={12}
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500 font-mono text-xs ${
+                      settingsError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder='{"affiliations": []}'
+                  />
+                  {settingsError && (
+                    <p className="text-xs text-red-600 mt-1">JSON invalide — corrigez le format avant de sauvegarder</p>
+                  )}
                 </div>
               </div>
 
