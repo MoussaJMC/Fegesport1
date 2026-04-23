@@ -291,11 +291,13 @@ const AboutPage: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      {isPresident(member) && (
-                        <span className="inline-block px-2.5 py-0.5 rounded-full bg-fed-gold-500/15 text-fed-gold-500 text-xs font-bold border border-fed-gold-500/30 mb-2">
-                          {lang === 'fr' ? 'President' : 'President'}
-                        </span>
-                      )}
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-2 ${
+                      isPresident(member)
+                        ? 'bg-fed-gold-500/15 text-fed-gold-500 border border-fed-gold-500/30'
+                        : 'bg-fed-red-500/15 text-fed-red-400 border border-fed-red-500/30'
+                    }`}>
+                      {getMemberPosition(member)}
+                    </span>
                     </div>
 
                     {/* Info */}
