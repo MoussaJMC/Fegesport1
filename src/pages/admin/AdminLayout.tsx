@@ -176,6 +176,7 @@ const AdminLayout: React.FC = () => {
       label: 'Tableau de bord',
       items: [
         { icon: Home, label: 'Dashboard', path: '/admin' },
+        { icon: Layout, label: 'Gestion Accueil', path: '/admin/homepage' },
         { icon: BarChart3, label: 'Statistiques Web', path: '/admin/analytics' },
         { icon: Activity, label: 'Diagnostic', path: '/admin/diagnostic' },
         { icon: Database, label: 'Test DB', path: '/admin/test-database' },

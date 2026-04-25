@@ -30,6 +30,7 @@ import AdminLayout from './pages/admin/AdminLayout';
 import LoginPage from './pages/admin/LoginPage';
 import PasswordResetHelper from './pages/admin/PasswordResetHelper';
 import DashboardPage from './pages/admin/DashboardPage';
+import HomePageManagerPage from './pages/admin/HomePageManagerPage';
 import DiagnosticPage from './pages/admin/DiagnosticPage';
 import TestDatabasePage from './pages/admin/TestDatabasePage';
 import PagesAdminPage from './pages/admin/PagesAdminPage';
@@ -80,6 +81,7 @@ function App() {
           <Route path="/admin/reset-password-helper" element={<PasswordResetHelper />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="homepage" element={<HomePageManagerPage />} />
             <Route path="analytics" element={<AnalyticsAdminPage />} />
             <Route path="diagnostic" element={<DiagnosticPage />} />
             <Route path="test-database" element={<TestDatabasePage />} />
