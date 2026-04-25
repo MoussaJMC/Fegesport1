@@ -271,29 +271,31 @@ const HomePage: React.FC = () => {
             </span>
           </motion.div>
 
-          {/* Logo with double ring */}
+          {/* Logo with double ring (centered via flex) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-8 relative inline-block"
+            className="mb-8 flex justify-center"
           >
-            {/* Decorative outer ring */}
-            <div className="absolute inset-0 -m-3 rounded-full border border-fed-gold-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36">
+              {/* Decorative outer ring */}
+              <div className="absolute inset-0 -m-3 rounded-full border border-fed-gold-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
 
-            {logoSettings.main_logo ? (
-              <img
-                src={logoSettings.main_logo}
-                alt={logoSettings.alt_text || "FEGESPORT Logo"}
-                className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl shadow-fed-gold-500/20 object-cover"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                loading="eager"
-              />
-            ) : (
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl bg-dark-800 flex items-center justify-center">
-                <span className="text-fed-gold-500 font-bold text-3xl sm:text-4xl font-heading">FGE</span>
-              </div>
-            )}
+              {logoSettings.main_logo ? (
+                <img
+                  src={logoSettings.main_logo}
+                  alt={logoSettings.alt_text || "FEGESPORT Logo"}
+                  className="relative w-full h-full rounded-full border-4 border-fed-gold-500/60 shadow-2xl shadow-fed-gold-500/20 object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  loading="eager"
+                />
+              ) : (
+                <div className="relative w-full h-full rounded-full border-4 border-fed-gold-500/60 shadow-2xl bg-dark-800 flex items-center justify-center">
+                  <span className="text-fed-gold-500 font-bold text-3xl sm:text-4xl font-heading">FGE</span>
+                </div>
+              )}
+            </div>
           </motion.div>
 
           {/* Overline */}
