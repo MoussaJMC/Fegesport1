@@ -4,12 +4,13 @@ import { toast } from 'sonner';
 import {
   Plus, Edit, Trash2, Eye, Search, Calendar as CalendarIcon,
   MapPin, Users, Clock, DollarSign, Check, X, TrendingUp,
-  AlertCircle, Copy, Share2
+  AlertCircle, Copy, Image as ImageIcon, Loader2
 } from 'lucide-react';
-import { format, isPast, isFuture, addDays, isWithinInterval } from 'date-fns';
+import { format, addDays, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import EventFormBilingual from '../../components/admin/EventFormBilingual';
+import { AdminPageHeader, EmptyState, StatusBadge } from '../../components/admin/ui';
 
 interface Event {
   id: string;
@@ -52,7 +53,6 @@ const UpcomingEventsAdminPage = () => {
   const fetchUpcomingEvents = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -65,25 +65,18 @@ const UpcomingEventsAdminPage = () => {
       setEvents(data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
-      toast.error('Erreur lors du chargement des événements');
+      toast.error('Erreur lors du chargement des evenements');
     } finally {
       setLoading(false);
     }
   };
 
   const deleteEvent = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-      return;
-    }
-
+    if (!confirm('Etes-vous sur de vouloir supprimer cet evenement ?')) return;
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.from('events').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Événement supprimé avec succès');
+      toast.success('Evenement supprime');
       fetchUpcomingEvents();
       setSelectedEvents(prev => {
         const newSet = new Set(prev);
@@ -104,13 +97,9 @@ const UpcomingEventsAdminPage = () => {
         title: `${event.title} (Copie)`,
         current_participants: 0,
       };
-
-      const { error } = await supabase
-        .from('events')
-        .insert([newEvent]);
-
+      const { error } = await supabase.from('events').insert([newEvent]);
       if (error) throw error;
-      toast.success('Événement dupliqué avec succès');
+      toast.success('Evenement duplique');
       fetchUpcomingEvents();
     } catch (error) {
       console.error('Error duplicating event:', error);
@@ -120,13 +109,9 @@ const UpcomingEventsAdminPage = () => {
 
   const startEvent = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('events')
-        .update({ status: 'ongoing' })
-        .eq('id', id);
-
+      const { error } = await supabase.from('events').update({ status: 'ongoing' }).eq('id', id);
       if (error) throw error;
-      toast.success('Événement démarré');
+      toast.success('Evenement demarre');
       fetchUpcomingEvents();
     } catch (error: any) {
       console.error('Error starting event:', error);
@@ -135,18 +120,11 @@ const UpcomingEventsAdminPage = () => {
   };
 
   const cancelEvent = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir annuler cet événement ?')) {
-      return;
-    }
-
+    if (!confirm('Etes-vous sur de vouloir annuler cet evenement ?')) return;
     try {
-      const { error } = await supabase
-        .from('events')
-        .update({ status: 'cancelled' })
-        .eq('id', id);
-
+      const { error } = await supabase.from('events').update({ status: 'cancelled' }).eq('id', id);
       if (error) throw error;
-      toast.success('Événement annulé');
+      toast.success('Evenement annule');
       fetchUpcomingEvents();
     } catch (error: any) {
       console.error('Error cancelling event:', error);
@@ -156,46 +134,27 @@ const UpcomingEventsAdminPage = () => {
 
   const bulkDelete = async () => {
     if (selectedEvents.size === 0) {
-      toast.error('Aucun événement sélectionné');
+      toast.error('Aucun evenement selectionne');
       return;
     }
-
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedEvents.size} événement(s) ?`)) {
-      return;
-    }
-
+    if (!confirm(`Supprimer ${selectedEvents.size} evenement(s) ?`)) return;
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .in('id', Array.from(selectedEvents));
-
+      const { error } = await supabase.from('events').delete().in('id', Array.from(selectedEvents));
       if (error) throw error;
-      toast.success(`${selectedEvents.size} événement(s) supprimé(s)`);
+      toast.success(`${selectedEvents.size} evenement(s) supprime(s)`);
       setSelectedEvents(new Set());
       fetchUpcomingEvents();
     } catch (error) {
       console.error('Error bulk deleting:', error);
-      toast.error('Erreur lors de la suppression groupée');
-    }
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedEvents.size === filteredEvents.length) {
-      setSelectedEvents(new Set());
-    } else {
-      setSelectedEvents(new Set(filteredEvents.map(e => e.id)));
+      toast.error('Erreur lors de la suppression groupee');
     }
   };
 
   const toggleSelectEvent = (id: string) => {
     setSelectedEvents(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
       return newSet;
     });
   };
@@ -214,22 +173,12 @@ const UpcomingEventsAdminPage = () => {
   const sortEvents = (events: Event[]) => {
     return [...events].sort((a, b) => {
       let comparison = 0;
-
       switch (sortField) {
-        case 'date':
-          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-          break;
-        case 'title':
-          comparison = a.title.localeCompare(b.title);
-          break;
-        case 'participants':
-          comparison = (a.current_participants || 0) - (b.current_participants || 0);
-          break;
-        case 'created_at':
-          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-          break;
+        case 'date': comparison = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
+        case 'title': comparison = a.title.localeCompare(b.title); break;
+        case 'participants': comparison = (a.current_participants || 0) - (b.current_participants || 0); break;
+        case 'created_at': comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime(); break;
       }
-
       return sortOrder === 'asc' ? comparison : -comparison;
     });
   };
@@ -237,46 +186,31 @@ const UpcomingEventsAdminPage = () => {
   const filterByTimeRange = (event: Event) => {
     const eventDate = new Date(event.date);
     const today = new Date();
-
     switch (filterTimeRange) {
-      case 'week':
-        return isWithinInterval(eventDate, {
-          start: today,
-          end: addDays(today, 7)
-        });
-      case 'month':
-        return isWithinInterval(eventDate, {
-          start: today,
-          end: addDays(today, 30)
-        });
-      case 'quarter':
-        return isWithinInterval(eventDate, {
-          start: today,
-          end: addDays(today, 90)
-        });
-      default:
-        return true;
+      case 'week': return isWithinInterval(eventDate, { start: today, end: addDays(today, 7) });
+      case 'month': return isWithinInterval(eventDate, { start: today, end: addDays(today, 30) });
+      case 'quarter': return isWithinInterval(eventDate, { start: today, end: addDays(today, 90) });
+      default: return true;
     }
   };
 
   const filteredEvents = sortEvents(
     events.filter(event => {
       const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           event.location.toLowerCase().includes(searchTerm.toLowerCase());
+        event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = !filterType || event.type === filterType;
       const matchesTimeRange = filterByTimeRange(event);
-
       return matchesSearch && matchesType && matchesTimeRange;
     })
   );
 
-  const getTypeColor = (type: string) => {
+  const getTypeLabel = (type: string): { label: string; emoji: string; color: string } => {
     switch (type) {
-      case 'online': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'in-person': return 'bg-green-100 text-green-800 border-green-200';
-      case 'hybrid': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'online': return { label: 'En ligne', emoji: '🌐', color: 'bg-accent-blue-500/15 text-accent-blue-400 border-accent-blue-500/30' };
+      case 'in-person': return { label: 'Presentiel', emoji: '📍', color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+      case 'hybrid': return { label: 'Hybride', emoji: '🔄', color: 'bg-fed-gold-500/15 text-fed-gold-500 border-fed-gold-500/30' };
+      default: return { label: type, emoji: '•', color: 'bg-dark-700 text-light-400 border-dark-700' };
     }
   };
 
@@ -295,109 +229,88 @@ const UpcomingEventsAdminPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <Loader2 className="w-12 h-12 animate-spin text-fed-red-500" />
       </div>
     );
   }
 
+  const totalParticipants = events.reduce((acc, e) => acc + (e.current_participants || 0), 0);
+  const avgFillRate = Math.round(events.reduce((acc, e) => acc + getParticipationRate(e), 0) / (events.length || 1));
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Événements à Venir</h1>
-          <p className="text-gray-600">Gérer les événements futurs et planifiés</p>
-        </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="btn bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvel Événement
-        </button>
+      <AdminPageHeader
+        icon={<CalendarIcon size={20} />}
+        title="Evenements a Venir"
+        subtitle="Gerer les evenements futurs et planifies"
+        publicLink="https://fegesport224.org"
+        publicLinkLabel="Voir le site"
+        actions={
+          <button
+            onClick={() => { setEditingEvent(null); setShowForm(true); }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-fed-red-500 hover:bg-fed-red-600 text-white text-sm font-semibold shadow-lg shadow-fed-red-500/20 transition-all"
+          >
+            <Plus size={16} />
+            Nouvel evenement
+          </button>
+        }
+      />
+
+      {/* === STATS CARDS === */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total a venir', value: events.length, icon: <CalendarIcon size={18} />, accent: 'accent-blue' },
+          { label: 'Cette semaine', value: events.filter(e => isEventSoon(e.date)).length, icon: <AlertCircle size={18} />, accent: 'fed-gold' },
+          { label: 'Inscrits totaux', value: totalParticipants, icon: <Users size={18} />, accent: 'emerald' },
+          { label: 'Taux remplissage', value: `${avgFillRate}%`, icon: <TrendingUp size={18} />, accent: 'fed-red' },
+        ].map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.05 }}
+            className="bg-dark-800 border border-dark-700 rounded-xl p-4 hover:border-fed-gold-500/30 transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-9 h-9 rounded-lg bg-${stat.accent}-500/10 border border-${stat.accent}-500/20 flex items-center justify-center text-${stat.accent}-${stat.accent === 'emerald' ? '400' : '500'}`}>
+                {stat.icon}
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-white font-heading">{stat.value}</div>
+            <div className="text-xs text-light-400 uppercase tracking-wider mt-1">{stat.label}</div>
+          </motion.div>
+        ))}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-gray-900">{events.length}</div>
-              <div className="text-sm text-gray-600">Total à venir</div>
-            </div>
-            <CalendarIcon className="text-blue-500" size={32} />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-orange-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {events.filter(e => isEventSoon(e.date)).length}
-              </div>
-              <div className="text-sm text-gray-600">Cette semaine</div>
-            </div>
-            <AlertCircle className="text-orange-500" size={32} />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {events.reduce((acc, e) => acc + (e.current_participants || 0), 0)}
-              </div>
-              <div className="text-sm text-gray-600">Participants inscrits</div>
-            </div>
-            <Users className="text-green-500" size={32} />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm border-l-4 border-purple-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {Math.round(
-                  events.reduce((acc, e) => acc + getParticipationRate(e), 0) /
-                  (events.length || 1)
-                )}%
-              </div>
-              <div className="text-sm text-gray-600">Taux de remplissage</div>
-            </div>
-            <TrendingUp className="text-purple-500" size={32} />
-          </div>
-        </div>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      {/* === FILTERS === */}
+      <div className="bg-dark-800 border border-dark-700 rounded-xl p-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <div className="relative md:col-span-2">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-light-400" size={16} />
             <input
               type="text"
-              placeholder="Rechercher par titre, description ou lieu..."
+              placeholder="Rechercher (titre, description, lieu)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10 pr-3 py-2 w-full bg-dark-900 border border-dark-700 rounded-lg text-sm text-light-100 placeholder-light-400 focus:outline-none focus:border-fed-red-500 focus:ring-1 focus:ring-fed-red-500/30"
             />
           </div>
 
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg text-sm text-light-100"
           >
             <option value="">Tous les types</option>
             <option value="online">En ligne</option>
-            <option value="in-person">Présentiel</option>
+            <option value="in-person">Presentiel</option>
             <option value="hybrid">Hybride</option>
           </select>
 
           <select
             value={filterTimeRange}
             onChange={(e) => setFilterTimeRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg text-sm text-light-100"
           >
             <option value="all">Toutes les dates</option>
             <option value="week">Cette semaine</option>
@@ -412,308 +325,271 @@ const UpcomingEventsAdminPage = () => {
               setSortField(field as SortField);
               setSortOrder(order as SortOrder);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg text-sm text-light-100"
           >
-            <option value="date-asc">Date (ancien → récent)</option>
-            <option value="date-desc">Date (récent → ancien)</option>
-            <option value="title-asc">Titre (A → Z)</option>
-            <option value="title-desc">Titre (Z → A)</option>
-            <option value="participants-asc">Participants (↑)</option>
-            <option value="participants-desc">Participants (↓)</option>
+            <option value="date-asc">Date ↑</option>
+            <option value="date-desc">Date ↓</option>
+            <option value="title-asc">Titre A→Z</option>
+            <option value="title-desc">Titre Z→A</option>
+            <option value="participants-asc">Participants ↑</option>
+            <option value="participants-desc">Participants ↓</option>
           </select>
         </div>
 
         {selectedEvents.size > 0 && (
-          <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 rounded-md">
-            <span className="text-sm text-blue-700">
-              {selectedEvents.size} événement(s) sélectionné(s)
+          <div className="mt-4 flex items-center justify-between p-3 bg-fed-red-500/10 border border-fed-red-500/20 rounded-lg">
+            <span className="text-sm text-fed-red-400 font-semibold">
+              {selectedEvents.size} evenement(s) selectionne(s)
             </span>
             <button
               onClick={bulkDelete}
-              className="text-sm text-red-600 hover:text-red-800 font-medium"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fed-red-500 hover:bg-fed-red-600 text-white text-xs font-semibold transition-all"
             >
-              Supprimer la sélection
+              <Trash2 size={12} /> Supprimer la selection
             </button>
           </div>
         )}
       </div>
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-4">
-                {editingEvent ? 'Modifier l\'événement' : 'Nouvel événement'}
-              </h2>
-              <EventFormBilingual
-                initialData={editingEvent || undefined}
-                onSuccess={handleFormSuccess}
-                onCancel={() => {
-                  setShowForm(false);
-                  setEditingEvent(null);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredEvents.map((event, index) => (
+      {/* === FORM MODAL === */}
+      <AnimatePresence>
+        {showForm && (
           <motion.div
-            key={event.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-            className={`bg-white rounded-lg shadow-sm border ${
-              isEventSoon(event.date) ? 'border-orange-300' : 'border-gray-200'
-            } overflow-hidden hover:shadow-md transition-shadow`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={(e) => { if (e.target === e.currentTarget) { setShowForm(false); setEditingEvent(null); } }}
           >
-            {/* Event Image */}
-            {event.image_url && (
-              <div className="relative h-48 bg-gray-200">
-                <img
-                  src={event.image_url}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/800x400?text=Image+non+disponible';
-                  }}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-dark-800 border border-dark-700 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4 pb-4 border-b border-dark-700">
+                  <h2 className="text-lg font-bold text-white font-heading">
+                    {editingEvent ? 'Modifier l\'evenement' : 'Nouvel evenement'}
+                  </h2>
+                  <button
+                    onClick={() => { setShowForm(false); setEditingEvent(null); }}
+                    className="text-light-400 hover:text-white p-1 rounded-md hover:bg-dark-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <EventFormBilingual
+                  initialData={editingEvent || undefined}
+                  onSuccess={handleFormSuccess}
+                  onCancel={() => { setShowForm(false); setEditingEvent(null); }}
                 />
-                {isEventSoon(event.date) && (
-                  <div className="absolute top-2 right-2 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                    <AlertCircle size={14} />
-                    Bientôt
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* === EVENTS GRID === */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {filteredEvents.map((event, index) => {
+          const typeInfo = getTypeLabel(event.type);
+          const participationRate = getParticipationRate(event);
+          const isSoon = isEventSoon(event.date);
+
+          return (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+              className={`bg-dark-800 rounded-xl border overflow-hidden transition-all hover:border-fed-gold-500/40 ${
+                isSoon ? 'border-fed-gold-500/40' : 'border-dark-700'
+              }`}
+            >
+              {/* === HEADER (image or gradient) === */}
+              <div className="relative h-40 bg-gradient-to-br from-fed-red-500/20 to-fed-gold-500/20 overflow-hidden">
+                {event.image_url ? (
+                  <img
+                    src={event.image_url}
+                    alt={event.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <CalendarIcon className="text-light-400/40" size={56} />
                   </div>
                 )}
-                <div className="absolute top-2 left-2">
+
+                {/* Gradient overlay for readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-transparent to-transparent" />
+
+                {/* Top-left: checkbox */}
+                <div className="absolute top-3 left-3">
                   <input
                     type="checkbox"
                     checked={selectedEvents.has(event.id)}
                     onChange={() => toggleSelectEvent(event.id)}
-                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded accent-fed-red-500 cursor-pointer"
                   />
                 </div>
-              </div>
-            )}
 
-            <div className="p-5">
-              {/* Title and Category */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                {/* Top-right: badges */}
+                <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+                  {isSoon && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-fed-gold-500 text-dark-950 text-[10px] font-bold uppercase tracking-wider">
+                      <AlertCircle size={10} /> Bientot
+                    </span>
+                  )}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${typeInfo.color}`}>
+                    <span>{typeInfo.emoji}</span> {typeInfo.label}
+                  </span>
+                </div>
+
+                {/* Bottom: date pill */}
+                <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-dark-950/80 backdrop-blur-sm text-white text-xs font-semibold border border-dark-700">
+                  <CalendarIcon size={12} className="text-fed-gold-500" />
+                  {format(new Date(event.date), 'd MMM yyyy', { locale: fr })}
+                  {event.time && (<><Clock size={11} className="ml-1 text-fed-gold-500" />{event.time}</>)}
+                </div>
+              </div>
+
+              {/* === BODY === */}
+              <div className="p-5">
+                {/* Title + category */}
+                <div className="mb-3">
+                  <h3 className="text-base font-bold text-white font-heading mb-1 line-clamp-1">
                     {event.title}
                   </h3>
-                  <span className="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+                  <span className="inline-block px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-dark-700 text-light-300 rounded">
                     {event.category}
                   </span>
                 </div>
-                <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getTypeColor(event.type)}`}>
-                  {event.type === 'online' ? '🌐 En ligne' :
-                   event.type === 'in-person' ? '📍 Présentiel' : '🔄 Hybride'}
-                </span>
-              </div>
 
-              {/* Description */}
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                {event.description}
-              </p>
+                {/* Description */}
+                <p className="text-sm text-light-400 mb-4 line-clamp-2 leading-relaxed">
+                  {event.description}
+                </p>
 
-              {/* Event Details */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-700">
-                  <CalendarIcon className="mr-2 text-gray-400" size={16} />
-                  <span className="font-medium">
-                    {format(new Date(event.date), 'EEEE d MMMM yyyy', { locale: fr })}
-                  </span>
-                  {event.time && (
-                    <>
-                      <Clock className="ml-3 mr-2 text-gray-400" size={16} />
-                      <span>{event.time}</span>
-                    </>
+                {/* Details */}
+                <div className="space-y-2 mb-4 text-sm">
+                  <div className="flex items-center gap-2 text-light-300">
+                    <MapPin size={14} className="text-light-400 flex-shrink-0" />
+                    <span className="truncate">{event.location}</span>
+                  </div>
+
+                  {event.max_participants && (
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <div className="flex items-center gap-2 text-light-300">
+                          <Users size={14} className="text-light-400" />
+                          <span>{event.current_participants || 0} / {event.max_participants}</span>
+                        </div>
+                        <span className="font-semibold text-light-300">
+                          {Math.round(participationRate)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-dark-700 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className={`h-1.5 rounded-full transition-all ${
+                            participationRate >= 80 ? 'bg-fed-red-500'
+                              : participationRate >= 50 ? 'bg-fed-gold-500'
+                              : 'bg-emerald-500'
+                          }`}
+                          style={{ width: `${Math.min(participationRate, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {event.price !== undefined && event.price > 0 && (
+                    <div className="flex items-center gap-2 text-light-300">
+                      <DollarSign size={14} className="text-fed-gold-500 flex-shrink-0" />
+                      <span className="font-semibold">{event.price.toLocaleString()} GNF</span>
+                    </div>
                   )}
                 </div>
 
-                <div className="flex items-center text-sm text-gray-700">
-                  <MapPin className="mr-2 text-gray-400" size={16} />
-                  <span className="truncate">{event.location}</span>
-                </div>
-
-                {event.max_participants && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center text-gray-700">
-                        <Users className="mr-2 text-gray-400" size={16} />
-                        <span>
-                          {event.current_participants || 0} / {event.max_participants} participants
-                        </span>
-                      </div>
-                      <span className="text-xs font-medium text-gray-600">
-                        {Math.round(getParticipationRate(event))}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          getParticipationRate(event) >= 80
-                            ? 'bg-red-500'
-                            : getParticipationRate(event) >= 50
-                            ? 'bg-yellow-500'
-                            : 'bg-green-500'
-                        }`}
-                        style={{ width: `${Math.min(getParticipationRate(event), 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                {event.price !== undefined && event.price > 0 && (
-                  <div className="flex items-center text-sm text-gray-700">
-                    <DollarSign className="mr-2 text-gray-400" size={16} />
-                    <span className="font-semibold">{event.price.toLocaleString()} FCFA</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-4 border-t">
-                <button
-                  onClick={() => startEvent(event.id)}
-                  className="flex-1 px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors flex items-center justify-center gap-1"
-                  title="Démarrer l'événement"
-                >
-                  <Check size={16} />
-                  Démarrer
-                </button>
-
-                <button
-                  onClick={() => handleEdit(event)}
-                  className="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
-                  title="Modifier"
-                >
-                  <Edit size={16} />
-                </button>
-
-                <button
-                  onClick={() => duplicateEvent(event)}
-                  className="px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-md transition-colors"
-                  title="Dupliquer"
-                >
-                  <Copy size={16} />
-                </button>
-
-                {event.image_url && (
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-3 border-t border-dark-700">
                   <button
-                    onClick={() => window.open(event.image_url, '_blank')}
-                    className="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
-                    title="Voir l'image"
+                    onClick={() => startEvent(event.id)}
+                    className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-all"
+                    title="Demarrer l'evenement"
                   >
-                    <Eye size={16} />
+                    <Check size={13} /> Demarrer
                   </button>
-                )}
-
-                <button
-                  onClick={() => cancelEvent(event.id)}
-                  className="px-3 py-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-md transition-colors"
-                  title="Annuler"
-                >
-                  <X size={16} />
-                </button>
-
-                <button
-                  onClick={() => deleteEvent(event.id)}
-                  className="px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
-                  title="Supprimer"
-                >
-                  <Trash2 size={16} />
-                </button>
+                  <button
+                    onClick={() => handleEdit(event)}
+                    className="inline-flex items-center justify-center w-9 h-8 rounded-lg bg-accent-blue-500/15 hover:bg-accent-blue-500/30 text-accent-blue-400 transition-all"
+                    title="Modifier"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    onClick={() => duplicateEvent(event)}
+                    className="inline-flex items-center justify-center w-9 h-8 rounded-lg bg-purple-500/15 hover:bg-purple-500/30 text-purple-400 transition-all"
+                    title="Dupliquer"
+                  >
+                    <Copy size={14} />
+                  </button>
+                  <button
+                    onClick={() => cancelEvent(event.id)}
+                    className="inline-flex items-center justify-center w-9 h-8 rounded-lg bg-fed-gold-500/15 hover:bg-fed-gold-500/30 text-fed-gold-500 transition-all"
+                    title="Annuler"
+                  >
+                    <X size={14} />
+                  </button>
+                  <button
+                    onClick={() => deleteEvent(event.id)}
+                    className="inline-flex items-center justify-center w-9 h-8 rounded-lg bg-fed-red-500/15 hover:bg-fed-red-500/30 text-fed-red-400 transition-all"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Empty State */}
+      {/* === EMPTY STATE — Generique professionnel === */}
       {filteredEvents.length === 0 && (
-        <div className="text-center py-16 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg shadow-sm border-2 border-green-200">
-          <div className="max-w-2xl mx-auto px-6">
-            <div className="bg-white rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6">
-              <CalendarIcon className="h-12 w-12 text-green-600" />
-            </div>
-
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              Période de vacances
-            </h3>
-
-            <div className="space-y-4 text-gray-700">
-              <p className="text-lg font-medium">
-                Les activités sportives sont actuellement en pause
-              </p>
-
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-green-200">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl">
-                    🌙
-                  </div>
-                  <div className="text-left">
-                    <p className="font-semibold text-gray-900">Mois sacré du Ramadan</p>
-                    <p className="text-sm text-gray-600">Période de jeûne et de recueillement</p>
-                  </div>
-                </div>
-
-                <p className="text-base leading-relaxed">
-                  Nous respectons cette période importante pour notre communauté.
-                  Tous les tournois, compétitions et événements sportifs reprendront
-                  après la fin du Ramadan.
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-5 shadow-md">
-                <p className="font-semibold text-lg mb-2">
-                  📅 Reprise prochaine des activités
-                </p>
-                <p className="text-sm">
-                  Le calendrier complet des tournois et événements sera publié
-                  dès la fin du mois de Ramadan. Restez connectés !
-                </p>
-              </div>
-
-              <div className="flex items-center justify-center gap-6 mt-6 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span>En attente</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>Planification en cours</span>
-                </div>
-              </div>
-            </div>
-
-            {!searchTerm && !filterType && filterTimeRange === 'all' && (
-              <div className="mt-8">
-                <p className="text-sm text-gray-500 mb-4">
-                  Vous pouvez tout de même planifier des événements futurs
-                </p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="btn bg-primary-600 hover:bg-primary-700 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Créer un événement
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <EmptyState
+          icon={<CalendarIcon size={28} />}
+          title={
+            searchTerm || filterType || filterTimeRange !== 'all'
+              ? 'Aucun resultat'
+              : 'Aucun evenement programme'
+          }
+          description={
+            searchTerm || filterType || filterTimeRange !== 'all'
+              ? 'Aucun evenement ne correspond a vos criteres de recherche. Essayez de modifier les filtres.'
+              : 'Le calendrier des prochains evenements est actuellement vide. Planifiez le premier evenement de la federation pour commencer.'
+          }
+          action={
+            !searchTerm && !filterType && filterTimeRange === 'all' && (
+              <button
+                onClick={() => { setEditingEvent(null); setShowForm(true); }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-fed-red-500 hover:bg-fed-red-600 text-white text-sm font-semibold shadow-lg shadow-fed-red-500/20 transition-all"
+              >
+                <Plus size={16} />
+                Creer un evenement
+              </button>
+            )
+          }
+        />
       )}
 
-      {/* Results Summary */}
+      {/* === Results Summary === */}
       {filteredEvents.length > 0 && (
-        <div className="text-center text-sm text-gray-500">
-          Affichage de {filteredEvents.length} événement(s) sur {events.length}
+        <div className="text-center text-xs text-light-400 pt-2">
+          Affichage de <strong className="text-light-100">{filteredEvents.length}</strong> evenement(s)
+          {filteredEvents.length !== events.length && (
+            <> sur <strong className="text-light-100">{events.length}</strong></>
+          )}
         </div>
       )}
     </div>
