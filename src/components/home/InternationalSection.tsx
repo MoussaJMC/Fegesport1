@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Globe, ExternalLink } from 'lucide-react';
+import { Globe, ExternalLink, CheckCircle } from 'lucide-react';
 import SectionHeader from '../ui/SectionHeader';
 import { supabase } from '../../lib/supabase';
 import { INTERNATIONAL_AFFILIATIONS } from '../../styles/design-tokens';
@@ -97,18 +97,30 @@ const InternationalSection: React.FC = () => {
           description={lang === 'fr' ? sectionDescription.fr : sectionDescription.en}
         />
 
-        <div className={`grid grid-cols-1 ${affiliations.length >= 2 ? 'md:grid-cols-2' : ''} ${affiliations.length >= 3 ? 'lg:grid-cols-3' : ''} gap-8 max-w-5xl mx-auto`}>
+        {/* Big number stat */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-baseline gap-3">
+            <span className="text-5xl md:text-6xl font-bold text-gradient-gold font-heading">
+              {affiliations.length}
+            </span>
+            <span className="text-light-400 text-sm md:text-base uppercase tracking-wider font-semibold">
+              {lang === 'fr' ? 'Affiliations Actives' : 'Active Affiliations'}
+            </span>
+          </div>
+        </div>
+
+        <div className={`grid grid-cols-1 ${affiliations.length >= 2 ? 'md:grid-cols-2' : ''} ${affiliations.length >= 3 ? 'lg:grid-cols-3' : ''} ${affiliations.length >= 4 ? 'xl:grid-cols-4' : ''} gap-6 max-w-7xl mx-auto`}>
           {affiliations.map((affiliation, index) => (
             <motion.div
               key={affiliation.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="card-featured overflow-hidden group"
+              className="card-featured overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
             >
               {/* Logo area — full width, white bg */}
-              <div className="bg-white flex items-center justify-center p-4 h-24">
+              <div className="bg-white flex items-center justify-center p-4 h-28 relative">
                 {affiliation.logo ? (
                   <img
                     src={affiliation.logo}
@@ -126,15 +138,23 @@ const InternationalSection: React.FC = () => {
                   <Globe className="text-fed-gold-600" size={32} />
                   <span className="text-2xl font-bold text-dark-900 font-heading">{affiliation.shortName}</span>
                 </div>
+
+                {/* "Member" label badge */}
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-fed-gold-500 text-dark-950 text-[9px] font-bold uppercase tracking-wider">
+                  {lang === 'fr' ? 'Membre' : 'Member'}
+                </div>
               </div>
 
               {/* Content */}
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-white font-heading mb-1">
-                  {affiliation.shortName}
-                </h3>
-                <p className="text-light-400 text-sm mb-3">{affiliation.name}</p>
-                <p className="text-light-300 text-sm leading-relaxed mb-4">
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h3 className="text-lg font-bold text-white font-heading">
+                    {affiliation.shortName}
+                  </h3>
+                  <CheckCircle size={16} className="text-fed-gold-500 flex-shrink-0 mt-1" />
+                </div>
+                <p className="text-light-400 text-xs mb-3 line-clamp-2">{affiliation.name}</p>
+                <p className="text-light-300 text-sm leading-relaxed mb-4 line-clamp-3">
                   {lang === 'fr' ? affiliation.description_fr : affiliation.description_en}
                 </p>
 
@@ -143,10 +163,10 @@ const InternationalSection: React.FC = () => {
                     href={affiliation.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium transition-colors"
+                    className="inline-flex items-center text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium transition-colors group/link"
                   >
-                    {lang === 'fr' ? 'Visiter le site officiel' : 'Visit official website'}
-                    <ExternalLink size={14} className="ml-1.5" />
+                    {lang === 'fr' ? 'Site officiel' : 'Official site'}
+                    <ExternalLink size={14} className="ml-1.5 group-hover/link:translate-x-0.5 transition-transform" />
                   </a>
                 )}
               </div>
@@ -155,7 +175,7 @@ const InternationalSection: React.FC = () => {
         </div>
 
         {/* Badge credibility */}
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex flex-col items-center gap-3">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-dark-800 border border-fed-gold-500/20 text-light-300 text-sm">
             <Globe size={16} className="text-fed-gold-500" />
             <span>
@@ -164,6 +184,11 @@ const InternationalSection: React.FC = () => {
                 : 'Member of the global esports community'}
             </span>
           </div>
+          <p className="text-xs text-light-400/60 italic">
+            {lang === 'fr'
+              ? 'La FEGESPORT participe aux competitions et evenements internationaux sous les couleurs de la Republique de Guinee.'
+              : 'FEGESPORT participates in international competitions and events under the colors of the Republic of Guinea.'}
+          </p>
         </div>
       </div>
     </section>

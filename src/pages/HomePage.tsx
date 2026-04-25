@@ -17,6 +17,9 @@ import AnimatedCounter from '../components/ui/AnimatedCounter';
 import GovernanceSection from '../components/home/GovernanceSection';
 import InternationalSection from '../components/home/InternationalSection';
 import PartnersShowcase from '../components/home/PartnersShowcase';
+import DisciplinesShowcase from '../components/home/DisciplinesShowcase';
+import OneCommunitySection from '../components/home/OneCommunitySection';
+import AuthorityBanner from '../components/home/AuthorityBanner';
 
 // Data (fallback)
 import { latestNews } from '../data/newsData';
@@ -219,77 +222,118 @@ const HomePage: React.FC = () => {
   return (
     <>
       {/* ============================================================
-          SECTION 1 — HERO INSTITUTIONNEL
-          Objective: First impression of national authority
+          SECTION 1 — HERO PREMIUM IESF-STYLE
+          Layered composition: bg image + grid pattern + gradients + content
           ============================================================ */}
-      <section className="relative bg-dark-950 min-h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Background image */}
+      <section className="relative bg-dark-950 min-h-[88vh] flex items-center justify-center overflow-hidden">
+        {/* Layer 1: Background image */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-15"
+          className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
             backgroundImage: `url("${heroSection?.image_url || "https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg"}")`,
           }}
         />
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-dark-950/80 via-dark-950/90 to-dark-950" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-950 to-transparent" />
 
-        {/* Decorative elements */}
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-fed-red-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-fed-gold-500/5 rounded-full blur-3xl" />
+        {/* Layer 2: Grid pattern overlay (institutional aesthetic) */}
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(245,158,11,1) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,1) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }}
+          aria-hidden="true"
+        />
 
-        <div className="container-custom relative z-10 text-center px-4 py-20 md:py-32">
-          {/* Logo */}
+        {/* Layer 3: Multi-stop gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-950/70 via-dark-950/85 to-dark-950" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-dark-950 to-transparent" />
+
+        {/* Layer 4: Glowing color accents */}
+        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-fed-red-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-fed-gold-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+
+        {/* Layer 5: Diagonal accent lines */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fed-gold-500/40 to-transparent" />
+        <div className="absolute bottom-32 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fed-red-500/30 to-transparent" />
+
+        {/* Content */}
+        <div className="container-custom relative z-10 text-center px-4 py-20 md:py-28">
+          {/* Official badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fed-gold-500/10 border border-fed-gold-500/30 mb-8 backdrop-blur-sm"
+          >
+            <span className="w-2 h-2 bg-fed-gold-500 rounded-full animate-pulse" />
+            <span className="text-fed-gold-500 text-xs font-bold uppercase tracking-[0.2em]">
+              {lang === 'fr' ? 'Federation Officielle Reconnue' : 'Officially Recognized Federation'}
+            </span>
+          </motion.div>
+
+          {/* Logo with double ring */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8 relative inline-block"
           >
+            {/* Decorative outer ring */}
+            <div className="absolute inset-0 -m-3 rounded-full border border-fed-gold-500/20 animate-pulse" style={{ animationDuration: '3s' }} />
+
             {logoSettings.main_logo ? (
               <img
                 src={logoSettings.main_logo}
                 alt={logoSettings.alt_text || "FEGESPORT Logo"}
-                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl shadow-fed-gold-500/10 mb-6 object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
+                className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl shadow-fed-gold-500/20 object-cover"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 loading="eager"
               />
             ) : (
-              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl mb-6 bg-dark-800 flex items-center justify-center">
-                <span className="text-fed-gold-500 font-bold text-2xl sm:text-3xl font-heading">FGE</span>
+              <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-full border-4 border-fed-gold-500/60 shadow-2xl bg-dark-800 flex items-center justify-center">
+                <span className="text-fed-gold-500 font-bold text-3xl sm:text-4xl font-heading">FGE</span>
               </div>
             )}
           </motion.div>
 
           {/* Overline */}
-          <motion.div
+          <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            className="overline block mb-4"
           >
-            <span className="overline block mb-4">
-              {lang === 'fr' ? 'FEDERATION GUINEENNE D\'ESPORT' : 'GUINEAN ESPORTS FEDERATION'}
-            </span>
-          </motion.div>
+            {lang === 'fr' ? 'FEDERATION GUINEENNE D\'ESPORT' : 'GUINEAN ESPORTS FEDERATION'}
+          </motion.span>
 
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-hero font-heading text-white mb-6"
+            className="text-hero font-heading text-white mb-4"
           >
             {t('home.hero.title')}
           </motion.h1>
+
+          {/* Tagline (IESF-inspired) */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="text-base md:text-lg mb-2 text-fed-gold-500 font-medium tracking-wide"
+          >
+            {lang === 'fr'
+              ? 'Reconnaissance Officielle. Standards Internationaux. Excellence Esport.'
+              : 'Official Recognition. Global Standards. Esports Excellence.'}
+          </motion.p>
 
           {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-light-300"
+            className="text-base md:text-lg mb-10 max-w-3xl mx-auto text-light-300"
           >
             {t('home.hero.subtitle')}
           </motion.p>
@@ -301,15 +345,37 @@ const HomePage: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link to="/membership" className="btn btn-primary text-lg px-8 py-4 shadow-lg shadow-fed-red-500/20">
+            <Link to="/membership" className="btn btn-primary text-lg px-8 py-4 shadow-lg shadow-fed-red-500/30">
               {t('home.hero.cta')}
+              <ArrowRight size={18} className="ml-2" />
             </Link>
             <Link to="/about" className="btn btn-secondary text-lg px-8 py-4">
               {t('common.learnMore')}
             </Link>
           </motion.div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-fed-gold-500/40 rounded-full flex justify-center pt-2">
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="w-1 h-2 bg-fed-gold-500 rounded-full"
+            />
+          </div>
+        </motion.div>
       </section>
+
+      {/* ============================================================
+          AUTHORITY BANNER — Credibility credentials
+          ============================================================ */}
+      <AuthorityBanner />
 
       {/* ============================================================
           SECTION 2 — SLIDESHOW MOMENTS
@@ -397,10 +463,20 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* ============================================================
+          ONE COMMUNITY — Emotional unity statement (IESF-inspired)
+          ============================================================ */}
+      <OneCommunitySection />
+
+      {/* ============================================================
           SECTION 4 — GOUVERNANCE
           Objective: Who leads the federation
           ============================================================ */}
       <GovernanceSection />
+
+      {/* ============================================================
+          DISCIPLINES OFFICIELLES — Game titles showcase (IESF-inspired)
+          ============================================================ */}
+      <DisciplinesShowcase />
 
       {/* ============================================================
           SECTION 5 — CHIFFRES CLES (Ecosysteme national)
