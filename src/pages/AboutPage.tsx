@@ -274,7 +274,7 @@ const AboutPage: React.FC = () => {
                     viewport={{ once: true }}
                     className={`card overflow-hidden ${isPresident(member) ? 'border-fed-gold-500/50' : ''}`}
                   >
-                    {/* Photo circle + Content */}
+                    {/* Photo circle */}
                     <div className="p-6 pt-8 text-center">
                       <div className={`w-28 h-28 rounded-full mx-auto mb-4 overflow-hidden border-3 ${
                         isPresident(member) ? 'border-fed-gold-500' : 'border-dark-700'
@@ -292,22 +292,17 @@ const AboutPage: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-2 ${
-                      isPresident(member)
-                        ? 'bg-fed-gold-500/15 text-fed-gold-500 border border-fed-gold-500/30'
-                        : 'bg-fed-red-500/15 text-fed-red-400 border border-fed-red-500/30'
-                    }`}>
-                      {getMemberPosition(member)}
-                    </span>
                     </div>
 
                     {/* Info */}
                     <div className="px-5 pb-5 text-center">
-                      <h3 className="text-lg font-bold text-white font-heading mb-1">
+                      <h3 className="text-lg font-bold text-white font-heading mb-2">
                         {getMemberName(member)}
                       </h3>
-                      <span className={`inline-block text-sm font-medium mb-3 ${
-                        isPresident(member) ? 'text-fed-gold-500' : 'text-fed-red-400'
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 ${
+                        isPresident(member)
+                          ? 'bg-fed-gold-500/15 text-fed-gold-500 border border-fed-gold-500/30'
+                          : 'bg-fed-red-500/15 text-fed-red-400 border border-fed-red-500/30'
                       }`}>
                         {getMemberPosition(member)}
                       </span>
