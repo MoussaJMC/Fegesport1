@@ -7,6 +7,7 @@ import {
   Gamepad2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { AdminPageHeader } from '../../components/admin/ui';
 
 interface SectionInfo {
   id: string;
@@ -271,23 +272,13 @@ const HomePageManagerPage: React.FC = () => {
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-white font-heading mb-2">
-          Gestion de la page d'Accueil
-        </h1>
-        <p className="text-light-400 text-sm md:text-base">
-          Toutes les sections de la homepage avec leur source et le lien direct vers l'admin pour les modifier.
-        </p>
-        <a
-          href="https://fegesport224.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-4 text-fed-gold-500 hover:text-fed-gold-400 text-sm font-medium"
-        >
-          <Eye size={14} /> Voir la page d'accueil <ExternalLink size={12} />
-        </a>
-      </div>
+      <AdminPageHeader
+        icon={<Home size={20} />}
+        title="Gestion de la page d'Accueil"
+        subtitle="Toutes les sections de la homepage avec leur source et le lien direct vers l'admin"
+        publicLink="https://fegesport224.org"
+        publicLinkLabel="Voir la page d'accueil"
+      />
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

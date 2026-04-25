@@ -386,22 +386,31 @@ const AdminLayout: React.FC = () => {
             MAIN CONTENT
             ================================================ */}
         <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
-          {/* Top Bar */}
-          <header className="bg-dark-900 border-b border-dark-700 h-16 flex items-center px-4 lg:px-6 sticky top-0 z-10">
+          {/* Top Bar — Premium with breadcrumb */}
+          <header className="bg-dark-900/95 backdrop-blur-md border-b border-dark-700 h-16 flex items-center px-4 lg:px-6 sticky top-0 z-10">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-light-400 hover:text-white mr-4 p-1.5 rounded-lg hover:bg-dark-800 transition-colors"
+              className="text-light-400 hover:text-white mr-4 p-2 rounded-lg hover:bg-dark-800 transition-all"
+              aria-label="Toggle sidebar"
             >
-              <Menu size={22} />
+              <Menu size={20} />
             </button>
 
-            {/* Current page indicator */}
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-light-100">
-                {menuGroups
-                  .flatMap(g => g.items)
-                  .find(item => item.path === location.pathname)?.label || 'Administration'}
-              </p>
+            {/* Breadcrumb */}
+            <div className="hidden sm:flex items-center gap-2 text-sm">
+              <Link to="/admin" className="text-light-400 hover:text-fed-gold-500 transition-colors">
+                Admin
+              </Link>
+              {location.pathname !== '/admin' && (
+                <>
+                  <span className="text-dark-700">/</span>
+                  <span className="text-light-100 font-medium">
+                    {menuGroups
+                      .flatMap(g => g.items)
+                      .find(item => item.path === location.pathname)?.label || 'Administration'}
+                  </span>
+                </>
+              )}
             </div>
 
             <div className="flex-1" />

@@ -1,14 +1,16 @@
 /* =================================================================
-   FEGESPORT ADMIN THEME — Dark Federation Override
+   FEGESPORT ADMIN THEME — Premium Dark Federation Override
 
-   This file globally overrides the light-theme classes used in
-   admin pages (bg-white, bg-gray-*, text-gray-*, border-gray-*)
-   to match the dark federation design system.
+   Globally transforms light-theme classes (bg-white, text-gray-*,
+   border-gray-*, primary-*) into the dark federation design system.
 
-   Applied ONLY within the admin layout context.
+   Applied ONLY within the admin layout context (.admin-dark).
+   Optimized for: forms, tables, modals, cards, badges, buttons.
    ================================================================= */
 
-/* --- Card / Panel backgrounds --- */
+/* =====================================================
+   1. CARD / PANEL BACKGROUNDS
+   ===================================================== */
 .admin-dark .bg-white {
   background-color: #1E293B !important; /* dark-800 */
 }
@@ -18,7 +20,13 @@
   background-color: #0F172A !important; /* dark-900 */
 }
 
-/* --- Text colors --- */
+.admin-dark .bg-gray-200 {
+  background-color: #334155 !important; /* dark-700 */
+}
+
+/* =====================================================
+   2. TEXT COLORS
+   ===================================================== */
 .admin-dark .text-gray-900,
 .admin-dark .text-gray-800 {
   color: #F1F5F9 !important; /* light-100 */
@@ -38,7 +46,9 @@
   color: #64748B !important; /* slate-500 */
 }
 
-/* --- Borders --- */
+/* =====================================================
+   3. BORDERS
+   ===================================================== */
 .admin-dark .border-gray-200,
 .admin-dark .border-gray-300 {
   border-color: #334155 !important; /* dark-700 */
@@ -48,67 +58,188 @@
   border-color: #1E293B !important; /* dark-800 */
 }
 
-/* --- Form inputs --- */
-.admin-dark input,
+/* =====================================================
+   4. FORM INPUTS — Premium dark styling
+   ===================================================== */
+.admin-dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .admin-dark select,
 .admin-dark textarea {
   background-color: #0F172A !important;
   border-color: #334155 !important;
   color: #F1F5F9 !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease !important;
 }
 
 .admin-dark input::placeholder,
-.admin-dark select::placeholder,
 .admin-dark textarea::placeholder {
   color: #64748B !important;
 }
 
-.admin-dark input:focus,
+.admin-dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 .admin-dark select:focus,
 .admin-dark textarea:focus {
   border-color: #DC2626 !important;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+  outline: none !important;
 }
 
-/* --- Shadows (darken for dark theme) --- */
-.admin-dark .shadow,
-.admin-dark .shadow-md,
-.admin-dark .shadow-lg,
+.admin-dark input:hover:not(:focus):not(:disabled),
+.admin-dark select:hover:not(:focus):not(:disabled),
+.admin-dark textarea:hover:not(:focus):not(:disabled) {
+  border-color: #475569 !important;
+}
+
+/* Checkbox / Radio */
+.admin-dark input[type="checkbox"],
+.admin-dark input[type="radio"] {
+  accent-color: #DC2626 !important;
+}
+
+/* Disabled state */
+.admin-dark input:disabled,
+.admin-dark select:disabled,
+.admin-dark textarea:disabled {
+  background-color: #1E293B !important;
+  color: #64748B !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
+/* =====================================================
+   5. SHADOWS — Adapted for dark theme
+   ===================================================== */
+.admin-dark .shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4) !important;
+}
+.admin-dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4) !important;
+}
+.admin-dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4) !important;
+}
 .admin-dark .shadow-xl {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* --- Table rows --- */
-.admin-dark .hover\:bg-gray-50:hover {
-  background-color: #1E293B !important; /* dark-800 */
+/* Cards with shadow get a subtle border */
+.admin-dark .bg-white.shadow,
+.admin-dark .bg-white.shadow-md,
+.admin-dark .bg-white.shadow-lg {
+  border: 1px solid rgba(51, 65, 85, 0.5) !important;
+}
+
+/* =====================================================
+   6. TABLES — Premium dark tables
+   ===================================================== */
+.admin-dark table {
+  background-color: transparent !important;
+}
+
+.admin-dark thead {
+  background-color: #0F172A !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+.admin-dark thead th {
+  color: #94A3B8 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-size: 0.75rem !important;
+}
+
+.admin-dark tbody tr {
+  border-bottom: 1px solid rgba(51, 65, 85, 0.3) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.admin-dark tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+.admin-dark .hover\:bg-gray-50:hover,
+.admin-dark .hover\:bg-gray-100:hover {
+  background-color: #1E293B !important;
 }
 
 .admin-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: #334155 !important;
+  border-color: rgba(51, 65, 85, 0.3) !important;
 }
 
-/* --- Modals --- */
+/* =====================================================
+   7. MODALS — Premium overlays
+   ===================================================== */
 .admin-dark .bg-black.bg-opacity-50,
-.admin-dark .bg-black\/50 {
-  background-color: rgba(0, 0, 0, 0.7) !important;
+.admin-dark .bg-black\/50,
+.admin-dark .bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
-/* --- Status badges (preserve their colors) --- */
-.admin-dark .bg-green-100 { background-color: rgba(16, 185, 129, 0.15) !important; }
-.admin-dark .bg-red-100 { background-color: rgba(220, 38, 38, 0.15) !important; }
-.admin-dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15) !important; }
-.admin-dark .bg-yellow-100 { background-color: rgba(245, 158, 11, 0.15) !important; }
-.admin-dark .bg-purple-100 { background-color: rgba(139, 92, 246, 0.15) !important; }
-.admin-dark .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15) !important; }
+/* Modal containers */
+.admin-dark .fixed.inset-0 > .bg-white,
+.admin-dark [class*="fixed"][class*="inset-0"] .bg-white {
+  border: 1px solid #334155 !important;
+}
 
-/* --- Primary button overrides --- */
+/* =====================================================
+   8. STATUS BADGES — Semi-transparent dark variants
+   ===================================================== */
+.admin-dark .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+.admin-dark .bg-red-100 {
+  background-color: rgba(220, 38, 38, 0.15) !important;
+  border: 1px solid rgba(220, 38, 38, 0.25) !important;
+}
+.admin-dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+.admin-dark .bg-yellow-100 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+.admin-dark .bg-purple-100 {
+  background-color: rgba(139, 92, 246, 0.15) !important;
+  border: 1px solid rgba(139, 92, 246, 0.25) !important;
+}
+.admin-dark .bg-orange-100 {
+  background-color: rgba(249, 115, 22, 0.15) !important;
+  border: 1px solid rgba(249, 115, 22, 0.25) !important;
+}
+.admin-dark .bg-pink-100 {
+  background-color: rgba(236, 72, 153, 0.15) !important;
+  border: 1px solid rgba(236, 72, 153, 0.25) !important;
+}
+.admin-dark .bg-indigo-100 {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Brighter text on dark badge backgrounds */
+.admin-dark .text-green-800 { color: #34D399 !important; }
+.admin-dark .text-red-800 { color: #F87171 !important; }
+.admin-dark .text-blue-800 { color: #60A5FA !important; }
+.admin-dark .text-yellow-800 { color: #FBBF24 !important; }
+.admin-dark .text-purple-800 { color: #A78BFA !important; }
+.admin-dark .text-orange-800 { color: #FB923C !important; }
+
+/* =====================================================
+   9. BUTTONS — Premium primary and variants
+   ===================================================== */
 .admin-dark .bg-primary-600 {
   background-color: #DC2626 !important;
+  transition: all 0.2s ease !important;
 }
 .admin-dark .bg-primary-600:hover,
 .admin-dark .hover\:bg-primary-700:hover {
   background-color: #B91C1C !important;
+  box-shadow: 0 4px 12px -2px rgba(220, 38, 38, 0.4) !important;
 }
+
 .admin-dark .text-primary-600,
 .admin-dark .text-primary-500 {
   color: #DC2626 !important;
@@ -117,48 +248,224 @@
   color: #F87171 !important;
 }
 
-/* --- Blue button overrides --- */
+/* Blue buttons */
 .admin-dark .bg-blue-600 {
   background-color: #3B82F6 !important;
+  transition: all 0.2s ease !important;
 }
 .admin-dark .bg-blue-600:hover,
 .admin-dark .hover\:bg-blue-700:hover {
   background-color: #2563EB !important;
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.4) !important;
 }
 
-/* --- Scrollbar --- */
+/* Green buttons (save) */
+.admin-dark .bg-green-600 {
+  background-color: #10B981 !important;
+}
+.admin-dark .bg-green-600:hover,
+.admin-dark .hover\:bg-green-700:hover {
+  background-color: #059669 !important;
+  box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* All buttons get smooth transitions */
+.admin-dark button {
+  transition: all 0.15s ease !important;
+}
+
+.admin-dark button:not(:disabled):active {
+  transform: scale(0.98) !important;
+}
+
+/* =====================================================
+   10. SCROLLBAR — Custom dark
+   ===================================================== */
 .admin-dark ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 .admin-dark ::-webkit-scrollbar-track {
   background: #0F172A;
 }
 .admin-dark ::-webkit-scrollbar-thumb {
   background: #334155;
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 2px solid #0F172A;
 }
 .admin-dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+.admin-dark ::-webkit-scrollbar-corner {
+  background: #0F172A;
+}
 
-/* --- Upload/drop zones --- */
+/* Firefox */
+.admin-dark * {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0F172A;
+}
+
+/* =====================================================
+   11. UPLOAD / DROP ZONES
+   ===================================================== */
 .admin-dark .border-dashed {
   border-color: #334155 !important;
+  background-color: rgba(15, 23, 42, 0.5) !important;
+  transition: all 0.2s ease !important;
 }
 .admin-dark .border-dashed:hover {
   border-color: #DC2626 !important;
+  background-color: rgba(220, 38, 38, 0.05) !important;
 }
 
-/* --- Alert info boxes --- */
+/* =====================================================
+   12. ALERT / INFO BOXES
+   ===================================================== */
 .admin-dark .bg-blue-50 {
-  background-color: rgba(59, 130, 246, 0.1) !important;
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
 }
 .admin-dark .bg-yellow-50 {
-  background-color: rgba(245, 158, 11, 0.1) !important;
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
 }
 .admin-dark .bg-red-50 {
-  background-color: rgba(220, 38, 38, 0.1) !important;
+  background-color: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
 }
 .admin-dark .bg-green-50 {
-  background-color: rgba(16, 185, 129, 0.1) !important;
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+.admin-dark .bg-purple-50 {
+  background-color: rgba(139, 92, 246, 0.08) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Brighter text inside alert boxes */
+.admin-dark .bg-blue-50 .text-blue-700,
+.admin-dark .bg-blue-50 .text-blue-800 { color: #93C5FD !important; }
+.admin-dark .bg-yellow-50 .text-yellow-700,
+.admin-dark .bg-yellow-50 .text-yellow-800 { color: #FCD34D !important; }
+.admin-dark .bg-red-50 .text-red-700,
+.admin-dark .bg-red-50 .text-red-800 { color: #FCA5A5 !important; }
+.admin-dark .bg-green-50 .text-green-700,
+.admin-dark .bg-green-50 .text-green-800 { color: #6EE7B7 !important; }
+
+/* =====================================================
+   13. RING / FOCUS STATES
+   ===================================================== */
+.admin-dark .focus\:ring-primary-500:focus,
+.admin-dark .focus\:ring-primary-600:focus {
+  --tw-ring-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+.admin-dark .focus\:border-primary-500:focus,
+.admin-dark .focus\:border-primary-600:focus {
+  border-color: #DC2626 !important;
+}
+
+/* =====================================================
+   14. CARDS WITH HOVER STATE
+   ===================================================== */
+.admin-dark .hover\:shadow-lg:hover,
+.admin-dark .hover\:shadow-md:hover {
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* =====================================================
+   15. PROGRESS BARS
+   ===================================================== */
+.admin-dark progress {
+  background-color: #0F172A !important;
+}
+.admin-dark progress::-webkit-progress-bar {
+  background-color: #0F172A !important;
+}
+.admin-dark progress::-webkit-progress-value {
+  background-color: #DC2626 !important;
+}
+
+/* =====================================================
+   16. CODE / PRE BLOCKS
+   ===================================================== */
+.admin-dark code,
+.admin-dark pre {
+  background-color: #0F172A !important;
+  color: #F1F5F9 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.8125rem !important;
+}
+
+/* =====================================================
+   17. LINKS
+   ===================================================== */
+.admin-dark a:not([class*="bg-"]):not([class*="btn"]) {
+  transition: color 0.15s ease !important;
+}
+
+/* =====================================================
+   18. HEADINGS — Better hierarchy
+   ===================================================== */
+.admin-dark h1,
+.admin-dark h2,
+.admin-dark h3,
+.admin-dark h4 {
+  color: #F1F5F9 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* =====================================================
+   19. SELECT DROPDOWNS — Better arrow visibility
+   ===================================================== */
+.admin-dark select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+  background-position: right 0.5rem center !important;
+  background-repeat: no-repeat !important;
+  background-size: 1.5em 1.5em !important;
+  padding-right: 2.5rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+/* =====================================================
+   20. DETAILS / SUMMARY (collapsibles)
+   ===================================================== */
+.admin-dark details summary {
+  cursor: pointer !important;
+  color: #CBD5E1 !important;
+  transition: color 0.15s ease !important;
+}
+.admin-dark details summary:hover {
+  color: #F1F5F9 !important;
+}
+.admin-dark details[open] summary {
+  color: #F59E0B !important;
+}
+
+/* =====================================================
+   21. SMOOTH ANIMATIONS
+   ===================================================== */
+.admin-dark .transition-colors {
+  transition-property: color, background-color, border-color !important;
+  transition-duration: 0.2s !important;
+}
+
+.admin-dark .transition-shadow {
+  transition: box-shadow 0.2s ease !important;
+}
+
+/* =====================================================
+   22. KBD (keyboard shortcuts)
+   ===================================================== */
+.admin-dark kbd {
+  background-color: #0F172A !important;
+  color: #F1F5F9 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0.25rem !important;
+  padding: 0.125rem 0.375rem !important;
+  font-size: 0.75rem !important;
+  font-family: monospace !important;
 }
