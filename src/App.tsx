@@ -23,6 +23,7 @@ import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DownloadBackupPage from './pages/DownloadBackupPage';
 import LEGPage from './pages/LEGPage';
+import PressKitPage from './pages/PressKitPage';
 
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -121,6 +122,8 @@ function App() {
           <Route path="/resources" element={<PublicLayout><ResourcesPage /></PublicLayout>} />
           <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
           <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+          <Route path="/press-kit" element={<PublicLayout><PressKitPage /></PublicLayout>} />
+          <Route path="/presse" element={<PublicLayout><PressKitPage /></PublicLayout>} />
           <Route path="/events" element={<PublicLayout><EventsListPage /></PublicLayout>} />
           <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
           <Route path="/card/:id" element={<PublicLayout><CardPage /></PublicLayout>} />

@@ -20,6 +20,7 @@ import PartnersShowcase from '../components/home/PartnersShowcase';
 import DisciplinesShowcase from '../components/home/DisciplinesShowcase';
 import OneCommunitySection from '../components/home/OneCommunitySection';
 import AuthorityBanner from '../components/home/AuthorityBanner';
+import SEO from '../components/seo/SEO';
 
 // Data (fallback)
 import { latestNews } from '../data/newsData';
@@ -221,6 +222,15 @@ const HomePage: React.FC = () => {
   // === RENDER ===
   return (
     <>
+      <SEO
+        title={lang === 'fr' ? 'Federation officielle d\'esport en Guinee' : 'Official esports federation in Guinea'}
+        description={lang === 'fr'
+          ? 'La Federation Guineenne d\'Esport (FEGESPORT) est l\'organisation nationale officielle reconnue pour l\'esport en Republique de Guinee. Membre IESF, AESF, WESCO, GEF.'
+          : 'The Guinean Esports Federation (FEGESPORT) is the official national organization for esports in the Republic of Guinea. Member of IESF, AESF, WESCO, GEF.'
+        }
+        keywords="FEGESPORT, esport Guinee, federation esport, federation esport Guinee, IESF Guinea, esport Conakry, jeux video Guinee"
+      />
+
       {/* ============================================================
           SECTION 1 — HERO PREMIUM IESF-STYLE
           Layered composition: bg image + grid pattern + gradients + content

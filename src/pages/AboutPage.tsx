@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { getLeadershipTranslation } from '../utils/translations';
 import SectionHeader from '../components/ui/SectionHeader';
+import SEO from '../components/seo/SEO';
 
 const OfficialDocumentsSection = lazy(() => import('../components/documents/OfficialDocumentsSection'));
 
@@ -150,6 +151,15 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'A propos de la FEGESPORT' : 'About FEGESPORT'}
+        description={lang === 'fr'
+          ? 'Decouvrez la Federation Guineenne d\'Esport : mission, vision, valeurs, equipe dirigeante, documents officiels et histoire de la FEGESPORT.'
+          : 'Discover the Guinean Esports Federation: mission, vision, values, leadership team, official documents and FEGESPORT history.'
+        }
+        keywords="FEGESPORT histoire, equipe FEGESPORT, direction FEGESPORT, mission federation esport Guinee, statuts FEGESPORT"
+      />
+
       {/* ============ HERO ============ */}
       <section className="relative bg-dark-950 py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">
