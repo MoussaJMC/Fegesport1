@@ -72,8 +72,9 @@ const GovernanceSection: React.FC = () => {
   };
 
   const isPresident = (member: LeadershipMember): boolean => {
-    const pos = member.position.toLowerCase();
-    return pos.includes('president') || pos.includes('président') || member.order === 1;
+    const pos = member.position.toLowerCase().trim();
+    // Exact match only — "Vice Président" should NOT match
+    return pos === 'president' || pos === 'président' || pos === 'fondateur & president' || pos === 'fondateur & président';
   };
 
   if (loading) {
