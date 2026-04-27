@@ -581,6 +581,47 @@ function DisciplinesTab({
     is_active: true,
     sort_order: 0
   });
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('L\'image ne doit pas depasser 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Le fichier doit etre une image');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `disciplines/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('static-files')
+        .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('static-files')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image: publicUrl });
+      toast.success('Image telechargee avec succes');
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast.error(`Erreur lors du telechargement: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (editing) {
@@ -682,23 +723,67 @@ function DisciplinesTab({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              URL de l'image
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Image de la discipline
             </label>
+
+            {/* Upload area */}
+            <div className="flex flex-col sm:flex-row gap-2 mb-2">
+              <label className="flex-1 cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+                <div className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed transition-all text-sm font-medium ${
+                  uploading
+                    ? 'border-fed-gold-500/50 text-fed-gold-500 cursor-wait'
+                    : 'border-dark-700 hover:border-fed-red-500 text-light-300 hover:text-white'
+                }`}>
+                  {uploading ? (
+                    <>
+                      <span className="inline-block w-4 h-4 border-2 border-fed-gold-500 border-t-transparent rounded-full animate-spin" />
+                      Telechargement...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      Telecharger une image
+                    </>
+                  )}
+                </div>
+              </label>
+            </div>
+
+            <div className="text-xs text-gray-500 mb-2">Ou utiliser une URL directe :</div>
+
             <input
               type="url"
               value={formData.image || ''}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               className="w-full px-3 py-2 border rounded-lg"
-              placeholder="https://images.pexels.com/photos/..."
+              placeholder="https://exemple.com/image.jpg"
             />
+
             {formData.image && (
-              <div className="mt-2 relative h-32 rounded-lg overflow-hidden">
-                <img
-                  src={formData.image}
-                  alt="Aperçu"
-                  className="w-full h-full object-cover"
-                />
+              <div className="mt-3 relative">
+                <div className="h-40 rounded-lg overflow-hidden border border-dark-700">
+                  <img
+                    src={formData.image}
+                    alt="Apercu"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, image: '' })}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-fed-red-500 hover:bg-fed-red-600 text-white flex items-center justify-center shadow-lg"
+                  title="Supprimer l'image"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             )}
           </div>
