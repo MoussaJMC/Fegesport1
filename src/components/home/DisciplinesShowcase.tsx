@@ -124,7 +124,7 @@ const DisciplinesShowcase: React.FC = () => {
   const hasAnyImage = disciplines.some(d => d.image && d.image.trim() !== '');
 
   return (
-    <section className="section bg-section-alt relative overflow-hidden">
+    <section id="disciplines" className="section bg-section-alt relative overflow-hidden">
       {/* Pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.03]"

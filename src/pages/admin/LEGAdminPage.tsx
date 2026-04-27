@@ -646,18 +646,63 @@ function DisciplinesTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Disciplines</h2>
-        <button
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-          className="btn-primary"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvelle discipline
-        </button>
+      {/* Premium header with sync info */}
+      <div className="bg-dark-800 border border-dark-700 rounded-xl p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-fed-gold-500/10 border border-fed-gold-500/20 flex items-center justify-center text-fed-gold-500 flex-shrink-0">
+              <Trophy size={18} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white font-heading">Disciplines Officielles</h2>
+              <p className="text-xs text-light-400 mt-0.5">
+                Synchronise avec la section <strong className="text-fed-gold-500">"Disciplines Officielles"</strong> de la page d'accueil
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="https://fegesport224.org/#disciplines"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 hover:border-fed-gold-500/40 text-light-300 hover:text-fed-gold-500 text-xs font-semibold transition-all"
+            >
+              <Eye size={13} />
+              Voir sur le site
+            </a>
+            <button
+              onClick={() => {
+                setEditing(null);
+                setShowForm(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-fed-red-500 hover:bg-fed-red-600 text-white text-xs font-semibold shadow-lg shadow-fed-red-500/20 transition-all"
+            >
+              <Plus size={13} />
+              Nouvelle discipline
+            </button>
+          </div>
+        </div>
+
+        {/* Stats bar */}
+        <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-dark-700">
+          <div>
+            <div className="text-2xl font-bold text-white font-heading">{disciplines.length}</div>
+            <div className="text-[10px] text-light-400 uppercase tracking-wider">Total</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-emerald-400 font-heading">
+              {disciplines.filter((d: Discipline) => d.is_active).length}
+            </div>
+            <div className="text-[10px] text-light-400 uppercase tracking-wider">Actives</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-fed-gold-500 font-heading">
+              {disciplines.filter((d: Discipline) => d.image && d.image.trim() !== '').length}
+            </div>
+            <div className="text-[10px] text-light-400 uppercase tracking-wider">Avec image</div>
+          </div>
+        </div>
       </div>
 
       {showForm && (
@@ -816,58 +861,127 @@ function DisciplinesTab({
         </form>
       )}
 
-      <div className="grid gap-4">
-        {disciplines.map((discipline: Discipline) => (
-          <div key={discipline.id} className={`border rounded-lg p-4 flex items-center justify-between ${!discipline.is_active ? 'bg-gray-100 opacity-60' : ''}`}>
-            <div className="flex items-center gap-4">
-              <div className="text-3xl">{discipline.icon}</div>
-              {discipline.image && (
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden">
+      {/* Empty state */}
+      {disciplines.length === 0 ? (
+        <div className="bg-dark-800 border border-dashed border-dark-700 rounded-xl p-10 text-center">
+          <div className="w-16 h-16 rounded-full bg-fed-gold-500/10 border border-fed-gold-500/30 flex items-center justify-center text-fed-gold-500 mx-auto mb-4">
+            <Trophy size={28} />
+          </div>
+          <h3 className="text-lg font-bold text-white font-heading mb-2">
+            Aucune discipline configuree
+          </h3>
+          <p className="text-sm text-light-400 max-w-md mx-auto mb-5">
+            La page d'accueil affiche actuellement les disciplines par defaut (FIFA, MLBB, Free Fire, Tekken, Forza, Clash Royale).
+            Ajoutez vos propres disciplines pour personnaliser la section.
+          </p>
+          <button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-fed-red-500 hover:bg-fed-red-600 text-white text-sm font-semibold shadow-lg shadow-fed-red-500/20 transition-all"
+          >
+            <Plus size={14} />
+            Creer la premiere discipline
+          </button>
+        </div>
+      ) : (
+        /* Preview cards (homepage-like) */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {disciplines.map((discipline: Discipline) => (
+            <div
+              key={discipline.id}
+              className={`bg-dark-800 border rounded-xl overflow-hidden transition-all hover:border-fed-gold-500/40 ${
+                !discipline.is_active ? 'opacity-50' : ''
+              } border-dark-700`}
+              style={{ borderTopColor: discipline.color, borderTopWidth: '3px' }}
+            >
+              {/* Visual preview */}
+              <div className="relative h-32 bg-dark-900 flex items-center justify-center overflow-hidden">
+                {discipline.image ? (
                   <img
                     src={discipline.image}
                     alt={discipline.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : discipline.icon && discipline.icon.length <= 4 ? (
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center"
+                    style={{
+                      backgroundColor: `${discipline.color}15`,
+                      border: `1px solid ${discipline.color}30`,
+                    }}
+                  >
+                    <span className="text-4xl">{discipline.icon}</span>
+                  </div>
+                ) : (
+                  <Gamepad2 size={40} style={{ color: discipline.color }} />
+                )}
+
+                {/* Status badge */}
+                {!discipline.is_active && (
+                  <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-dark-700 text-light-400 rounded">
+                    Desactivee
+                  </span>
+                )}
+
+                {/* Image indicator */}
+                {discipline.image && (
+                  <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-fed-gold-500/90 text-dark-950 rounded">
+                    Image
+                  </span>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className="font-bold text-white font-heading text-base leading-tight">
+                    {discipline.name}
+                  </h3>
+                  <div
+                    className="w-5 h-5 rounded flex-shrink-0 mt-0.5"
+                    style={{ backgroundColor: discipline.color }}
+                    title={`Couleur: ${discipline.color}`}
                   />
                 </div>
-              )}
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold">{discipline.name}</h3>
-                  {!discipline.is_active && (
-                    <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded">
-                      Désactivée
-                    </span>
-                  )}
+
+                {discipline.games && discipline.games.length > 0 && (
+                  <p className="text-xs text-light-400 line-clamp-2 mb-3">
+                    {discipline.games.join(' • ')}
+                  </p>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-3 border-t border-dark-700">
+                  <button
+                    onClick={() => {
+                      setEditing(discipline);
+                      setShowForm(true);
+                    }}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-blue-500/15 hover:bg-accent-blue-500/30 text-accent-blue-400 text-xs font-semibold transition-all"
+                  >
+                    <Edit2 size={12} />
+                    Modifier
+                  </button>
+                  <button
+                    onClick={() => onToggle(discipline.id, discipline.is_active)}
+                    className={`inline-flex items-center justify-center w-9 rounded-lg transition-all ${
+                      discipline.is_active
+                        ? 'bg-fed-gold-500/15 hover:bg-fed-gold-500/30 text-fed-gold-500'
+                        : 'bg-emerald-500/15 hover:bg-emerald-500/30 text-emerald-400'
+                    }`}
+                    title={discipline.is_active ? 'Desactiver' : 'Activer'}
+                  >
+                    {discipline.is_active ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
                 </div>
-                <p className="text-sm text-gray-600">{discipline.games.join(', ')}</p>
               </div>
-              <div
-                className="w-6 h-6 rounded"
-                style={{ backgroundColor: discipline.color }}
-              />
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setEditing(discipline);
-                  setShowForm(true);
-                }}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                title="Modifier"
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onToggle(discipline.id, discipline.is_active)}
-                className={`p-2 rounded ${discipline.is_active ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'}`}
-                title={discipline.is_active ? 'Désactiver' : 'Activer'}
-              >
-                {discipline.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
