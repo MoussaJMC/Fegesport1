@@ -34,6 +34,20 @@ SITE_URL = "https://fegesport224.org"
 [build.services]
 
 [[headers]]
+for = "/*.txt"
+
+[headers.values]
+Content-Type = "text/plain; charset=utf-8"
+Access-Control-Allow-Origin = "*"
+
+[[headers]]
+for = "/admin/*"
+
+[headers.values]
+X-Robots-Tag = "noindex, nofollow"
+Cache-Control = "no-store, no-cache, must-revalidate, private"
+
+[[headers]]
 for = "/*"
 
 [headers.values]
@@ -46,11 +60,33 @@ Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=
 Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
 [[headers]]
-for = "/admin/*"
+for = "/sitemap.xml"
 
 [headers.values]
-X-Robots-Tag = "noindex, nofollow"
-Cache-Control = "no-store, no-cache, must-revalidate, private"
+Content-Type = "application/xml; charset=utf-8"
+Cache-Control = "public, max-age=3600, must-revalidate"
+X-Robots-Tag = "noindex"
+Access-Control-Allow-Origin = "*"
+
+[[headers]]
+for = "/robots.txt"
+
+[headers.values]
+Content-Type = "text/plain; charset=utf-8"
+Cache-Control = "public, max-age=3600, must-revalidate"
+Access-Control-Allow-Origin = "*"
+
+[[headers]]
+for = "/*.txt"
+
+[headers.values]
+Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+for = "/*.json"
+
+[headers.values]
+Content-Type = "application/json; charset=utf-8"
 
 [[headers]]
 for = "/*"

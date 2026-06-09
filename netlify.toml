@@ -47,43 +47,9 @@ status = 200
 force = false
 
 # ============================================================
-# SEO files — sitemap.xml, robots.txt
-# Served WITHOUT restrictive CSP / X-Frame-Options
-# so Googlebot / Bingbot / IndexNow crawlers can fetch them.
-# ============================================================
-[[headers]]
-for = "/sitemap.xml"
-
-[headers.values]
-Content-Type = "application/xml; charset=utf-8"
-Cache-Control = "public, max-age=3600, must-revalidate"
-X-Robots-Tag = "noindex"
-Access-Control-Allow-Origin = "*"
-
-[[headers]]
-for = "/robots.txt"
-
-[headers.values]
-Content-Type = "text/plain; charset=utf-8"
-Cache-Control = "public, max-age=3600, must-revalidate"
-Access-Control-Allow-Origin = "*"
-
-# IndexNow key file (when activated for Bing)
-[[headers]]
-for = "/*.txt"
-
-[headers.values]
-Content-Type = "text/plain; charset=utf-8"
-
-# Schema/Schema.org files
-[[headers]]
-for = "/*.json"
-
-[headers.values]
-Content-Type = "application/json; charset=utf-8"
-
-# ============================================================
-# Default security headers for all other routes (HTML, JS, etc.)
+# Note: Specific SEO file headers are managed in public/_headers
+# (sitemap.xml, robots.txt, /*.txt for IndexNow)
+# Below: default security headers for HTML/JS/CSS.
 # ============================================================
 [[headers]]
 for = "/*"

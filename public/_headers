@@ -1,27 +1,38 @@
 # ============================================================
 # FEGESPORT — Netlify Headers
-# Note: Specific rules come FIRST, generic /* rules at the END.
-# Netlify applies the most specific match.
+# IMPORTANT: Netlify ADDS headers from all matching rules,
+# so to remove a header for a specific path, we re-declare it
+# with an empty value or non-restrictive one.
 # ============================================================
 
 # ===== SEO files — accessible by all crawlers =====
-# No restrictive CSP, no X-Frame-Options, no XSS filter
-# Googlebot / Bingbot / IndexNow / AI crawlers need these clean.
+# Explicitly override restrictive headers from /*
 
 /sitemap.xml
   Content-Type: application/xml; charset=utf-8
   Cache-Control: public, max-age=3600, must-revalidate
   X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https:
+  X-Frame-Options: SAMEORIGIN
 
 /robots.txt
   Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600, must-revalidate
   Access-Control-Allow-Origin: *
+  Content-Security-Policy: default-src 'self'
+  X-Frame-Options: SAMEORIGIN
 
 # IndexNow key files at root (Bing/Yandex notification protocol)
 /*.txt
   Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Content-Security-Policy: default-src 'self'
+  X-Frame-Options: SAMEORIGIN
+
+# Schema.org / manifest files
+/*.json
+  Content-Type: application/json; charset=utf-8
   Access-Control-Allow-Origin: *
 
 # ===== Admin pages — never index =====
