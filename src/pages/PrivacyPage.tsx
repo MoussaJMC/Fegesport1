@@ -1,11 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/seo';
 
 const PrivacyPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
     <div className="pt-20">
+      <SEO
+        title="Politique de Confidentialite"
+        description="Politique de confidentialite et protection des donnees personnelles de la Federation Guineenne d'Esport (FEGESPORT). RGPD et droits des utilisateurs."
+        keywords="politique confidentialite FEGESPORT, RGPD esport Guinee, donnees personnelles federation, vie privee FEGESPORT"
+        breadcrumbs={[{ name: 'Politique de Confidentialite', url: '/privacy' }]}
+      />
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">

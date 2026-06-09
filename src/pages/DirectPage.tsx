@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Twitch, Youtube, RefreshCw, ExternalLink, Calendar, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { SEO } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Stream {
   id: string;
@@ -17,6 +19,8 @@ interface Stream {
 
 const DirectPage: React.FC = () => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStream, setActiveStream] = useState<Stream | null>(null);
@@ -222,6 +226,17 @@ const DirectPage: React.FC = () => {
 
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
+      <SEO
+        title={lang === 'fr' ? 'DIRECT - Streams en Direct' : 'LIVE - Live Streams'}
+        description={lang === 'fr'
+          ? 'Suivez en direct les competitions et evenements esport de la FEGESPORT. Streams Twitch et YouTube officiels, tournois nationaux et internationaux.'
+          : 'Watch FEGESPORT competitions and esports events live. Official Twitch and YouTube streams, national and international tournaments.'
+        }
+        keywords="streams FEGESPORT, esport live Guinee, twitch FEGESPORT, youtube esport Guinee, competition esport en direct, tournoi esport live Afrique"
+        breadcrumbs={[{ name: lang === 'fr' ? 'DIRECT' : 'LIVE', url: '/direct' }]}
+        type="video.other"
+      />
+
       {/* Hero Section */}
       <section className="bg-primary-700 text-white py-12">
         <div className="container-custom">

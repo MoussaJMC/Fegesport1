@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Handshake, Trophy, Users, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { SEO, buildCollectionSchema } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Partner {
   id: string;
@@ -16,6 +18,8 @@ interface Partner {
 
 const PartnersPage: React.FC = () => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [partnersData, setPartnersData] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -96,6 +100,22 @@ const PartnersPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'Partenaires Officiels' : 'Official Partners'}
+        description={lang === 'fr'
+          ? 'Decouvrez les partenaires officiels de la FEGESPORT : sponsors, partenaires techniques, medias et institutions qui soutiennent le developpement de l\'esport en Guinee.'
+          : 'Discover the official FEGESPORT partners: sponsors, technical partners, media and institutions supporting the development of esports in Guinea.'
+        }
+        keywords="partenaires FEGESPORT, sponsors esport Guinee, partenaires institutionnels esport, sponsoring federation esport, partenariat esport africain"
+        breadcrumbs={[{ name: lang === 'fr' ? 'Partenaires' : 'Partners', url: '/partners' }]}
+        schema={buildCollectionSchema({
+          name: lang === 'fr' ? 'Partenaires FEGESPORT' : 'FEGESPORT Partners',
+          description: lang === 'fr' ? 'Liste des partenaires officiels de la Federation Guineenne d\'Esport' : 'List of official partners of the Guinean Esports Federation',
+          url: 'https://fegesport224.org/partners',
+          itemCount: partnersData.length,
+        })}
+      />
+
       {/* Hero Section */}
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">

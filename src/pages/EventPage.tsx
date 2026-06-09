@@ -6,9 +6,13 @@ import { upcomingEvents } from '../data/eventsData';
 import EventRegistrationForm from '../components/events/EventRegistrationForm';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
+import { SEO, buildEventSchema } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 const EventPage: React.FC = () => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const { id } = useParams();
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -107,6 +111,30 @@ const EventPage: React.FC = () => {
 
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
+      <SEO
+        title={event.title}
+        description={event.description?.substring(0, 160) || `${event.title} - Evenement FEGESPORT le ${event.formattedDate} a ${event.location}`}
+        keywords={`${event.category || 'tournoi'}, FEGESPORT, ${event.title}, esport Guinee evenement, competition esport`}
+        image={event.image}
+        type="article"
+        breadcrumbs={[
+          { name: lang === 'fr' ? 'Evenements' : 'Events', url: '/events' },
+          { name: event.title, url: `/events/${event.id}` },
+        ]}
+        schema={buildEventSchema({
+          name: event.title,
+          description: event.description || event.title,
+          startDate: event.date,
+          location: event.location || 'Conakry, Guinee',
+          type: event.type,
+          image: event.image,
+          price: event.price,
+          maxAttendees: event.maxParticipants || event.max_participants,
+          url: `https://fegesport224.org/events/${event.id}`,
+          status: event.status,
+        })}
+      />
+
       {/* Hero Image */}
       <div className="relative h-[400px] w-full">
         <div className="absolute inset-0">

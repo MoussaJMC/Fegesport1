@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { useLanguage } from '../hooks/useLanguage';
+import { SEO, buildContactPageSchema } from '../components/seo';
 
 interface ContactFormData {
   name: string;
@@ -105,6 +106,17 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'Contact - FEGESPORT' : 'Contact - FEGESPORT'}
+        description={lang === 'fr'
+          ? 'Contactez la Federation Guineenne d\'Esport : siege a Conakry, email contact@fegesport224.org, telephone +224 625 87 87 64. Demandes de partenariat, presse, adhesion.'
+          : 'Contact the Guinean Esports Federation: headquarters in Conakry, email contact@fegesport224.org, phone +224 625 87 87 64. Partnership, press, membership inquiries.'
+        }
+        keywords="contact FEGESPORT, federation esport Guinee contact, siege FEGESPORT Conakry, telephone FEGESPORT, email federation esport"
+        breadcrumbs={[{ name: lang === 'fr' ? 'Contact' : 'Contact', url: '/contact' }]}
+        schema={buildContactPageSchema()}
+      />
+
       {/* ============ HERO ============ */}
       <section className="relative bg-dark-950 py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">

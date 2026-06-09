@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import SectionHeader from '../components/ui/SectionHeader';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
 import { useLanguage } from '../hooks/useLanguage';
+import { SEO, buildCollectionSchema } from '../components/seo';
 
 interface CommunityStats {
   players: number;
@@ -128,6 +129,25 @@ const CommunityPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'Communaute Esport Guineenne' : 'Guinean Esports Community'}
+        description={lang === 'fr'
+          ? `Decouvrez la communaute esport guineenne : ${stats.players}+ joueurs licencies, ${stats.clubs} clubs affilies, ${stats.partners} partenaires. Joueurs pro, clubs officiels et partenaires institutionnels.`
+          : `Discover the Guinean esports community: ${stats.players}+ licensed players, ${stats.clubs} affiliated clubs, ${stats.partners} partners. Pro players, official clubs and institutional partners.`
+        }
+        keywords="communaute esport Guinee, joueurs esport Guinee, clubs esport Conakry, athletes esport, ecosysteme gaming Guinee, electronic sports Guinea"
+        breadcrumbs={[
+          { name: lang === 'fr' ? 'Adhesion' : 'Membership', url: '/membership' },
+          { name: lang === 'fr' ? 'Communaute' : 'Community', url: '/membership/community' },
+        ]}
+        schema={buildCollectionSchema({
+          name: lang === 'fr' ? 'Communaute FEGESPORT' : 'FEGESPORT Community',
+          description: lang === 'fr' ? 'La communaute esport de la FEGESPORT' : 'The FEGESPORT esports community',
+          url: 'https://fegesport224.org/membership/community',
+          itemCount: stats.players + stats.clubs + stats.partners,
+        })}
+      />
+
       {/* ============ HERO ============ */}
       <section className="relative bg-dark-950 py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">

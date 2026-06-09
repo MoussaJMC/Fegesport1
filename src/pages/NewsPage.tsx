@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { NewsItem } from '../types/news';
 import { Search, Tag, Newspaper, X, Loader2 } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
+import { SEO, buildCollectionSchema } from '../components/seo';
 
 const NewsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -86,6 +87,22 @@ const NewsPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'Actualites Esport en Guinee' : 'Esports News in Guinea'}
+        description={lang === 'fr'
+          ? `Toutes les actualites de la Federation Guineenne d'Esport : competitions, partenariats, formations, communiques officiels et resultats des athletes esport en Guinee. ${news.length} articles publies.`
+          : `All news from the Guinean Esports Federation: competitions, partnerships, training, official press releases and results from Guinean esports athletes. ${news.length} articles published.`
+        }
+        keywords="actualites esport Guinee, news FEGESPORT, competitions esport Guinee, esport africain news, gaming Guinee actualites, federation esport actualites"
+        breadcrumbs={[{ name: lang === 'fr' ? 'Actualites' : 'News', url: '/news' }]}
+        schema={buildCollectionSchema({
+          name: lang === 'fr' ? 'Actualites FEGESPORT' : 'FEGESPORT News',
+          description: lang === 'fr' ? 'Toutes les actualites officielles de la FEGESPORT' : 'All official FEGESPORT news',
+          url: 'https://fegesport224.org/news',
+          itemCount: news.length,
+        })}
+      />
+
       {/* ============ HERO ============ */}
       <section className="relative bg-dark-950 py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">

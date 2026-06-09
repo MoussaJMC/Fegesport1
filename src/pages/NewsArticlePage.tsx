@@ -5,6 +5,8 @@ import { ArrowLeft, Calendar, Tag, User, Loader } from 'lucide-react';
 import { latestNews } from '../data/newsData';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
+import { SEO, buildArticleSchema } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface NewsArticle {
   id: string;
@@ -21,6 +23,8 @@ interface NewsArticle {
 
 const NewsArticlePage: React.FC = () => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const { id } = useParams();
   const navigate = useNavigate();
   const [article, setArticle] = useState<NewsArticle | null>(null);
@@ -113,6 +117,32 @@ const NewsArticlePage: React.FC = () => {
 
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
+      <SEO
+        title={article.title}
+        description={article.excerpt || article.content.substring(0, 160)}
+        keywords={`${article.category || 'esport'}, FEGESPORT, ${article.title}, actualites esport Guinee`}
+        image={article.image_url}
+        type="article"
+        publishedTime={article.created_at}
+        modifiedTime={article.updated_at}
+        author="FEGESPORT"
+        section={article.category}
+        breadcrumbs={[
+          { name: lang === 'fr' ? 'Actualites' : 'News', url: '/news' },
+          { name: article.title, url: `/news/${article.id}` },
+        ]}
+        schema={buildArticleSchema({
+          title: article.title,
+          description: article.excerpt || article.content.substring(0, 200),
+          image: article.image_url || 'https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg',
+          url: `https://fegesport224.org/news/${article.id}`,
+          datePublished: article.created_at,
+          dateModified: article.updated_at,
+          author: 'FEGESPORT',
+          category: article.category,
+        })}
+      />
+
       {/* Hero Image */}
       <div className="relative h-[400px] w-full">
         <div className="absolute inset-0">

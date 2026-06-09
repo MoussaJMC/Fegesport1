@@ -1,21 +1,38 @@
+# ============================================================
 # FEGESPORT - Federation Guineenne d'Esport
-# https://fegesport224.org
+# Robots policy for https://fegesport224.org
+# Last updated: 2026-06-07
+# ============================================================
 
+# Default rules — allow indexing all public content
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
+Disallow: /backup
+Disallow: /download-backup
+Disallow: /*?*
 
-# Specific bot directives
+# Google
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
+Disallow: /admin/
 
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /news
+Allow: /events
+
+# Bing
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
 
+# Social previews
 User-agent: Twitterbot
 Allow: /
 
@@ -28,12 +45,46 @@ Allow: /
 User-agent: WhatsApp
 Allow: /
 
-# Sitemap location
-Sitemap: https://fegesport224.org/sitemap.xml
+User-agent: Slackbot
+Allow: /
 
-# Crawl-delay for less aggressive bots
+User-agent: Discordbot
+Allow: /
+
+# AI / LLM Crawlers (allow for FEGESPORT discoverability)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Aggressive SEO crawlers — limit rate
 User-agent: AhrefsBot
 Crawl-delay: 10
 
 User-agent: SemrushBot
 Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
+
+# Sitemap
+Sitemap: https://fegesport224.org/sitemap.xml

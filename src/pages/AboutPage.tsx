@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { getLeadershipTranslation } from '../utils/translations';
 import SectionHeader from '../components/ui/SectionHeader';
-import SEO from '../components/seo/SEO';
+import { SEO, buildFAQSchema, buildAboutPageSchema } from '../components/seo';
 
 const OfficialDocumentsSection = lazy(() => import('../components/documents/OfficialDocumentsSection'));
 
@@ -149,15 +149,75 @@ const AboutPage: React.FC = () => {
 
   const displayHistory = historyEntries.length > 0 ? historyEntries : defaultHistory;
 
+  // FAQ for AboutPage — generates FAQPage Schema for Google snippets
+  const faqs = lang === 'fr' ? [
+    {
+      question: 'Qu\'est-ce que la FEGESPORT ?',
+      answer: 'La FEGESPORT (Federation Guineenne d\'Esport) est l\'organisation nationale officielle reconnue qui regit le sport electronique en Republique de Guinee. Elle est membre de l\'IESF, ACES, WESCO et GEF.',
+    },
+    {
+      question: 'Quelles sont les missions de la FEGESPORT ?',
+      answer: 'La FEGESPORT a pour mission de structurer, developper et representer l\'esport guineen. Elle organise des competitions officielles, soutient les clubs, accompagne les joueurs et represente la Guinee aux competitions internationales.',
+    },
+    {
+      question: 'Ou se trouve le siege de la FEGESPORT ?',
+      answer: 'Le siege de la Federation Guineenne d\'Esport est situe a Conakry, en Republique de Guinee.',
+    },
+    {
+      question: 'Comment devenir membre de la FEGESPORT ?',
+      answer: 'Vous pouvez devenir membre en tant que joueur, club ou partenaire. L\'adhesion se fait via la page Adhesion du site fegesport224.org. Trois formules existent : joueur, club et partenaire.',
+    },
+    {
+      question: 'A quelles federations internationales appartient la FEGESPORT ?',
+      answer: 'La FEGESPORT est membre de quatre federations internationales majeures : IESF (International Esports Federation), ACES (African Confederation of Electronic Sports), WESCO (World Esports Consortium) et GEF (Global Esports Federation).',
+    },
+  ] : [
+    {
+      question: 'What is FEGESPORT?',
+      answer: 'FEGESPORT (Guinean Esports Federation) is the official recognized national organization that governs electronic sports in the Republic of Guinea. It is a member of IESF, ACES, WESCO and GEF.',
+    },
+    {
+      question: 'What are FEGESPORT\'s missions?',
+      answer: 'FEGESPORT\'s mission is to structure, develop and represent Guinean esports. It organizes official competitions, supports clubs, mentors players and represents Guinea in international competitions.',
+    },
+    {
+      question: 'Where is FEGESPORT headquartered?',
+      answer: 'The Guinean Esports Federation headquarters is located in Conakry, Republic of Guinea.',
+    },
+    {
+      question: 'How to become a FEGESPORT member?',
+      answer: 'You can become a member as a player, club or partner. Membership is done via the Membership page on fegesport224.org. Three plans exist: player, club and partner.',
+    },
+    {
+      question: 'Which international federations does FEGESPORT belong to?',
+      answer: 'FEGESPORT is a member of four major international federations: IESF (International Esports Federation), ACES (African Confederation of Electronic Sports), WESCO (World Esports Consortium) and GEF (Global Esports Federation).',
+    },
+  ];
+
+  // Combine AboutPage + FAQ schemas
+  const combinedSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      buildAboutPageSchema({
+        title: lang === 'fr' ? 'A propos de la FEGESPORT' : 'About FEGESPORT',
+        description: lang === 'fr' ? 'Decouvrez la Federation Guineenne d\'Esport' : 'Discover the Guinean Esports Federation',
+        url: 'https://fegesport224.org/about',
+      }),
+      buildFAQSchema(faqs),
+    ],
+  };
+
   return (
     <div className="pt-20">
       <SEO
         title={lang === 'fr' ? 'A propos de la FEGESPORT' : 'About FEGESPORT'}
         description={lang === 'fr'
-          ? 'Decouvrez la Federation Guineenne d\'Esport : mission, vision, valeurs, equipe dirigeante, documents officiels et histoire de la FEGESPORT.'
-          : 'Discover the Guinean Esports Federation: mission, vision, values, leadership team, official documents and FEGESPORT history.'
+          ? 'Decouvrez la Federation Guineenne d\'Esport : mission, vision, valeurs, equipe dirigeante de 20 membres, documents officiels et histoire depuis 2017. Membre IESF, ACES, WESCO, GEF.'
+          : 'Discover the Guinean Esports Federation: mission, vision, values, 20-member leadership team, official documents and history since 2017. Member of IESF, ACES, WESCO, GEF.'
         }
-        keywords="FEGESPORT histoire, equipe FEGESPORT, direction FEGESPORT, mission federation esport Guinee, statuts FEGESPORT"
+        keywords="FEGESPORT histoire, equipe FEGESPORT, direction FEGESPORT, mission federation esport Guinee, statuts FEGESPORT, gouvernance esport, federation esport Afrique, electronic sports Guinea"
+        breadcrumbs={[{ name: lang === 'fr' ? 'A propos' : 'About', url: '/about' }]}
+        schema={combinedSchema}
       />
 
       {/* ============ HERO ============ */}

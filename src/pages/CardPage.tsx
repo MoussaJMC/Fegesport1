@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/seo';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { getCardTranslation, CardTranslations } from '../utils/translations';
@@ -102,6 +103,13 @@ const CardPage: React.FC = () => {
 
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
+      <SEO
+        title={translated.title || card.title}
+        description={(translated.content || card.content).substring(0, 160)}
+        image={card.image_url}
+        type="article"
+        breadcrumbs={[{ name: translated.title || card.title, url: `/card/${card.id}` }]}
+      />
       <div className="relative h-[400px] w-full">
         <div className="absolute inset-0">
           <img

@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase';
 import GuineaMap from '../components/leg/GuineaMap';
 import TournamentForm from '../components/forms/TournamentForm';
 import SponsorsCarousel from '../components/leg/SponsorsCarousel';
+import { SEO } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Discipline {
   id: string;
@@ -65,6 +67,8 @@ interface Tournament {
 }
 
 const LEGPage: React.FC = () => {
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'clubs' | 'rankings' | 'tournaments'>('clubs');
@@ -248,6 +252,16 @@ const LEGPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-dark-950 text-white overflow-hidden">
+      <SEO
+        title={lang === 'fr' ? 'LEG - League eSport de Guinee' : 'LEG - Guinea eSports League'}
+        description={lang === 'fr'
+          ? `League eSport de Guinee (LEG) : ${clubs.length} clubs officiels, ${disciplines.length} disciplines structurees, competitions nationales et internationales. Le championnat esport de la FEGESPORT.`
+          : `Guinea eSports League (LEG): ${clubs.length} official clubs, ${disciplines.length} structured disciplines, national and international competitions. The FEGESPORT esports championship.`
+        }
+        keywords="LEG, eLeague Guinee, championnat esport Guinee, clubs esport Conakry, ligue esport Afrique, league esport Guinee, FIFA Guinee, MLBB Guinee, Free Fire Guinee"
+        breadcrumbs={[{ name: 'LEG', url: '/leg' }]}
+      />
+
       {/* Back to Home Button */}
       <Link
         to="/"

@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import { getMembershipTypeTranslation } from '../utils/translations';
 import SectionHeader from '../components/ui/SectionHeader';
+import { SEO, buildServiceSchema, buildFAQSchema } from '../components/seo';
 
 interface MembershipType {
   id: string;
@@ -152,6 +153,36 @@ const MembershipPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      <SEO
+        title={lang === 'fr' ? 'Adhesion FEGESPORT' : 'FEGESPORT Membership'}
+        description={lang === 'fr'
+          ? 'Devenez membre officiel de la Federation Guineenne d\'Esport. Inscription pour joueurs, clubs et partenaires. Licence officielle, participation aux tournois, formation et reconnaissance institutionnelle.'
+          : 'Become an official member of the Guinean Esports Federation. Registration for players, clubs and partners. Official license, tournament participation, training and institutional recognition.'
+        }
+        keywords="adhesion FEGESPORT, devenir membre federation esport, licence joueur esport Guinee, club esport affiliation, partenaire FEGESPORT, inscription tournoi esport"
+        breadcrumbs={[{ name: lang === 'fr' ? 'Adhesion' : 'Membership', url: '/membership' }]}
+        schema={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            buildServiceSchema({
+              name: lang === 'fr' ? 'Adhesion FEGESPORT' : 'FEGESPORT Membership',
+              description: lang === 'fr' ? 'Adhesion officielle pour joueurs, clubs et partenaires.' : 'Official membership for players, clubs and partners.',
+              url: 'https://fegesport224.org/membership',
+            }),
+            buildFAQSchema(lang === 'fr' ? [
+              { question: 'Comment devenir membre de la FEGESPORT ?', answer: 'Choisissez votre formule (joueur, club, partenaire), remplissez le formulaire d\'inscription en ligne, et payez les frais d\'adhesion. Vous recevrez votre licence officielle.' },
+              { question: 'Combien coute l\'adhesion FEGESPORT ?', answer: 'L\'adhesion joueur est gratuite (contribution volontaire suggeree de 15 000 GNF). L\'adhesion club est de 150 000 GNF / an. L\'adhesion partenaire est sur demande.' },
+              { question: 'Quels sont les avantages d\'etre membre ?', answer: 'Licence officielle, participation aux tournois officiels, acces aux formations, newsletter exclusive, badge digital officiel, support marketing et visibilite sur le site FEGESPORT.' },
+              { question: 'Combien de temps dure l\'adhesion ?', answer: 'L\'adhesion est valable un an, renouvelable. Les clubs peuvent enregistrer jusqu\'a 10 joueurs avec leur licence.' },
+            ] : [
+              { question: 'How to become a FEGESPORT member?', answer: 'Choose your plan (player, club, partner), complete the online registration form, and pay the membership fee. You will receive your official license.' },
+              { question: 'How much does FEGESPORT membership cost?', answer: 'Player membership is free (suggested voluntary contribution of 15,000 GNF). Club membership is 150,000 GNF/year. Partner membership is on request.' },
+              { question: 'What are the benefits of being a member?', answer: 'Official license, participation in official tournaments, access to training, exclusive newsletter, official digital badge, marketing support and visibility on the FEGESPORT website.' },
+              { question: 'How long does membership last?', answer: 'Membership is valid for one year, renewable. Clubs can register up to 10 players with their license.' },
+            ]),
+          ],
+        }}
+      />
       <Toaster position="top-right" />
 
       {/* ============ HERO ============ */}

@@ -4,6 +4,8 @@ import { Calendar, MapPin, Users, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import EventCard from '../components/events/EventCard';
+import { SEO, buildCollectionSchema } from '../components/seo';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Event {
   id: string;
@@ -23,6 +25,8 @@ interface Event {
 
 const EventsListPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { currentLanguage } = useLanguage();
+  const lang = currentLanguage;
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,6 +149,22 @@ const EventsListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-secondary-900 py-12">
+      <SEO
+        title={lang === 'fr' ? 'Evenements et Competitions' : 'Events and Competitions'}
+        description={lang === 'fr'
+          ? `Calendrier des evenements et competitions esport de la FEGESPORT en Guinee. Tournois, championnats, qualifications IESF, ${events.length} evenements programmes.`
+          : `Calendar of FEGESPORT esports events and competitions in Guinea. Tournaments, championships, IESF qualifications, ${events.length} programmed events.`
+        }
+        keywords="evenements esport Guinee, competitions FEGESPORT, tournois esport Conakry, calendrier esport Afrique, championnat esport national, qualifications IESF"
+        breadcrumbs={[{ name: lang === 'fr' ? 'Evenements' : 'Events', url: '/events' }]}
+        schema={buildCollectionSchema({
+          name: lang === 'fr' ? 'Evenements FEGESPORT' : 'FEGESPORT Events',
+          description: lang === 'fr' ? 'Calendrier des evenements et competitions FEGESPORT' : 'FEGESPORT events and competitions calendar',
+          url: 'https://fegesport224.org/events',
+          itemCount: events.length,
+        })}
+      />
+
       <div className="container-custom">
         {/* Header */}
         <div className="text-center mb-12">

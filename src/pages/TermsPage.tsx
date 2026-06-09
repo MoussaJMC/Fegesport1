@@ -1,11 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/seo';
 
 const TermsPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
     <div className="pt-20">
+      <SEO
+        title="Conditions d'Utilisation"
+        description="Conditions d'utilisation et regles d'usage du site et des services de la Federation Guineenne d'Esport (FEGESPORT)."
+        keywords="conditions utilisation FEGESPORT, mentions legales esport Guinee, reglement utilisation federation"
+        breadcrumbs={[{ name: 'Conditions d\'Utilisation', url: '/terms' }]}
+      />
       <section className="bg-primary-700 text-white py-20">
         <div className="container-custom">
           <div className="max-w-3xl">
