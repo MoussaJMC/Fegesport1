@@ -211,14 +211,63 @@
   <body>
     <div id="root"></div>
 
-    <!-- Noscript fallback for SEO -->
+    <!-- ============== NOSCRIPT FALLBACK ==============
+         Provides:
+         - SEO-friendly content for crawlers that may not execute JavaScript
+         - Internal links for Googlebot/Bingbot to discover all pages
+         - Accessible information for users with JS disabled
+         ============================================ -->
     <noscript>
-      <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
-        <h1>FEGESPORT - Fédération Guinéenne d'Esport</h1>
-        <p>L'organisation nationale officielle pour l'esport en République de Guinée.</p>
-        <p>Membre de l'IESF, AESF, WESCO et GEF.</p>
-        <p>Veuillez activer JavaScript pour accéder au site complet.</p>
-        <p>Contact : <a href="mailto:contact@fegesport224.org">contact@fegesport224.org</a></p>
+      <div style="padding: 2rem; max-width: 1200px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6;">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h1>FEGESPORT — Fédération Guinéenne d'Esport</h1>
+          <p style="font-size: 1.1rem; color: #444;">
+            L'organisation nationale officielle reconnue pour l'esport en République de Guinée.<br/>
+            Membre de l'<strong>IESF</strong> (International Esports Federation), <strong>ACES</strong> (African Confederation of Electronic Sports), <strong>WESCO</strong> (World Esports Consortium) et <strong>GEF</strong> (Global Esports Federation).
+          </p>
+          <p><em>Veuillez activer JavaScript pour accéder à l'expérience complète du site.</em></p>
+        </header>
+
+        <nav aria-label="Navigation principale" style="margin: 2rem 0;">
+          <h2>Navigation</h2>
+          <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <li><a href="/" title="Page d'accueil FEGESPORT">Accueil</a></li>
+            <li><a href="/about" title="À propos de la Fédération Guinéenne d'Esport">À propos</a></li>
+            <li><a href="/news" title="Actualités FEGESPORT et esport en Guinée">Actualités</a></li>
+            <li><a href="/events" title="Événements et compétitions esport en Guinée">Événements</a></li>
+            <li><a href="/leg" title="League eSport de Guinée (LEG) — Championnat national">eLeague (LEG)</a></li>
+            <li><a href="/membership" title="Adhésion FEGESPORT pour joueurs, clubs et partenaires">Adhésion</a></li>
+            <li><a href="/membership/community" title="Communauté esport guinéenne">Communauté</a></li>
+            <li><a href="/partners" title="Partenaires officiels FEGESPORT">Partenaires</a></li>
+            <li><a href="/direct" title="Streams en direct FEGESPORT">DIRECT (Streams)</a></li>
+          </ul>
+        </nav>
+
+        <section style="margin: 2rem 0;">
+          <h2>Ressources institutionnelles</h2>
+          <ul>
+            <li><a href="/press-kit" title="Kit de presse officiel FEGESPORT — Pour journalistes et médias"><strong>Kit de Presse</strong></a> — Informations officielles, logos, citations pour journalistes</li>
+            <li><a href="/resources" title="Documents officiels, statuts, règlements">Documents officiels et ressources</a></li>
+            <li><a href="/contact" title="Nous contacter">Contact</a></li>
+          </ul>
+        </section>
+
+        <section style="margin: 2rem 0;">
+          <h2>Contact</h2>
+          <address style="font-style: normal;">
+            <p>
+              <strong>Siège :</strong> Conakry, République de Guinée<br/>
+              <strong>Email :</strong> <a href="mailto:contact@fegesport224.org">contact@fegesport224.org</a><br/>
+              <strong>Téléphone :</strong> <a href="tel:+224625878764">+224 625 87 87 64</a><br/>
+              <strong>Site officiel :</strong> <a href="https://fegesport224.org">fegesport224.org</a>
+            </p>
+          </address>
+        </section>
+
+        <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 0.875rem;">
+          <p>&copy; 2026 FEGESPORT — Fédération Guinéenne d'Esport. Tous droits réservés.</p>
+          <p><a href="/sitemap.xml">Sitemap</a> · <a href="/privacy">Politique de confidentialité</a> · <a href="/terms">Conditions d'utilisation</a></p>
+        </footer>
       </div>
     </noscript>
 
