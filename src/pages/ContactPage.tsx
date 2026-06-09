@@ -344,6 +344,35 @@ const ContactPage: React.FC = () => {
               title="Siege FEGESPORT - Conakry, Guinee"
             />
           </div>
+
+          {/* Press kit CTA — strategic internal link for journalists & SEO */}
+          <div className="mt-8 max-w-2xl mx-auto">
+            <a
+              href="/press-kit"
+              className="block p-5 rounded-2xl bg-dark-800 border border-dark-700 hover:border-fed-gold-500/40 transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-fed-gold-500/10 border border-fed-gold-500/20 flex items-center justify-center text-fed-gold-500 flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-white font-heading mb-0.5 group-hover:text-fed-gold-500 transition-colors">
+                    {lang === 'fr' ? 'Demande presse ou journaliste ?' : 'Press or journalist inquiry?'}
+                  </h3>
+                  <p className="text-light-400 text-sm">
+                    {lang === 'fr'
+                      ? 'Consultez notre Kit de Presse officiel : logos, fiche d\'identite, citations prets a l\'emploi.'
+                      : 'View our official Press Kit: logos, fact sheet, ready-to-use quotes.'}
+                  </p>
+                </div>
+                <svg className="w-5 h-5 text-light-400 group-hover:text-fed-gold-500 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
+          </div>
         </div>
       </section>
     </div>

@@ -34,10 +34,40 @@ SITE_URL = "https://fegesport224.org"
 [build.services]
 
 [[headers]]
+for = "/sitemap.xml"
+
+[headers.values]
+Content-Type = "application/xml; charset=utf-8"
+Cache-Control = "public, max-age=3600, must-revalidate"
+X-Robots-Tag = "noindex"
+Access-Control-Allow-Origin = "*"
+Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:"
+X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+for = "/robots.txt"
+
+[headers.values]
+Content-Type = "text/plain; charset=utf-8"
+Cache-Control = "public, max-age=3600, must-revalidate"
+Access-Control-Allow-Origin = "*"
+Content-Security-Policy = "default-src 'self'"
+X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
 for = "/*.txt"
 
 [headers.values]
 Content-Type = "text/plain; charset=utf-8"
+Access-Control-Allow-Origin = "*"
+Content-Security-Policy = "default-src 'self'"
+X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+for = "/*.json"
+
+[headers.values]
+Content-Type = "application/json; charset=utf-8"
 Access-Control-Allow-Origin = "*"
 
 [[headers]]
@@ -58,35 +88,6 @@ X-XSS-Protection = "1; mode=block"
 Referrer-Policy = "strict-origin-when-cross-origin"
 Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
 Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-
-[[headers]]
-for = "/sitemap.xml"
-
-[headers.values]
-Content-Type = "application/xml; charset=utf-8"
-Cache-Control = "public, max-age=3600, must-revalidate"
-X-Robots-Tag = "noindex"
-Access-Control-Allow-Origin = "*"
-
-[[headers]]
-for = "/robots.txt"
-
-[headers.values]
-Content-Type = "text/plain; charset=utf-8"
-Cache-Control = "public, max-age=3600, must-revalidate"
-Access-Control-Allow-Origin = "*"
-
-[[headers]]
-for = "/*.txt"
-
-[headers.values]
-Content-Type = "text/plain; charset=utf-8"
-
-[[headers]]
-for = "/*.json"
-
-[headers.values]
-Content-Type = "application/json; charset=utf-8"
 
 [[headers]]
 for = "/*"

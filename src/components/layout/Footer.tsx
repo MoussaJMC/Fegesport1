@@ -81,45 +81,133 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Column 2 — Navigation */}
+          {/* Column 2 — Navigation (primary internal links — SEO critical) */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
               {lang === 'fr' ? 'Navigation' : 'Navigation'}
             </h4>
             <ul className="space-y-2.5">
-              {navigationSettings.items?.slice(0, 6).map((item: any) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  >
-                    {getTranslatedLabel(item.label)}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  to="/"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Page d\'accueil FEGESPORT' : 'FEGESPORT homepage'}
+                >
+                  {lang === 'fr' ? 'Accueil' : 'Home'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/about"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'A propos de la Federation Guineenne d\'Esport' : 'About the Guinean Esports Federation'}
+                >
+                  {lang === 'fr' ? 'A propos' : 'About'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/news"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Actualites de la FEGESPORT' : 'FEGESPORT news'}
+                >
+                  {lang === 'fr' ? 'Actualites' : 'News'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/events"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Evenements et competitions' : 'Events and competitions'}
+                >
+                  {lang === 'fr' ? 'Evenements' : 'Events'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/leg"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'League eSport de Guinee (LEG)' : 'Guinea eSports League (LEG)'}
+                >
+                  {lang === 'fr' ? 'eLeague (LEG)' : 'eLeague (LEG)'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/membership"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Adhesion FEGESPORT' : 'FEGESPORT membership'}
+                >
+                  {lang === 'fr' ? 'Adhesion' : 'Membership'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/membership/community"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                >
+                  {lang === 'fr' ? 'Communaute' : 'Community'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/partners"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Partenaires officiels' : 'Official partners'}
+                >
+                  {lang === 'fr' ? 'Partenaires' : 'Partners'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                >
+                  Contact
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 3 — Resources */}
+          {/* Column 3 — Resources (institutional + legal) */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
               {lang === 'fr' ? 'Ressources' : 'Resources'}
             </h4>
             <ul className="space-y-2.5">
-              {navigationSettings.items?.slice(6).map((item: any) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  >
-                    {getTranslatedLabel(item.label)}
-                  </Link>
-                </li>
-              ))}
               <li>
-                <Link to="/resources" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
+                <Link
+                  to="/press-kit"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Kit de presse officiel FEGESPORT' : 'Official FEGESPORT press kit'}
+                >
+                  {lang === 'fr' ? 'Kit de presse' : 'Press kit'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/resources"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                >
                   {lang === 'fr' ? 'Documents officiels' : 'Official Documents'}
                 </Link>
+              </li>
+              <li>
+                <Link
+                  to="/direct"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                >
+                  {lang === 'fr' ? 'DIRECT (Streams)' : 'LIVE (Streams)'}
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="/sitemap.xml"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title="Sitemap XML"
+                >
+                  Sitemap
+                </a>
               </li>
               <li>
                 <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
