@@ -1,6 +1,37 @@
-/*
-  # Security Headers
+# ============================================================
+# FEGESPORT — Netlify Headers
+# Note: Specific rules come FIRST, generic /* rules at the END.
+# Netlify applies the most specific match.
+# ============================================================
 
+# ===== SEO files — accessible by all crawlers =====
+# No restrictive CSP, no X-Frame-Options, no XSS filter
+# Googlebot / Bingbot / IndexNow / AI crawlers need these clean.
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+  X-Robots-Tag: noindex
+  Access-Control-Allow-Origin: *
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+  Access-Control-Allow-Origin: *
+
+# IndexNow key files at root (Bing/Yandex notification protocol)
+/*.txt
+  Content-Type: text/plain; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# ===== Admin pages — never index =====
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store, no-cache, must-revalidate, private
+
+# ===== Default rules for all other content =====
+# Strict security headers for HTML/JS/CSS
+/*
   # Content Security Policy
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.twitch.tv; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
 
@@ -21,8 +52,3 @@
 
   # Strict Transport Security (force HTTPS)
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-
-/admin/*
-  # Additional security for admin pages
-  X-Robots-Tag: noindex, nofollow
-  Cache-Control: no-store, no-cache, must-revalidate, private
