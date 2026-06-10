@@ -121,8 +121,24 @@ export default function GuineaMap({ clubs, onClubClick }: GuineaMapProps) {
     setIsLoaded(true);
   }, []);
 
-  // Clé API Google Maps - L'utilisateur doit créer sa propre clé
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBpGuAdDlxGc8rkGmpLi2gR5jrMy5c3gLs';
+  // Clé API Google Maps — lue depuis l'environnement (jamais hardcodée).
+  // Configurée dans Netlify : Site settings → Environment variables → VITE_GOOGLE_MAPS_API_KEY
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+
+  // Fallback UI propre si la clé n'est pas configurée (évite un crash silencieux)
+  if (!apiKey) {
+    return (
+      <div className="w-full h-[600px] bg-dark-900 rounded-xl flex items-center justify-center border border-dark-700">
+        <div className="text-center max-w-md px-6">
+          <p className="text-light-100 font-semibold mb-2">Carte indisponible</p>
+          <p className="text-light-400 text-sm leading-relaxed">
+            La carte interactive de la Guinée n'est pas chargée car la configuration Google Maps est manquante.
+            Cette section est purement décorative et n'affecte pas le fonctionnement du reste de la page.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
