@@ -1,3 +1,5 @@
+<!-- Pipeline CI/CD GitHub -> Netlify : verifie le 2026-06-11 (PR-jouet chore/test-pipeline). -->
+
 # 📚 Strategie editoriale FEGESPORT 2026-2027
 
 **Mission :** faire de FEGESPORT la reference numerique incontestable de l'esport en Guinee et en Afrique de l'Ouest.
