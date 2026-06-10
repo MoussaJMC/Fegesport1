@@ -10,7 +10,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "indexnow": "node scripts/notify-indexnow.js",
-    "indexnow:url": "node scripts/notify-indexnow.js --url"
+    "indexnow:url": "node scripts/notify-indexnow.js --url",
+    "seo:check": "node scripts/seo-check.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",

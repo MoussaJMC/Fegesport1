@@ -1,0 +1,53 @@
+{
+  "name": "FEGESPORT - Federation Guineenne d'Esport",
+  "short_name": "FEGESPORT",
+  "description": "Federation Guineenne d'Esport - L'organisation nationale officielle reconnue pour l'esport en Republique de Guinee. Membre IESF, ACES, WESCO, GEF.",
+  "lang": "fr-GN",
+  "scope": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0F172A",
+  "background_color": "#0F172A",
+  "categories": ["sports", "esports", "education"],
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Actualites",
+      "short_name": "Actualites",
+      "description": "Dernieres actualites FEGESPORT",
+      "url": "/news"
+    },
+    {
+      "name": "Adhesion",
+      "short_name": "Adhesion",
+      "description": "Devenir membre",
+      "url": "/membership"
+    },
+    {
+      "name": "eLeague",
+      "short_name": "LEG",
+      "description": "League eSport de Guinee",
+      "url": "/leg"
+    }
+  ]
+}

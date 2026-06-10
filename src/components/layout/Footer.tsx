@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, Globe } from 'lucide-react';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
+import { ManageCookiesLink } from '../cookie/CookieBanner';
 
 const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -265,13 +266,15 @@ const Footer: React.FC = () => {
           <p className="text-light-400 text-xs text-center md:text-left">
             &copy; {currentYear} FEGESPORT — {lang === 'fr' ? 'Federation Guineenne d\'Esport. Tous droits reserves.' : 'Guinean Esports Federation. All rights reserved.'}
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-wrap">
             <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
               {t('footer.privacy')}
             </Link>
             <Link to="/terms" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
               {t('footer.terms')}
             </Link>
+            {/* Re-show cookie banner — only rendered if analytics are configured */}
+            <ManageCookiesLink className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors" />
           </div>
         </div>
       </div>
