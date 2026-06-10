@@ -108,6 +108,15 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
+                  to="/federation-guineenne-esport"
+                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
+                  title={lang === 'fr' ? 'Page institutionnelle officielle de la FEGESPORT' : 'Official institutional page of FEGESPORT'}
+                >
+                  {lang === 'fr' ? 'La Federation' : 'The Federation'}
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/news"
                   className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
                   title={lang === 'fr' ? 'Actualites de la FEGESPORT' : 'FEGESPORT news'}

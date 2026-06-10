@@ -29,6 +29,28 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://fegesport224.org/about?lang=en" />
   </url>
 
+  <!-- ===== PILLAR — FEDERATION INSTITUTIONAL ===== -->
+  <url>
+    <loc>https://fegesport224.org/federation-guineenne-esport</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://fegesport224.org/federation-guineenne-esport" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://fegesport224.org/federation-guineenne-esport?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fegesport224.org/federation-guineenne-esport" />
+  </url>
+
+  <!-- ===== PILLAR — HISTOIRE ===== -->
+  <url>
+    <loc>https://fegesport224.org/histoire-esport-guinee</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://fegesport224.org/histoire-esport-guinee" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://fegesport224.org/histoire-esport-guinee?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fegesport224.org/histoire-esport-guinee" />
+  </url>
+
   <url>
     <loc>https://fegesport224.org/press-kit</loc>
     <lastmod>2026-06-07</lastmod>
