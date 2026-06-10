@@ -40,6 +40,12 @@ to = "/admin/:splat"
 status = 301
 force = true
 
+# ============================================================
+# IMPORTANT: SPA fallback — sends all non-existent paths to index.html
+# Specific static files (sitemap.xml, robots.txt, *.txt, *.json, /assets/*)
+# are served directly since they exist in dist/ — no rewrite needed.
+# force = false means: only fallback if the file does NOT exist.
+# ============================================================
 [[redirects]]
 from = "/*"
 to = "/index.html"
