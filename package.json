@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "postbuild": "node scripts/notify-indexnow.js || true",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "indexnow": "node scripts/notify-indexnow.js",
+    "indexnow:url": "node scripts/notify-indexnow.js --url"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
