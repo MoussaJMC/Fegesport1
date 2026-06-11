@@ -26,6 +26,7 @@ import LEGPage from './pages/LEGPage';
 import PressKitPage from './pages/PressKitPage';
 import FederationGuineenneEsportPage from './pages/FederationGuineenneEsportPage';
 import HistoireEsportGuineePage from './pages/HistoireEsportGuineePage';
+import EsportGuineePage from './pages/EsportGuineePage';
 
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -121,6 +122,7 @@ function App() {
           <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
           <Route path="/federation-guineenne-esport" element={<PublicLayout><FederationGuineenneEsportPage /></PublicLayout>} />
           <Route path="/histoire-esport-guinee" element={<PublicLayout><HistoireEsportGuineePage /></PublicLayout>} />
+          <Route path="/esport-guinee" element={<PublicLayout><EsportGuineePage /></PublicLayout>} />
           <Route path="/news" element={<PublicLayout><NewsPage /></PublicLayout>} />
           <Route path="/news/:id" element={<PublicLayout><NewsArticlePage /></PublicLayout>} />
           <Route path="/membership" element={<PublicLayout><MembershipPage /></PublicLayout>} />
