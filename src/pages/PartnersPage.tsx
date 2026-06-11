@@ -129,7 +129,7 @@ const PartnersPage: React.FC = () => {
       </section>
 
       {/* Partners Grid */}
-      <section className="section bg-white">
+      <section className="section bg-dark-950 text-light-100">
         <div className="container-custom">
           {partners.length === 0 ? (
             <div className="text-center py-12">
@@ -210,7 +210,7 @@ const PartnersPage: React.FC = () => {
       </section>
 
       {/* Partnership Process */}
-      <section className="section bg-white">
+      <section className="section bg-dark-950 text-light-100">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">{t('partners.process.title')}</h2>
