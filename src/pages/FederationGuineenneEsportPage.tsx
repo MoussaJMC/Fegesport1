@@ -393,13 +393,15 @@ const sections: PillarSection[] = [
         <p>
           La FEGESPORT s’engage à publier les communiqués officiels, les
           décisions majeures et les rapports d’activité. Les statuts,
-          les règlements et les documents officiels sont mis à
-          disposition sur la page{' '}
+          les règlements et les documents officiels sont communiqués via
+          les canaux institutionnels de la fédération. Pour toute demande
+          d’accès à un document spécifique, vous pouvez prendre contact
+          via la page{' '}
           <Link
-            to="/resources"
+            to="/contact"
             className="text-fed-gold-500 hover:underline font-medium"
           >
-            Ressources et documents officiels
+            Contact officiel
           </Link>
           .
         </p>

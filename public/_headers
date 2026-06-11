@@ -40,6 +40,19 @@
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store, no-cache, must-revalidate, private
 
+# ===== Private resource library — never index, never archive =====
+# /resources is the FEGESPORT internal resource library (institutional documents,
+# media archives, official files). Access is gated by AdminGuard at the application
+# layer. These headers ensure that no crawler or AI bot indexes, archives, snippets
+# or image-indexes it.
+/resources
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-store, no-cache, must-revalidate, private
+
+/resources/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-store, no-cache, must-revalidate, private
+
 # ===== Default rules for all other content =====
 # Strict security headers for HTML/JS/CSS
 /*

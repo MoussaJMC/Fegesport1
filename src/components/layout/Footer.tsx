@@ -194,14 +194,7 @@ const Footer: React.FC = () => {
                   {lang === 'fr' ? 'Kit de presse' : 'Press kit'}
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/resources"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                >
-                  {lang === 'fr' ? 'Documents officiels' : 'Official Documents'}
-                </Link>
-              </li>
+              {/* "Documents officiels" link removed — /resources is now a private (gated) area. */}
               <li>
                 <Link
                   to="/direct"
