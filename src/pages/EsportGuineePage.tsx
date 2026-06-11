@@ -760,14 +760,14 @@ const sections: PillarSection[] = [
         <div className="not-prose my-5 space-y-3">
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Esport</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Pratique compétitive et organisée des jeux vidéo,
               reconnue comme discipline sportive à part entière.
             </p>
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Discipline</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Jeu vidéo reconnu officiellement par une fédération pour
               y organiser des compétitions (par exemple FIFA, MLBB, Free
               Fire).
@@ -775,7 +775,7 @@ const sections: PillarSection[] = [
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">LAN</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               «&nbsp;Local Area Network&nbsp;» — tournoi organisé en
               présentiel, sur un même site, avec tous les joueurs
               connectés au même réseau local.
@@ -783,35 +783,35 @@ const sections: PillarSection[] = [
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Online</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Tournoi joué à distance, chaque participant connecté
               depuis son lieu de pratique (domicile, cybercafé, club).
             </p>
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Bracket</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Schéma d’une compétition à élimination, généralement
               affiché sous forme d’arbre de matchs.
             </p>
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Shoutcaster</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Commentateur d’une rencontre esport en direct, équivalent
               du commentateur sportif traditionnel.
             </p>
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Roster</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Composition officielle d’une équipe esport (joueurs
               titulaires, remplaçants, coach).
             </p>
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Meta</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Ensemble des stratégies et configurations considérées
               comme les plus efficaces à un moment donné dans une
               discipline.
@@ -819,7 +819,7 @@ const sections: PillarSection[] = [
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">Fair-play</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Ensemble des règles éthiques que les athlètes doivent
               respecter (respect des adversaires, intégrité du jeu,
               refus de la triche).
@@ -827,7 +827,7 @@ const sections: PillarSection[] = [
           </div>
           <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
             <h4 className="text-light-100 font-semibold mb-1">IESF / ACES / WESCO / GEF</h4>
-            <p className="text-sm text-light-300 leading-snug m-0">
+            <p className="text-sm text-light-200 leading-snug m-0">
               Les quatre fédérations internationales auxquelles la
               FEGESPORT est affiliée. <strong>IESF</strong>{' '}
               (International Esports Federation) et <strong>GEF</strong>{' '}

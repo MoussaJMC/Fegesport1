@@ -129,13 +129,13 @@ const PartnersPage: React.FC = () => {
       </section>
 
       {/* Partners Grid */}
-      <section className="section bg-white">
+      <section className="section bg-dark-950 text-light-100">
         <div className="container-custom">
           {partners.length === 0 ? (
             <div className="text-center py-12">
-              <Handshake size={64} className="mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun partenaire pour le moment</h3>
-              <p className="text-gray-600">Revenez bientôt pour découvrir nos partenaires</p>
+              <Handshake size={64} className="mx-auto text-light-400 mb-4" />
+              <h3 className="text-xl font-semibold text-light-100 mb-2">Aucun partenaire pour le moment</h3>
+              <p className="text-light-300">Revenez bientôt pour découvrir nos partenaires</p>
             </div>
           ) : (
             partners.map((category, index) => (
@@ -149,7 +149,7 @@ const PartnersPage: React.FC = () => {
                     whileHover={{ y: -5 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <div className="h-48 bg-gray-100">
+                    <div className="h-48 bg-dark-800 border-b border-dark-700">
                       <img 
                         src={partner.logo} 
                         alt={partner.name}
@@ -161,7 +161,7 @@ const PartnersPage: React.FC = () => {
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-bold mb-2 card-title">{partner.name}</h3>
-                      <p className="text-gray-600 card-description">{partner.description}</p>
+                      <p className="text-light-300 card-description">{partner.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -173,7 +173,7 @@ const PartnersPage: React.FC = () => {
       </section>
 
       {/* Partnership Benefits */}
-      <section className="section bg-gray-50">
+      <section className="section bg-dark-900 text-light-100">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">{t('partners.become')}</h2>
@@ -192,17 +192,17 @@ const PartnersPage: React.FC = () => {
                 whileHover={{ y: -10 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="bg-primary-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                  <div className="text-primary-600">{benefit.icon}</div>
+                <div className="bg-fed-red-500/10 border border-fed-red-500/30 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-4">
+                  <div className="text-fed-red-500">{benefit.icon}</div>
                 </div>
                 <h3 className="text-xl font-bold mb-3 card-title">{benefit.title}</h3>
-                <p className="text-gray-600 card-description">{benefit.description}</p>
+                <p className="text-light-300 card-description">{benefit.description}</p>
               </motion.div>
             ))}
           </div>
 
           <div className="text-center">
-            <Link to="/contact" className="btn bg-primary-600 hover:bg-primary-700 text-white text-lg px-8">
+            <Link to="/contact" className="btn bg-fed-red-500 hover:bg-fed-red-600 text-white text-lg px-8">
               {t('contact.title')}
             </Link>
           </div>
@@ -210,7 +210,7 @@ const PartnersPage: React.FC = () => {
       </section>
 
       {/* Partnership Process */}
-      <section className="section bg-white">
+      <section className="section bg-dark-950 text-light-100">
         <div className="container-custom">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">{t('partners.process.title')}</h2>
@@ -218,42 +218,42 @@ const PartnersPage: React.FC = () => {
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+            <div className="relative pl-8 pb-12 border-l-2 border-fed-red-500/40">
+              <div className="absolute top-0 left-0 w-8 h-8 bg-fed-red-500 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 1
               </div>
               <h3 className="text-xl font-bold mb-2">{t('partners.process.contact')}</h3>
-              <p className="text-gray-600">
+              <p className="text-light-300">
                 {t('partners.process.contact_desc')}
               </p>
             </div>
 
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+            <div className="relative pl-8 pb-12 border-l-2 border-fed-red-500/40">
+              <div className="absolute top-0 left-0 w-8 h-8 bg-fed-red-500 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 2
               </div>
               <h3 className="text-xl font-bold mb-2">{t('partners.process.proposal')}</h3>
-              <p className="text-gray-600">
+              <p className="text-light-300">
                 {t('partners.process.proposal_desc')}
               </p>
             </div>
 
-            <div className="relative pl-8 pb-12 border-l-2 border-primary-300">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+            <div className="relative pl-8 pb-12 border-l-2 border-fed-red-500/40">
+              <div className="absolute top-0 left-0 w-8 h-8 bg-fed-red-500 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 3
               </div>
               <h3 className="text-xl font-bold mb-2">{t('partners.process.finalization')}</h3>
-              <p className="text-gray-600">
+              <p className="text-light-300">
                 {t('partners.process.finalization_desc')}
               </p>
             </div>
 
             <div className="relative pl-8">
-              <div className="absolute top-0 left-0 w-8 h-8 bg-primary-600 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
+              <div className="absolute top-0 left-0 w-8 h-8 bg-fed-red-500 rounded-full -translate-x-1/2 flex items-center justify-center text-white font-bold">
                 4
               </div>
               <h3 className="text-xl font-bold mb-2">{t('partners.process.activation')}</h3>
-              <p className="text-gray-600">
+              <p className="text-light-300">
                 {t('partners.process.activation_desc')}
               </p>
             </div>
