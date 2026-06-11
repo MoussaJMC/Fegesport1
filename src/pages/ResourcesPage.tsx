@@ -5,7 +5,7 @@ import { FileText, Download, Book, Shield, Eye, Image, File } from 'lucide-react
 import PDFViewer from '../components/resources/PDFViewer';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
-import { SEO, buildCollectionSchema } from '../components/seo';
+import { SEO } from '../components/seo';
 import { useLanguage } from '../hooks/useLanguage';
 
 interface FileCategory {
@@ -113,19 +113,14 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <div className="pt-20">
+      {/* Private resource library — must NOT be indexed by search engines or AI bots */}
       <SEO
-        title={lang === 'fr' ? 'Ressources et Documents' : 'Resources and Documents'}
+        title={lang === 'fr' ? 'Espace privé' : 'Private area'}
         description={lang === 'fr'
-          ? 'Centre de ressources FEGESPORT : documents officiels, statuts, reglements, guides pratiques, etudes et rapports sur l\'esport en Guinee.'
-          : 'FEGESPORT resource center: official documents, statutes, regulations, practical guides, studies and reports on esports in Guinea.'
+          ? 'Espace réservé — accès restreint.'
+          : 'Restricted area — access reserved.'
         }
-        keywords="ressources FEGESPORT, documents officiels, statuts federation esport, reglement esport Guinee, guides pratiques esport, etudes esport Afrique"
-        breadcrumbs={[{ name: lang === 'fr' ? 'Ressources' : 'Resources', url: '/resources' }]}
-        schema={buildCollectionSchema({
-          name: lang === 'fr' ? 'Ressources FEGESPORT' : 'FEGESPORT Resources',
-          description: lang === 'fr' ? 'Centre de documents et ressources officiels' : 'Official documents and resources center',
-          url: 'https://fegesport224.org/resources',
-        })}
+        noindex={true}
       />
       {selectedPDF && (
         <PDFViewer url={selectedPDF} onClose={() => setSelectedPDF(null)} />

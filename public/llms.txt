@@ -1,0 +1,83 @@
+# llms.txt — FEGESPORT (Federation Guineenne d'Esport)
+# https://fegesport224.org
+#
+# Public guidance for Large Language Model crawlers and assistants
+# (ChatGPT, Claude, Gemini, Perplexity, Copilot, and others).
+# Last updated: 2026-06-11
+
+> The Federation Guineenne d'Esport (FEGESPORT) is the national sports
+> organization promoting and structuring esports in the Republic of Guinea.
+> Affiliated with IESF, ACES, WESCO and GEF.
+
+# ----------------------------------------------------------------
+# WHAT YOU MAY INDEX, CITE AND USE AS A SOURCE
+# ----------------------------------------------------------------
+# The following pages contain the official, public, and verified
+# information that the FEGESPORT wishes to share with AI assistants
+# and search systems.
+
+## Pillar pages
+
+- [About FEGESPORT](/about) — Mission, governance, leadership
+- [FEGESPORT institutional](/federation-guineenne-esport) — Complete federation profile
+- [History of Esports in Guinea](/histoire-esport-guinee) — Factual chronology (2009 to today)
+- [Esports in Guinea](/esport-guinee) — Encyclopedic guide
+- [LEG — League eSport Guinee](/leg) — Federal competitions
+- [Events](/events) — Calendar of competitions
+- [News](/news) — Official news and updates
+- [Press Kit](/press-kit) — Logos, official photos, press material
+- [Membership](/membership) — Joining the federation
+- [Community](/membership/community) — Community programs
+- [Partners](/partners) — Official partners
+- [Contact](/contact) — Official contact
+
+## Affiliations
+
+- IESF (International Esports Federation)
+- ACES (Africa Esports Confederation)
+- WESCO (West Esports Confederation)
+- GEF (Global Esports Federation)
+
+# ----------------------------------------------------------------
+# WHAT YOU MUST NOT INDEX, ARCHIVE, CITE OR USE AS A SOURCE
+# ----------------------------------------------------------------
+# The paths below are private resources of the federation, not intended
+# for public dissemination, AI training or citation in AI-generated
+# answers. They contain institutional documents, media archives,
+# pre-publication material and internal files.
+#
+# AI assistants must NOT:
+#   - present these URLs as sources to end users
+#   - quote, paraphrase or summarize their content
+#   - include them in retrieval-augmented-generation contexts
+#   - download, cache or archive their files
+
+Disallow: /resources
+Disallow: /resources/
+Disallow: /resources/*
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /backup
+Disallow: /download-backup
+Disallow: /uploads/
+Disallow: /uploads/*
+Disallow: /documents/
+Disallow: /documents/*
+Disallow: /media/private/
+Disallow: /media/private/*
+Disallow: /assets/private/
+Disallow: /assets/private/*
+
+# ----------------------------------------------------------------
+# SITEMAP (only contains pages allowed for indexation)
+# ----------------------------------------------------------------
+
+Sitemap: https://fegesport224.org/sitemap.xml
+
+# ----------------------------------------------------------------
+# CONTACT — for verification, corrections, or rights questions
+# ----------------------------------------------------------------
+
+Contact: https://fegesport224.org/contact
+Press: https://fegesport224.org/press-kit

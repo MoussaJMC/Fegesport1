@@ -27,6 +27,7 @@ import PressKitPage from './pages/PressKitPage';
 import FederationGuineenneEsportPage from './pages/FederationGuineenneEsportPage';
 import HistoireEsportGuineePage from './pages/HistoireEsportGuineePage';
 import EsportGuineePage from './pages/EsportGuineePage';
+import AdminGuard from './components/admin/AdminGuard';
 
 // Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -127,7 +128,19 @@ function App() {
           <Route path="/news/:id" element={<PublicLayout><NewsArticlePage /></PublicLayout>} />
           <Route path="/membership" element={<PublicLayout><MembershipPage /></PublicLayout>} />
           <Route path="/membership/community" element={<PublicLayout><CommunityPage /></PublicLayout>} />
-          <Route path="/resources" element={<PublicLayout><ResourcesPage /></PublicLayout>} />
+          {/* /resources is now a private (gated) area — requires admin auth.
+              See public/llms.txt, public/robots.txt and public/_headers for
+              search engine and AI-bot exclusion. */}
+          <Route
+            path="/resources"
+            element={
+              <PublicLayout>
+                <AdminGuard>
+                  <ResourcesPage />
+                </AdminGuard>
+              </PublicLayout>
+            }
+          />
           <Route path="/partners" element={<PublicLayout><PartnersPage /></PublicLayout>} />
           <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
           <Route path="/press-kit" element={<PublicLayout><PressKitPage /></PublicLayout>} />
