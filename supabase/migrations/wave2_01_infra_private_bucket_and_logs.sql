@@ -147,19 +147,25 @@ COMMENT ON TABLE public.download_logs IS
 
 -- ============================================================
 -- 4. Indexes for audit queries
+--
+-- Naming convention : idx_<table>_<column>[_<discriminator>]
+-- Following the project-wide convention used by other migrations.
 -- ============================================================
 
-CREATE INDEX IF NOT EXISTS download_logs_file_id_idx
+-- Required by the audit specification: lookup by file_id
+CREATE INDEX IF NOT EXISTS idx_download_logs_file_id
   ON public.download_logs (file_id);
 
-CREATE INDEX IF NOT EXISTS download_logs_user_id_idx
-  ON public.download_logs (user_id);
-
-CREATE INDEX IF NOT EXISTS download_logs_downloaded_at_idx
+-- Required by the audit specification: chronological scan (newest first)
+CREATE INDEX IF NOT EXISTS idx_download_logs_downloaded_at
   ON public.download_logs (downloaded_at DESC);
 
--- Composite index for "recent downloads by user" admin queries
-CREATE INDEX IF NOT EXISTS download_logs_user_recent_idx
+-- Operational: filter by user_id
+CREATE INDEX IF NOT EXISTS idx_download_logs_user_id
+  ON public.download_logs (user_id);
+
+-- Operational: composite index for "recent downloads by user" admin queries
+CREATE INDEX IF NOT EXISTS idx_download_logs_user_recent
   ON public.download_logs (user_id, downloaded_at DESC);
 
 -- ============================================================

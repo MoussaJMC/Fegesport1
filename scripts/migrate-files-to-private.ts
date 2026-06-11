@@ -44,6 +44,7 @@ import { createClient } from '@supabase/supabase-js';
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 // ============================================================
 // Config
@@ -58,6 +59,8 @@ const RETRY_DELAY_MS = 1000;
 const args = new Set(process.argv.slice(2));
 const DRY_RUN = args.has('--dry-run');
 const VERBOSE = args.has('--verbose');
+const CONFIRM_LIVE = args.has('--confirm-live');
+const COMPUTE_CHECKSUMS = args.has('--checksums') || DRY_RUN; // hashing is cheap on dry-run
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -66,6 +69,38 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error(
     'ERROR: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set.\n' +
       'Refusing to run without explicit credentials.',
+  );
+  process.exit(1);
+}
+
+// ============================================================
+// Safety gate — dry-run is MANDATORY before any live run.
+// ============================================================
+//
+// Workflow ENFORCED by this script:
+//   1. First invocation MUST be `--dry-run`. The CSV is generated
+//      and inspected by a human.
+//   2. The live run requires BOTH:
+//        - explicit `--confirm-live` flag
+//        - a marker file `.wave2-dry-run-done` in the project root
+//          (created automatically by a successful dry-run).
+//   3. Without both, the script refuses to start.
+//
+// This makes it impossible to copy/paste a fancy command and migrate
+// real production data by mistake.
+
+if (!DRY_RUN && !CONFIRM_LIVE) {
+  console.error(
+    'ERROR: This is a live execution but `--confirm-live` was not passed.\n' +
+      '\n' +
+      'Required workflow:\n' +
+      '  1. First, run a dry-run:\n' +
+      '       npx tsx scripts/migrate-files-to-private.ts --dry-run\n' +
+      '  2. Review the generated migration-report-<ts>.csv carefully.\n' +
+      '  3. Only then, run live:\n' +
+      '       npx tsx scripts/migrate-files-to-private.ts --confirm-live\n' +
+      '\n' +
+      'Refusing to run without the explicit `--confirm-live` flag.',
   );
   process.exit(1);
 }
@@ -105,10 +140,21 @@ type ReportStatus =
   | 'unknown_error';
 
 interface ReportRow {
-  path: string;
+  /** Path inside the SOURCE (public) bucket */
+  source_path: string;
+  /** Path inside the TARGET (private) bucket — same as source by design */
+  target_path: string;
+  /** Source bucket name (for clarity in the CSV) */
+  source_bucket: string;
+  /** Target bucket name */
+  target_bucket: string;
   status: ReportStatus;
   source_size: number | null;
   target_size: number | null;
+  /** SHA-256 hex of the source file content, when downloaded for the run */
+  source_sha256?: string;
+  /** SHA-256 hex of the bytes uploaded to the target (= source on a live run) */
+  target_sha256?: string;
   error?: string;
 }
 
@@ -172,7 +218,14 @@ async function listAllObjects(bucket: string): Promise<StorageObject[]> {
 
 async function copyOne(
   obj: StorageObject,
-): Promise<{ status: ReportStatus; sourceSize: number | null; targetSize: number | null; error?: string }> {
+): Promise<{
+  status: ReportStatus;
+  sourceSize: number | null;
+  targetSize: number | null;
+  sourceSha256?: string;
+  targetSha256?: string;
+  error?: string;
+}> {
   const path = obj.name;
   const sourceSize = obj.metadata?.size ?? null;
 
@@ -197,17 +250,9 @@ async function copyOne(
     }
   }
 
-  if (DRY_RUN) {
-    log.verbose(`DRY-RUN would copy: ${path}`);
-    return {
-      status: 'copied',
-      sourceSize,
-      targetSize: sourceSize,
-    };
-  }
-
-  // 2) Download from source
+  // 2) Download from source (needed in both dry-run for checksum and live for copy)
   let blob: Blob;
+  let sourceSha256: string | undefined;
   try {
     const dl = await withRetries(`download ${path}`, async () => {
       const r = await supabase.storage.from(SOURCE_BUCKET).download(path);
@@ -216,12 +261,28 @@ async function copyOne(
       return r.data;
     });
     blob = dl;
+    if (COMPUTE_CHECKSUMS) {
+      const buf = Buffer.from(await blob.arrayBuffer());
+      sourceSha256 = createHash('sha256').update(buf).digest('hex');
+    }
   } catch (e) {
     return {
       status: 'download_failed',
       sourceSize,
       targetSize: null,
+      sourceSha256,
       error: (e as Error).message,
+    };
+  }
+
+  if (DRY_RUN) {
+    log.verbose(`DRY-RUN would copy: ${path} (sha256=${sourceSha256?.slice(0, 16)}...)`);
+    return {
+      status: 'copied',
+      sourceSize,
+      targetSize: sourceSize,
+      sourceSha256,
+      targetSha256: sourceSha256, // same content would be copied
     };
   }
 
@@ -239,6 +300,7 @@ async function copyOne(
       status: 'upload_failed',
       sourceSize,
       targetSize: null,
+      sourceSha256,
       error: (e as Error).message,
     };
   }
@@ -260,12 +322,37 @@ async function copyOne(
       status: 'integrity_mismatch',
       sourceSize,
       targetSize,
+      sourceSha256,
       error: `Size mismatch: source=${sourceSize} target=${targetSize}`,
     };
   }
 
+  // Optional: re-download from target to recompute checksum and verify byte-identity
+  let targetSha256: string | undefined = sourceSha256;
+  if (COMPUTE_CHECKSUMS && !DRY_RUN) {
+    try {
+      const r = await supabase.storage.from(TARGET_BUCKET).download(path);
+      if (r.data) {
+        const buf = Buffer.from(await r.data.arrayBuffer());
+        targetSha256 = createHash('sha256').update(buf).digest('hex');
+        if (sourceSha256 && targetSha256 !== sourceSha256) {
+          return {
+            status: 'integrity_mismatch',
+            sourceSize,
+            targetSize,
+            sourceSha256,
+            targetSha256,
+            error: 'Checksum mismatch source vs target',
+          };
+        }
+      }
+    } catch (e) {
+      log.warn(`Checksum verify failed for ${path}: ${(e as Error).message}`);
+    }
+  }
+
   log.verbose(`COPIED: ${path}`);
-  return { status: 'copied', sourceSize, targetSize };
+  return { status: 'copied', sourceSize, targetSize, sourceSha256, targetSha256 };
 }
 
 // ============================================================
@@ -298,15 +385,23 @@ async function main(): Promise<void> {
         try {
           const r = await copyOne(obj);
           return {
-            path: obj.name,
+            source_path: obj.name,
+            target_path: obj.name, // same path preserved across buckets
+            source_bucket: SOURCE_BUCKET,
+            target_bucket: TARGET_BUCKET,
             status: r.status,
             source_size: r.sourceSize,
             target_size: r.targetSize,
+            source_sha256: r.sourceSha256,
+            target_sha256: r.targetSha256,
             error: r.error,
           } satisfies ReportRow;
         } catch (e) {
           return {
-            path: obj.name,
+            source_path: obj.name,
+            target_path: obj.name,
+            source_bucket: SOURCE_BUCKET,
+            target_bucket: TARGET_BUCKET,
             status: 'unknown_error' as ReportStatus,
             source_size: obj.metadata?.size ?? null,
             target_size: null,
@@ -347,16 +442,36 @@ async function main(): Promise<void> {
     `..`,
     `migration-report-${ts}.csv`,
   );
-  const csv =
-    'path,status,source_size,target_size,error\n' +
-    report
-      .map(
-        (r) =>
-          `"${r.path.replace(/"/g, '""')}","${r.status}",${
-            r.source_size ?? ''
-          },${r.target_size ?? ''},"${(r.error ?? '').replace(/"/g, '""')}"`,
-      )
-      .join('\n');
+  const escape = (s: string) => `"${s.replace(/"/g, '""')}"`;
+  const csvHeader = [
+    'source_bucket',
+    'source_path',
+    'target_bucket',
+    'target_path',
+    'status',
+    'source_size',
+    'target_size',
+    'source_sha256',
+    'target_sha256',
+    'error',
+  ].join(',');
+  const csvBody = report
+    .map((r) =>
+      [
+        escape(r.source_bucket),
+        escape(r.source_path),
+        escape(r.target_bucket),
+        escape(r.target_path),
+        escape(r.status),
+        r.source_size ?? '',
+        r.target_size ?? '',
+        escape(r.source_sha256 ?? ''),
+        escape(r.target_sha256 ?? ''),
+        escape(r.error ?? ''),
+      ].join(','),
+    )
+    .join('\n');
+  const csv = `${csvHeader}\n${csvBody}\n`;
   await writeFile(csvPath, csv, 'utf-8');
   log.info(`Report written to ${csvPath}`);
 

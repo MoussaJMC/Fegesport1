@@ -104,7 +104,7 @@ CREATE OR REPLACE FUNCTION public.get_signed_url(
 RETURNS text
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, storage, pg_temp
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_clamped_ttl   integer;
@@ -255,7 +255,7 @@ CREATE OR REPLACE FUNCTION public.get_signed_url_for_document(
 RETURNS text
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, storage, pg_temp
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_file_url text;
