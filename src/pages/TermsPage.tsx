@@ -1,6 +1,24 @@
 import React from 'react';
 import { SEO } from '../components/seo';
 
+/**
+ * /terms — Conditions d'utilisation.
+ *
+ * Design dark premium identique a /privacy :
+ * - Fond general bg-dark-950
+ * - Hero gradient avec accents fed-gold / fed-red
+ * - Conteneur contenu : bg-dark-900/80 + border-dark-700 + rounded-2xl + shadow-xl
+ * - Toutes les classes appliquees DIRECTEMENT sur chaque element (pas de selecteur arbitraire).
+ */
+
+const H2_CLASS =
+  'text-light-100 font-bold text-2xl md:text-3xl mt-10 mb-4 tracking-tight first:mt-0';
+const P_CLASS = 'text-light-200 leading-relaxed';
+const UL_CLASS = 'list-disc list-outside ml-6 space-y-1.5 text-light-300';
+const LI_CLASS = 'leading-relaxed';
+const A_CLASS =
+  'text-fed-gold-500 underline underline-offset-2 hover:text-fed-gold-400 transition-colors';
+
 const TermsPage: React.FC = () => {
   return (
     <div className="bg-dark-950 text-light-100 min-h-screen">
@@ -11,7 +29,7 @@ const TermsPage: React.FC = () => {
         breadcrumbs={[{ name: "Conditions d'Utilisation", url: '/terms' }]}
       />
 
-      {/* Hero — federation dark theme */}
+      {/* ================= Hero ================= */}
       <section className="relative bg-gradient-to-b from-dark-900 via-dark-950 to-dark-950 border-b border-dark-800 overflow-hidden pt-28 pb-16 md:pt-32 md:pb-20">
         <div
           aria-hidden="true"
@@ -36,73 +54,66 @@ const TermsPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Content — dark prose */}
-      <section className="container-custom max-w-4xl py-14 md:py-20">
-        <article
-          className="
-            text-light-200 leading-relaxed text-[16px] md:text-[17px] space-y-5
-            [&_h2]:text-light-100 [&_h2]:font-bold [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:tracking-tight
-            [&_h2:first-child]:mt-0
-            [&_h3]:text-light-100 [&_h3]:font-semibold [&_h3]:text-xl [&_h3]:mt-8 [&_h3]:mb-3
-            [&_p]:text-light-200 [&_p]:leading-relaxed
-            [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:space-y-1.5 [&_ul]:text-light-200
-            [&_li]:leading-relaxed
-            [&_a]:text-fed-gold-500 [&_a]:underline [&_a:hover]:text-fed-gold-400
-            [&_strong]:text-light-100
-          "
-        >
-          <h2>1. Acceptation des Conditions</h2>
-          <p>
-            En accedant et en utilisant le site web de la FEGESPORT, vous acceptez d'etre lie par ces conditions
-            d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre site.
-          </p>
+      {/* ================= Content (premium dark card) ================= */}
+      <section className="bg-dark-950 py-14 md:py-20">
+        <div className="container-custom max-w-4xl">
+          <article className="bg-dark-900/80 border border-dark-700 rounded-2xl shadow-xl shadow-black/40 p-6 sm:p-8 md:p-12 space-y-5">
+            <h2 className={H2_CLASS}>1. Acceptation des Conditions</h2>
+            <p className={P_CLASS}>
+              En accedant et en utilisant le site web de la FEGESPORT, vous acceptez d'etre lie par ces conditions
+              d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre site.
+            </p>
 
-          <h2>2. Description des Services</h2>
-          <p>
-            La FEGESPORT fournit une plateforme en ligne permettant aux utilisateurs d'acceder a des informations sur
-            l'esport en Guinee, de s'inscrire a des evenements, et de participer a la communaute esport guineenne.
-          </p>
+            <h2 className={H2_CLASS}>2. Description des Services</h2>
+            <p className={P_CLASS}>
+              La FEGESPORT fournit une plateforme en ligne permettant aux utilisateurs d'acceder a des informations sur
+              l'esport en Guinee, de s'inscrire a des evenements, et de participer a la communaute esport guineenne.
+            </p>
 
-          <h2>3. Inscription et Compte Utilisateur</h2>
-          <p>
-            Pour acceder a certaines fonctionnalites du site, vous devrez creer un compte. Vous etes responsable de
-            maintenir la confidentialite de vos informations de connexion et de toutes les activites qui se produisent
-            sous votre compte.
-          </p>
+            <h2 className={H2_CLASS}>3. Inscription et Compte Utilisateur</h2>
+            <p className={P_CLASS}>
+              Pour acceder a certaines fonctionnalites du site, vous devrez creer un compte. Vous etes responsable de
+              maintenir la confidentialite de vos informations de connexion et de toutes les activites qui se produisent
+              sous votre compte.
+            </p>
 
-          <h2>4. Regles de Conduite</h2>
-          <p>En utilisant notre site, vous acceptez de :</p>
-          <ul>
-            <li>Ne pas violer les lois applicables</li>
-            <li>Respecter les droits des autres utilisateurs</li>
-            <li>Ne pas publier de contenu offensant ou inapproprie</li>
-            <li>Ne pas perturber le fonctionnement normal du site</li>
-          </ul>
+            <h2 className={H2_CLASS}>4. Regles de Conduite</h2>
+            <p className={P_CLASS}>En utilisant notre site, vous acceptez de :</p>
+            <ul className={UL_CLASS}>
+              <li className={LI_CLASS}>Ne pas violer les lois applicables</li>
+              <li className={LI_CLASS}>Respecter les droits des autres utilisateurs</li>
+              <li className={LI_CLASS}>Ne pas publier de contenu offensant ou inapproprie</li>
+              <li className={LI_CLASS}>Ne pas perturber le fonctionnement normal du site</li>
+            </ul>
 
-          <h2>5. Propriete Intellectuelle</h2>
-          <p>
-            Tout le contenu present sur le site de la FEGESPORT est protege par les droits d'auteur et autres lois sur
-            la propriete intellectuelle. Vous ne pouvez pas utiliser ce contenu sans autorisation explicite.
-          </p>
+            <h2 className={H2_CLASS}>5. Propriete Intellectuelle</h2>
+            <p className={P_CLASS}>
+              Tout le contenu present sur le site de la FEGESPORT est protege par les droits d'auteur et autres lois
+              sur la propriete intellectuelle. Vous ne pouvez pas utiliser ce contenu sans autorisation explicite.
+            </p>
 
-          <h2>6. Limitation de Responsabilite</h2>
-          <p>
-            La FEGESPORT ne peut etre tenue responsable des dommages directs ou indirects resultant de l'utilisation ou
-            de l'impossibilite d'utiliser nos services.
-          </p>
+            <h2 className={H2_CLASS}>6. Limitation de Responsabilite</h2>
+            <p className={P_CLASS}>
+              La FEGESPORT ne peut etre tenue responsable des dommages directs ou indirects resultant de l'utilisation
+              ou de l'impossibilite d'utiliser nos services.
+            </p>
 
-          <h2>7. Modifications des Conditions</h2>
-          <p>
-            Nous nous reservons le droit de modifier ces conditions a tout moment. Les modifications entrent en vigueur
-            des leur publication sur le site.
-          </p>
+            <h2 className={H2_CLASS}>7. Modifications des Conditions</h2>
+            <p className={P_CLASS}>
+              Nous nous reservons le droit de modifier ces conditions a tout moment. Les modifications entrent en
+              vigueur des leur publication sur le site.
+            </p>
 
-          <h2>8. Contact</h2>
-          <p>
-            Pour toute question concernant ces conditions d'utilisation, veuillez nous contacter a l'adresse suivante :{' '}
-            <a href="mailto:contact@fegesport.org">contact@fegesport.org</a>
-          </p>
-        </article>
+            <h2 className={H2_CLASS}>8. Contact</h2>
+            <p className={P_CLASS}>
+              Pour toute question concernant ces conditions d'utilisation, veuillez nous contacter a l'adresse
+              suivante :{' '}
+              <a className={A_CLASS} href="mailto:contact@fegesport.org">
+                contact@fegesport.org
+              </a>
+            </p>
+          </article>
+        </div>
       </section>
     </div>
   );
