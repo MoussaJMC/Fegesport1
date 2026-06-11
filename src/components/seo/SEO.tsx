@@ -32,7 +32,10 @@ interface SEOProps {
 
 const DEFAULT_TITLE = "FEGESPORT - Fédération Guinéenne d'Esport";
 const DEFAULT_DESCRIPTION = "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle reconnue pour l'esport en République de Guinée. Membre IESF, ACES, WESCO et GEF.";
-const DEFAULT_IMAGE = "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg";
+// Wave 2.6: brand asset served locally from Netlify (absolute URL required by SEO crawlers).
+// Legacy Supabase URL kept here as a documented fallback only:
+//   https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg
+const DEFAULT_IMAGE = "https://fegesport224.org/assets/brand/og-image.jpg";
 const SITE_URL = "https://fegesport224.org";
 
 /**

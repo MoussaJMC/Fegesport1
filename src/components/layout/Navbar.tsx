@@ -31,7 +31,9 @@ const Navbar: React.FC = () => {
   const { getSetting, loading: settingsLoading } = useSiteSettings();
 
   const logoSettings = getSetting('site_logo', {
-    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
+    // Wave 2.6: brand asset served locally from /assets/brand/.
+    // Legacy Supabase fallback URL preserved as comment for traceability.
+    main_logo: "/assets/brand/logo.jpg",
     alt_text: "FEGESPORT Logo",
     width: 44,
     height: 44,

@@ -343,8 +343,9 @@ FEGESPORT's mission is to structure, develop, and represent Guinean esports at n
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="card p-6 text-center">
                 <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-fed-gold-500/40 bg-white p-2">
+                  {/* Wave 2.6: brand asset served locally. */}
                   <img
-                    src="https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg"
+                    src="/assets/brand/logo.jpg"
                     alt="Logo officiel FEGESPORT"
                     className="w-full h-full object-contain"
                   />
@@ -353,11 +354,10 @@ FEGESPORT's mission is to structure, develop, and represent Guinean esports at n
                   {lang === 'fr' ? 'Logo officiel' : 'Official logo'}
                 </h3>
                 <p className="text-light-400 text-xs mb-4">PNG / JPG haute resolution</p>
+                {/* Wave 2.6: direct download from local /assets/brand/. */}
                 <a
-                  href="https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg"
+                  href="/assets/brand/logo.jpg"
                   download="fegesport-logo.jpg"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-fed-gold-500 hover:bg-fed-gold-600 text-dark-950 text-sm font-semibold transition-all"
                 >
                   <Download size={14} /> {lang === 'fr' ? 'Telecharger' : 'Download'}

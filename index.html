@@ -15,8 +15,10 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <!-- Fallback to Supabase logo if favicon.ico is missing -->
-    <link rel="shortcut icon" type="image/png" href="https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg" />
+    <!-- Wave 2.6: local Netlify-served brand asset (1216x1216 JPG).
+         Fallback Supabase public URL kept as a documented historical reference only:
+         https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg -->
+    <link rel="shortcut icon" type="image/jpeg" href="/assets/brand/logo.jpg" />
 
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -91,7 +93,9 @@
     <meta property="og:site_name" content="FEGESPORT" />
     <meta property="og:title" content="FEGESPORT - Fédération Guinéenne d'Esport" />
     <meta property="og:description" content="L'organisation nationale officielle pour l'esport en Guinée. Membre IESF, AESF, WESCO, GEF. Federation reconnue, structuree et engagee." />
-    <meta property="og:image" content="https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg" />
+    <!-- Wave 2.6: OG image served locally from Netlify (absolute URL required by crawlers).
+         Fallback Supabase URL: https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg -->
+    <meta property="og:image" content="https://fegesport224.org/assets/brand/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Logo officiel FEGESPORT - Fédération Guinéenne d'Esport" />
@@ -103,7 +107,9 @@
     <meta property="twitter:url" content="https://fegesport224.org/" />
     <meta property="twitter:title" content="FEGESPORT - Fédération Guinéenne d'Esport" />
     <meta property="twitter:description" content="Federation officielle d'esport en Guinee. Membre IESF, AESF, WESCO, GEF." />
-    <meta property="twitter:image" content="https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg" />
+    <!-- Wave 2.6: Twitter image served locally from Netlify.
+         Fallback Supabase URL: https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg -->
+    <meta property="twitter:image" content="https://fegesport224.org/assets/brand/og-image.jpg" />
     <meta property="twitter:image:alt" content="Logo officiel FEGESPORT" />
 
     <!-- ============== SCHEMA.ORG (JSON-LD) ============== -->
@@ -114,8 +120,8 @@
       "name": "Fédération Guinéenne d'Esport",
       "alternateName": ["FEGESPORT", "FEGESPORT224", "Federation Guineenne d'Esport", "Guinean Esports Federation"],
       "url": "https://fegesport224.org",
-      "logo": "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
-      "image": "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
+      "logo": "https://fegesport224.org/assets/brand/logo.jpg",
+      "image": "https://fegesport224.org/assets/brand/logo.jpg",
       "description": "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle reconnue pour l'esport en République de Guinée. Membre de l'IESF, ACES, WESCO et GEF. Structure, developpe et represente l'esport guineen au niveau national et international.",
       "knowsAbout": ["Esport", "Sport electronique", "Gaming competitif", "Jeux video competitifs", "FIFA", "MLBB", "Free Fire", "Tekken", "Competitions internationales"],
       "slogan": "Reconnaissance Officielle. Standards Internationaux. Excellence Esport.",
