@@ -241,16 +241,42 @@ const AboutPage: React.FC = () => {
     },
   ];
 
-  // Always use the curated factual chronology (aligned with the FEGESPORT press kit
-  // and with /federation-guineenne-esport, /histoire-esport-guinee, /esport-guinee).
-  // The Supabase `history_timeline` table still receives the fetch (for future
-  // admin-side migration) but we intentionally do NOT render its rows here yet
-  // because they contain pre-press-kit entries (Fondation 2009-2013, etc.).
-  // To re-enable database-driven entries: replace the line below with the
-  // conditional version once /admin/history has been migrated to match the
-  // factual chronology.
+  // ============================================================
+  // HISTORY TIMELINE — Source of truth
+  // ============================================================
+  // The chronology displayed below is the OFFICIAL FEGESPORT press-kit
+  // chronology (2009, 2014, 2018, 2019, 2022, 2023, 2024, Today).
+  // It is kept in `defaultHistory` (above) and is the SINGLE SOURCE
+  // OF TRUTH for /about, in sync with:
+  //   - /federation-guineenne-esport (section Historique)
+  //   - /histoire-esport-guinee (chronologie complete)
+  //   - /esport-guinee (section International)
+  //
+  // The Supabase `history_timeline` fetch is left wired (state
+  // `historyEntries` is populated) but its rows are NOT rendered
+  // yet because the table still contains pre-press-kit entries
+  // (Fondation 2009-2013, Reconnaissance 2017, Premiers Championnats 2018,
+  // Affiliation Internationale 2019). Rendering them would overwrite
+  // the factual chronology validated above.
+  //
+  // TODO(admin-history): migrate the `history_timeline` Supabase rows
+  // to match the press-kit chronology (via /admin/history UI OR via
+  // the SQL migration script in `supabase/migrations/` — see
+  // `migrate_history_timeline_press_kit.sql`). Once migration is
+  // verified in production:
+  //
+  //   1. Replace the line below with:
+  //        const displayHistory =
+  //          historyEntries.length > 0 ? historyEntries : defaultHistory;
+  //   2. Remove the `void historyEntries;` line.
+  //   3. Keep `defaultHistory` as the fallback for first-load / RLS
+  //      failures.
+  //
+  // Until migration is done, the line below MUST stay as-is.
   const displayHistory = defaultHistory;
-  // Silence the unused-state warning while keeping fetch wiring intact:
+  // Mark `historyEntries` as intentionally observed-but-unused so the
+  // fetch wiring stays connected for the future migration. Removing
+  // this line would re-introduce a TS noUnusedLocals warning.
   void historyEntries;
 
   // FAQ for AboutPage — generates FAQPage Schema for Google snippets
