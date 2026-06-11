@@ -11,7 +11,9 @@ const PUBLISHER = {
   url: SITE_URL,
   logo: {
     '@type': 'ImageObject',
-    url: 'https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg',
+    // Wave 2.6: brand asset served locally. Legacy Supabase URL preserved for reference:
+    // https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg
+    url: 'https://fegesport224.org/assets/brand/logo.jpg',
     width: 400,
     height: 400,
   },
