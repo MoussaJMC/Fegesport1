@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Building2,
   Heart,
+  Handshake,
 } from 'lucide-react';
 import PillarPageLayout from '../components/layout/PillarPageLayout';
 import type { PillarSection } from '../components/layout/PillarPageLayout';
@@ -75,6 +76,28 @@ const sections: PillarSection[] = [
             Histoire de l’esport en Guinée
           </Link>
           .
+        </p>
+        <p>
+          Sur le plan international, l’esport est aujourd’hui reconnu
+          comme l’une des disciplines compétitives les plus dynamiques
+          au monde, avec des audiences en forte croissance et un cadre
+          fédéral mature porté par l’<em>International Esports
+          Federation</em> (IESF), la <em>Global Esports Federation</em>{' '}
+          (GEF) et plusieurs confédérations continentales. La Guinée
+          s’inscrit dans ce mouvement et y participe activement à
+          travers la FEGESPORT et ses partenaires.
+        </p>
+        <p>
+          Il est important de distinguer trois notions souvent
+          confondues. Le <strong>gaming</strong> désigne la pratique
+          large du jeu vidéo, de loisir ou de manière occasionnelle.
+          L’<strong>esport</strong> en est la dimension compétitive,
+          organisée autour de règles, de classements et de
+          compétitions. Le <strong>cybercafé</strong>, lui, est un lieu
+          de pratique — historiquement central en Guinée — qui peut
+          accueillir aussi bien du gaming récréatif que des tournois
+          esport structurés. Ces trois réalités cohabitent et se
+          renforcent dans l’écosystème national.
         </p>
       </>
     ),
@@ -286,6 +309,22 @@ const sections: PillarSection[] = [
           </Link>
           .
         </p>
+        <p>
+          Le choix des disciplines reconnues n’est pas figé&nbsp;: il
+          évolue d’une saison à l’autre en fonction de la popularité
+          locale, de la disponibilité de l’infrastructure, et des
+          standards portés par les fédérations internationales
+          partenaires. Chaque discipline officielle de la LEG dispose de
+          son propre règlement, de ses formats de qualification et de
+          ses propres classements nationaux, ce qui permet aux athlètes
+          de se spécialiser et de progresser dans la durée. Les
+          disciplines mobiles bénéficient d’une accessibilité
+          particulière en Guinée — un smartphone et une bonne connexion
+          suffisent pour entrer dans la pratique compétitive — tandis
+          que les disciplines PC nécessitent un investissement matériel
+          plus structuré, souvent porté par les clubs ou les espaces de
+          jeu collectifs.
+        </p>
       </>
     ),
   },
@@ -366,6 +405,32 @@ const sections: PillarSection[] = [
           s’est tenue en 2023. L’affiliation à la <strong>GEF</strong>{' '}
           en 2024 a renforcé encore l’ancrage international de
           l’écosystème national.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Formats et organisation des compétitions
+        </h3>
+        <p>
+          Les compétitions esport en Guinée prennent plusieurs formes
+          selon leur ampleur et leur ambition&nbsp;: <strong>tournois
+          LAN</strong> (en présentiel, sur un même site, avec matériel
+          fourni ou apporté), <strong>tournois online</strong> (à
+          distance, depuis le domicile ou un cybercafé), et formats{' '}
+          <strong>hybrides</strong> (qualifications online, finales
+          présentielles). Le format de jeu varie également&nbsp;:
+          phases de groupes, élimination directe, double élimination,
+          ligues à points cumulés sur une saison.
+        </p>
+        <p>
+          La{' '}
+          <Link
+            to="/events"
+            className="text-fed-gold-500 hover:underline font-medium"
+          >
+            page Compétitions
+          </Link>{' '}
+          recense les rendez-vous officiels en cours et à venir,
+          avec leurs dates, disciplines, modalités d’inscription et
+          informations pratiques.
         </p>
       </>
     ),
@@ -527,6 +592,239 @@ const sections: PillarSection[] = [
           ces fédérations (règlements, calendriers, disciplines
           reconnues).
         </p>
+      </>
+    ),
+  },
+  {
+    id: 'culture',
+    eyebrow: 'Culture',
+    heading: 'Esport et culture guinéenne',
+    content: (
+      <>
+        <p>
+          L’esport ne s’est pas développé en Guinée comme une pratique
+          importée et déconnectée de la culture locale&nbsp;: il s’est
+          au contraire enraciné dans des dynamiques sociales et
+          sportives déjà présentes, et y a trouvé une résonance
+          immédiate.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Une passion sportive prolongée
+        </h3>
+        <p>
+          La passion guinéenne pour le <strong>football</strong> a
+          naturellement nourri l’engouement pour le football virtuel.
+          FIFA et eFootball ne sont pas perçus en Guinée comme de
+          simples jeux, mais comme une extension numérique d’une
+          pratique sportive nationale. Les débats sur les tactiques,
+          les classements, les transferts ou les compositions
+          d’équipes prolongent dans l’espace numérique ce qui se
+          discute déjà dans les conversations quotidiennes autour du
+          ballon rond.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Une pratique communautaire
+        </h3>
+        <p>
+          Le caractère <strong>collectif</strong> de la pratique esport
+          en Guinée s’inscrit dans la continuité d’une culture
+          fortement communautaire. Les tournois sont vécus comme des
+          rendez-vous sociaux. Les soirées dans les cybercafés
+          rassemblent des groupes d’amis, des familles, des voisins.
+          La compétition individuelle se vit dans un cadre collectif —
+          ce qui constitue une force particulière de l’écosystème
+          guinéen.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Une expression de la jeunesse
+        </h3>
+        <p>
+          Pour la jeunesse guinéenne, l’esport représente aussi une
+          forme d’<strong>expression contemporaine</strong>. Il
+          permet de construire des identités, de se projeter, de
+          s’affirmer dans un univers porteur de codes mondiaux tout en
+          étant ancré localement. Cette dimension expressive est
+          essentielle&nbsp;: elle explique pourquoi l’esport gagne en
+          visibilité et en légitimité auprès des familles et des
+          institutions.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Un patrimoine en construction
+        </h3>
+        <p>
+          Les premières années de la pratique compétitive — depuis la
+          création de l’Association JMC en 2009 — commencent à
+          constituer un véritable <strong>patrimoine immatériel</strong>{' '}
+          de l’esport guinéen&nbsp;: figures pionnières, tournois
+          historiques, anecdotes fondatrices. Documenter et faire vivre
+          ce patrimoine fait partie de la responsabilité de l’ensemble
+          de l’écosystème.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'innovation',
+    eyebrow: 'Infrastructure',
+    heading: 'Innovation, infrastructure et économie numérique',
+    content: (
+      <>
+        <p>
+          Le développement de l’esport en Guinée est étroitement lié à
+          l’évolution de l’<strong>infrastructure numérique</strong> du
+          pays&nbsp;: connectivité internet, équipements personnels,
+          espaces de pratique, énergie. Comprendre ces facteurs permet
+          de mieux saisir la trajectoire et les défis du secteur.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Connectivité et mobile
+        </h3>
+        <p>
+          La <strong>pénétration du smartphone</strong> et la
+          démocratisation progressive de l’internet mobile ont été des
+          accélérateurs majeurs de la pratique esport en Guinée. Pour
+          de nombreux pratiquants, l’entrée dans l’esport se fait via
+          un smartphone — d’où la popularité particulière des jeux
+          mobiles compétitifs comme Mobile Legends Bang Bang ou Free
+          Fire. Cette réalité oriente fortement la pyramide des
+          disciplines pratiquées localement.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Équipements et lieux de pratique
+        </h3>
+        <p>
+          La pratique sur <strong>console</strong> (PlayStation, Xbox)
+          et sur <strong>PC</strong> reste plus coûteuse en matériel
+          mais demeure essentielle pour les disciplines exigeant un
+          écran large, des périphériques de précision et une latence
+          réduite. Les cybercafés, les espaces gaming et les structures
+          de clubs jouent un rôle de mutualisation&nbsp;: ils
+          permettent à des athlètes qui ne disposent pas du matériel à
+          domicile de pratiquer dans les conditions requises pour la
+          haute compétition.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Une économie créative en formation
+        </h3>
+        <p>
+          L’esport contribue à l’émergence d’une <strong>économie
+          créative et numérique</strong> en Guinée. Au-delà des
+          athlètes, c’est tout un tissu de métiers qui s’active&nbsp;:
+          production audiovisuelle d’événements, animation de
+          tournois, design graphique et identité visuelle, streaming
+          en direct, gestion des réseaux sociaux, marketing
+          d’événements, gestion de communautés en ligne, équipements
+          et accessoires. Cette dynamique offre à la jeunesse
+          guinéenne des perspectives professionnelles concrètes dans
+          un secteur en croissance.
+        </p>
+        <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
+          Défis et perspectives
+        </h3>
+        <p>
+          Plusieurs <strong>défis structurants</strong> restent à
+          relever pour amplifier la trajectoire&nbsp;: amélioration de
+          la qualité et de la couverture de la connectivité,
+          accessibilité du matériel, énergie stable pour les
+          événements, formation des cadres techniques (arbitres,
+          organisateurs, commentateurs), accès à des plateaux
+          professionnels pour la captation des tournois. Ces défis sont
+          aussi des opportunités&nbsp;: chaque progrès sur ces fronts
+          renforce directement la capacité de l’esport guinéen à se
+          développer.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'glossaire',
+    eyebrow: 'Glossaire',
+    heading: 'Petit glossaire de l’esport',
+    content: (
+      <>
+        <p>
+          L’univers de l’esport repose sur un vocabulaire spécifique.
+          Voici les principaux termes utiles pour suivre l’actualité,
+          comprendre les compétitions, et participer à la communauté.
+        </p>
+        <div className="not-prose my-5 space-y-3">
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Esport</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Pratique compétitive et organisée des jeux vidéo,
+              reconnue comme discipline sportive à part entière.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Discipline</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Jeu vidéo reconnu officiellement par une fédération pour
+              y organiser des compétitions (par exemple FIFA, MLBB, Free
+              Fire).
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">LAN</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              «&nbsp;Local Area Network&nbsp;» — tournoi organisé en
+              présentiel, sur un même site, avec tous les joueurs
+              connectés au même réseau local.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Online</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Tournoi joué à distance, chaque participant connecté
+              depuis son lieu de pratique (domicile, cybercafé, club).
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Bracket</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Schéma d’une compétition à élimination, généralement
+              affiché sous forme d’arbre de matchs.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Shoutcaster</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Commentateur d’une rencontre esport en direct, équivalent
+              du commentateur sportif traditionnel.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Roster</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Composition officielle d’une équipe esport (joueurs
+              titulaires, remplaçants, coach).
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Meta</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Ensemble des stratégies et configurations considérées
+              comme les plus efficaces à un moment donné dans une
+              discipline.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">Fair-play</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Ensemble des règles éthiques que les athlètes doivent
+              respecter (respect des adversaires, intégrité du jeu,
+              refus de la triche).
+            </p>
+          </div>
+          <div className="p-4 rounded-xl border border-dark-700 bg-dark-900/60">
+            <h4 className="text-light-100 font-semibold mb-1">IESF / ACES / WESCO / GEF</h4>
+            <p className="text-sm text-light-300 leading-snug m-0">
+              Les quatre fédérations internationales auxquelles la
+              FEGESPORT est affiliée — respectivement mondiale,
+              africaine, ouest-africaine, et mondiale (Global Esports
+              Federation).
+            </p>
+          </div>
+        </div>
       </>
     ),
   },
@@ -817,8 +1115,26 @@ const EsportGuineePage: React.FC = () => {
         {
           to: '/leg',
           label: 'La LEG — League eSport Guinée',
-          description: 'Compétitions, disciplines, calendrier.',
+          description: 'Saison nationale, disciplines, calendrier.',
           icon: <Trophy size={18} />,
+        },
+        {
+          to: '/events',
+          label: 'Compétitions officielles',
+          description: 'Rendez-vous nationaux en cours et à venir.',
+          icon: <Gamepad2 size={18} />,
+        },
+        {
+          to: '/membership/community',
+          label: 'Athlètes et communauté',
+          description: 'Espace dédié aux pratiquants.',
+          icon: <Users size={18} />,
+        },
+        {
+          to: '/partners',
+          label: 'Partenaires',
+          description: 'Écosystème institutionnel et privé.',
+          icon: <Handshake size={18} />,
         },
         {
           to: '/news',
@@ -836,25 +1152,13 @@ const EsportGuineePage: React.FC = () => {
           to: '/about',
           label: 'Notre direction',
           description: 'Bureau exécutif FEGESPORT.',
-          icon: <Users size={18} />,
-        },
-        {
-          to: '/partners',
-          label: 'Partenaires',
-          description: 'Écosystème institutionnel et privé.',
           icon: <Building2 size={18} />,
         },
         {
-          to: '/membership/community',
-          label: 'Communauté esport',
-          description: 'Espaces et dynamiques communautaires.',
-          icon: <Heart size={18} />,
-        },
-        {
           to: '/contact',
-          label: 'Contact',
+          label: 'Contact officiel',
           description: 'Joindre la fédération.',
-          icon: <Gamepad2 size={18} />,
+          icon: <Heart size={18} />,
         },
         {
           to: '/press-kit',
