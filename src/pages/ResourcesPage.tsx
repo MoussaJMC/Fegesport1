@@ -5,6 +5,7 @@ import { FileText, Download, Book, Shield, Eye, Image, File } from 'lucide-react
 import PDFViewer from '../components/resources/PDFViewer';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
+import { getSignedFileUrl } from '../lib/secureFileAccess';
 import { SEO } from '../components/seo';
 import { useLanguage } from '../hooks/useLanguage';
 
@@ -73,20 +74,48 @@ const ResourcesPage: React.FC = () => {
     }
   };
 
-  const handleViewPDF = (url: string) => {
+  /**
+   * WAVE 2 — every "view" or "download" action goes through a freshly
+   * issued, short-lived signed URL. We never expose the raw file URL
+   * to the DOM or to the PDFViewer prop chain — the URL is resolved
+   * at click time, audited server-side, and forgotten after use.
+   *
+   * The UI behaviour (button labels, toast feedback, modal flow) is
+   * intentionally identical to pre-Wave-2 so users see no change.
+   */
+  const handleViewPDF = async (fileId: string) => {
+    const url = await getSignedFileUrl(fileId);
+    if (!url) {
+      toast.error(t('resources.access_denied') || 'Acces non autorise ou fichier indisponible.');
+      return;
+    }
     setSelectedPDF(url);
   };
 
-  const handleDownloadPDF = async (url: string, title: string, fileId: string) => {
+  const handleDownloadPDF = async (
+    _legacyUrl: string,
+    title: string,
+    fileId: string,
+  ) => {
     try {
+      const signedUrl = await getSignedFileUrl(fileId);
+      if (!signedUrl) {
+        toast.error(t('resources.access_denied') || 'Acces non autorise ou fichier indisponible.');
+        return;
+      }
+
       const link = document.createElement('a');
-      link.href = url;
+      link.href = signedUrl;
       link.download = title;
       link.target = '_blank';
+      link.rel = 'noopener noreferrer';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
+      // download_count remains an app-level metric (cosmetic counter
+      // shown in the admin UI). The Wave 2 audit row in download_logs
+      // is already inserted by the RPC.
       await supabase.rpc('increment_download_count', { file_id: fileId });
 
       toast.success(t('resources.download_started') || 'Téléchargement démarré');
@@ -204,7 +233,7 @@ const ResourcesPage: React.FC = () => {
                               <div className="flex space-x-2">
                                 {isPDF(file.file_type) && (
                                   <button
-                                    onClick={() => handleViewPDF(file.file_url)}
+                                    onClick={() => handleViewPDF(file.id)}
                                     className="text-primary-600 hover:text-primary-700 flex items-center text-sm"
                                   >
                                     <Eye size={16} className="mr-1" />
