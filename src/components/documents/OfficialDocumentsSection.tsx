@@ -192,30 +192,47 @@ const OfficialDocumentsSection: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Action buttons */}
+                    {/* Action buttons (Wave 2: signed URL on click — no raw file_url in DOM) */}
                     {doc.file_url ? (
                       <div className="flex items-center gap-2">
-                        <a
-                          href={doc.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const { getSignedDocumentUrl } = await import(
+                              '../../lib/secureFileAccess'
+                            );
+                            const url = await getSignedDocumentUrl(doc.id);
+                            if (url) window.open(url, '_blank', 'noopener,noreferrer');
+                          }}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-dark-700 hover:bg-fed-red-500 text-light-100 hover:text-white text-xs font-semibold transition-all"
                           title={lang === 'fr' ? 'Consulter' : 'View'}
                         >
                           <ExternalLink size={13} />
                           {lang === 'fr' ? 'Consulter' : 'View'}
-                        </a>
-                        <a
-                          href={doc.file_url}
-                          download={doc.file_name || undefined}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const { getSignedDocumentUrl } = await import(
+                              '../../lib/secureFileAccess'
+                            );
+                            const url = await getSignedDocumentUrl(doc.id);
+                            if (!url) return;
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = doc.file_name || '';
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                          }}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-fed-gold-500 hover:bg-fed-gold-600 text-dark-950 text-xs font-semibold transition-all"
                           title={lang === 'fr' ? 'Telecharger' : 'Download'}
                         >
                           <Download size={13} />
                           {lang === 'fr' ? 'Telecharger' : 'Download'}
-                        </a>
+                        </button>
                       </div>
                     ) : (
                       <span className="text-xs text-light-400/50 italic">
