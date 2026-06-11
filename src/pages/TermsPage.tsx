@@ -29,7 +29,7 @@ const TermsPage: React.FC = () => {
             <h1 className="text-3xl md:text-5xl font-bold text-light-100 leading-tight tracking-tight mb-4">
               Conditions d'Utilisation
             </h1>
-            <p className="text-lg md:text-xl text-light-300 leading-relaxed">
+            <p className="text-lg md:text-xl text-light-200 leading-relaxed">
               Veuillez lire attentivement ces conditions d'utilisation avant d'utiliser nos services.
             </p>
           </div>
@@ -44,8 +44,8 @@ const TermsPage: React.FC = () => {
             [&_h2]:text-light-100 [&_h2]:font-bold [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:tracking-tight
             [&_h2:first-child]:mt-0
             [&_h3]:text-light-100 [&_h3]:font-semibold [&_h3]:text-xl [&_h3]:mt-8 [&_h3]:mb-3
-            [&_p]:text-light-300 [&_p]:leading-relaxed
-            [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:space-y-1.5 [&_ul]:text-light-300
+            [&_p]:text-light-200 [&_p]:leading-relaxed
+            [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:space-y-1.5 [&_ul]:text-light-200
             [&_li]:leading-relaxed
             [&_a]:text-fed-gold-500 [&_a]:underline [&_a:hover]:text-fed-gold-400
             [&_strong]:text-light-100

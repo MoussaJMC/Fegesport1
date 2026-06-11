@@ -193,7 +193,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2009
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Création de l’Association JMC</strong> — premier
               collectif guinéen organisé autour de la pratique du jeu
               vidéo compétitif.
@@ -203,7 +203,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2014
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Reconnaissance officielle de l’Association JMC</strong>{' '}
               — première étape institutionnelle structurante pour
               l’écosystème esport guinéen.
@@ -213,7 +213,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2018
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Création de la FEGESPORT</strong>, reconnaissance
               nationale, et <strong>cofondation de l’AEC (African Esports
               Confederation)</strong> — trois jalons qui font de 2018 une
@@ -224,7 +224,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2019
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Affiliation WESCO</strong> (West Esports Confederation),{' '}
               <strong>première compétition nationale</strong> organisée par la
               fédération et <strong>première participation africaine</strong> de la Guinée.
@@ -234,7 +234,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2022
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Affiliation IESF</strong> (International Esports
               Federation) — entrée de la Guinée dans la fédération mondiale
               de référence de l’esport.
@@ -244,7 +244,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2023
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Cofondation de l’ACES</strong>, affiliation
               ACES/AESF et <strong>première participation mondiale</strong>{' '}
               de la Guinée à l’IESF World Esports Championship.
@@ -254,7 +254,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               2024
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Affiliation GEF</strong> (Global Esports Federation) et{' '}
               <strong>création de la LEG (League eSport Guinée)</strong> —
               compétition fédérale phare structurée autour d’un calendrier
@@ -265,7 +265,7 @@ const sections: PillarSection[] = [
             <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
               Aujourd’hui
             </span>
-            <p className="text-light-300 leading-snug text-sm m-0">
+            <p className="text-light-200 leading-snug text-sm m-0">
               <strong>41 tournois organisés</strong>, environ{' '}
               <strong>234 athlètes</strong> identifiés dans l’écosystème,
               quatre affiliations internationales actives (IESF, ACES,

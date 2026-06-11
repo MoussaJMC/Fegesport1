@@ -67,13 +67,13 @@ const TLDRBox: React.FC<TLDRBoxProps> = ({
         </h2>
       </div>
 
-      <p className="text-light-300 leading-relaxed mb-4">{summary}</p>
+      <p className="text-light-200 leading-relaxed mb-4">{summary}</p>
 
       <ul className="space-y-2 list-none">
         {bullets.map((bullet, i) => (
           <li
             key={i}
-            className="flex gap-3 text-light-300 leading-relaxed text-[15px]"
+            className="flex gap-3 text-light-200 leading-relaxed text-[15px]"
           >
             <span
               aria-hidden="true"

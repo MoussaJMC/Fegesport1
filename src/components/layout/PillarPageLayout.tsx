@@ -245,7 +245,7 @@ const PillarPageLayout: React.FC<PillarPageLayoutProps> = ({
             </h1>
 
             {heroSubtitle && (
-              <p className="text-lg md:text-xl text-light-300 leading-relaxed max-w-3xl">
+              <p className="text-lg md:text-xl text-light-200 leading-relaxed max-w-3xl">
                 {heroSubtitle}
               </p>
             )}
@@ -302,7 +302,7 @@ const PillarPageLayout: React.FC<PillarPageLayoutProps> = ({
                   <h2 className="text-2xl md:text-3xl font-bold text-light-100 mb-5 tracking-tight">
                     {section.heading}
                   </h2>
-                  <div className="prose-pillar text-light-300 leading-relaxed text-[16px] md:text-[17px] space-y-4">
+                  <div className="prose-pillar text-light-200 leading-relaxed text-[16px] md:text-[17px] space-y-4">
                     {section.content}
                   </div>
                 </section>
@@ -375,7 +375,7 @@ const PillarPageLayout: React.FC<PillarPageLayoutProps> = ({
                 {cta.title}
               </h2>
               {cta.description && (
-                <p className="text-light-300 text-lg leading-relaxed mb-8">
+                <p className="text-light-200 text-lg leading-relaxed mb-8">
                   {cta.description}
                 </p>
               )}
