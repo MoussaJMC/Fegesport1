@@ -97,7 +97,12 @@ const sections: PillarSection[] = [
           de pratique — historiquement central en Guinée — qui peut
           accueillir aussi bien du gaming récréatif que des tournois
           esport structurés. Ces trois réalités cohabitent et se
-          renforcent dans l’écosystème national.
+          renforcent dans l’écosystème national. Concrètement, le{' '}
+          <strong>gaming guinéen</strong> et l’<strong>esport en Guinée</strong>{' '}
+          progressent en synergie&nbsp;: la pratique récréative nourrit
+          la pratique compétitive, et l’univers des{' '}
+          <strong>jeux vidéo compétitifs en Guinée</strong> bénéficie
+          de la communauté gaming guinéenne dans son ensemble.
         </p>
       </>
     ),
@@ -606,7 +611,12 @@ const sections: PillarSection[] = [
           importée et déconnectée de la culture locale&nbsp;: il s’est
           au contraire enraciné dans des dynamiques sociales et
           sportives déjà présentes, et y a trouvé une résonance
-          immédiate.
+          immédiate. Le <strong>gaming guinéen</strong>, qui rassemble
+          tous les pratiquants de jeu vidéo — joueurs occasionnels,
+          passionnés, compétiteurs — a constitué un terreau culturel
+          dans lequel les <strong>jeux vidéo compétitifs en Guinée</strong>{' '}
+          se sont progressivement structurés autour de tournois et de
+          clubs.
         </p>
         <h3 className="text-xl font-semibold text-light-100 mt-5 mb-2">
           Une passion sportive prolongée
@@ -819,9 +829,16 @@ const sections: PillarSection[] = [
             <h4 className="text-light-100 font-semibold mb-1">IESF / ACES / WESCO / GEF</h4>
             <p className="text-sm text-light-300 leading-snug m-0">
               Les quatre fédérations internationales auxquelles la
-              FEGESPORT est affiliée — respectivement mondiale,
-              africaine, ouest-africaine, et mondiale (Global Esports
-              Federation).
+              FEGESPORT est affiliée. <strong>IESF</strong>{' '}
+              (International Esports Federation) et <strong>GEF</strong>{' '}
+              (Global Esports Federation) sont deux organisations
+              mondiales distinctes — fondées séparément, avec leurs
+              propres compétitions et calendriers. <strong>ACES</strong>{' '}
+              (Africa Esports Confederation) est la confédération
+              continentale africaine. <strong>WESCO</strong> (West
+              Esports Confederation) est la confédération
+              ouest-africaine. La FEGESPORT participe activement aux
+              quatre.
             </p>
           </div>
         </div>
@@ -1075,7 +1092,7 @@ const EsportGuineePage: React.FC = () => {
   return (
     <PillarPageLayout
       seoTitle="L'esport en Guinée — guide complet et factuel"
-      seoDescription="Tout savoir sur l'esport en Guinée : définition, écosystème (FEGESPORT, clubs, athlètes), disciplines pratiquées, compétitions nationales (LEG) et internationales, communauté, jeunesse et éducation."
+      seoDescription="Esport en Guinée et gaming guinéen : définition, écosystème (FEGESPORT, clubs, athlètes), disciplines, compétitions nationales (LEG) et internationales, communauté, jeunesse, glossaire."
       seoKeywords="esport guinee, gaming guinee, electronic sports guinea, jeux video competitifs guinee, esport en Guinee, esport guineen, esport conakry, esport ouest-africain"
       schema={schema}
       breadcrumbs={[
