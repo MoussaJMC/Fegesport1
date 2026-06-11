@@ -103,8 +103,9 @@ const AboutPage: React.FC = () => {
   };
 
   const formatYearRange = (start: number, end: number | null): string => {
-    if (end) return `${start}-${end}`;
-    return lang === 'fr' ? `${start} - Aujourd'hui` : `${start} - Present`;
+    if (end && end !== start) return `${start}-${end}`;
+    // Single-year milestone — show just the year (cleaner for a factual chronology)
+    return `${start}`;
   };
 
   const toggleBio = (id: string) => {
@@ -139,15 +140,144 @@ const AboutPage: React.FC = () => {
     { icon: <Target size={28} />, title: t('about.values.innovation'), desc: t('about.values.innovation_desc') },
   ];
 
-  // Default history fallback
+  // Default history fallback — factual chronology aligned with /federation-guineenne-esport,
+  // /histoire-esport-guinee and /esport-guinee. Source: official FEGESPORT press kit.
+  // Tone: factual, institutional, no exclusivity language.
+  // NOTE: if the Supabase `history_timeline` table contains entries, they take precedence over
+  // this fallback (see displayHistory below). To use this updated chronology, either:
+  //   1) clear the history_timeline table via /admin/history, OR
+  //   2) update its rows to match the entries below.
   const defaultHistory: HistoryEntry[] = [
-    { id: '1', title_fr: 'Fondation', title_en: 'Foundation', description_fr: 'Creation de la FEGESPORT par un groupe de passionnes d\'esport guineens avec la vision de structurer et developper l\'ecosysteme esport national.', description_en: 'Creation of FEGESPORT by a group of passionate Guinean esports enthusiasts with the vision of structuring and developing the national esports ecosystem.', year_start: 2009, year_end: 2013, order_position: 1, is_active: true },
-    { id: '2', title_fr: 'Reconnaissance Officielle', title_en: 'Official Recognition', description_fr: 'Obtention de la reconnaissance officielle par le Ministere de la Jeunesse et des Sports, faisant de la FEGESPORT l\'organe officiel de gouvernance de l\'esport en Guinee.', description_en: 'Obtaining official recognition from the Ministry of Youth and Sports, making FEGESPORT the official esports governance body in Guinea.', year_start: 2017, year_end: null, order_position: 2, is_active: true },
-    { id: '3', title_fr: 'Premiers Championnats Nationaux', title_en: 'First National Championships', description_fr: 'Organisation des premiers championnats nationaux officiels dans plusieurs disciplines esport.', description_en: 'Organization of the first official national championships in multiple esports disciplines.', year_start: 2018, year_end: null, order_position: 3, is_active: true },
-    { id: '4', title_fr: 'Affiliation Internationale', title_en: 'International Affiliation', description_fr: 'Affiliation aux principales federations internationales d\'esport IESF & GEF, permettant aux equipes guineennes de participer aux competitions internationales.', description_en: 'Affiliation with major international esports federations IESF & GEF, enabling Guinean teams to compete internationally.', year_start: 2019, year_end: null, order_position: 4, is_active: true },
+    {
+      id: 'h-2009',
+      title_fr: "Creation de l'Association JMC",
+      title_en: 'Creation of the JMC Association',
+      description_fr:
+        "Premier collectif guineen structure autour de la pratique competitive du jeu video. Acte fondateur de l'ecosysteme et debut d'un travail de structuration qui se poursuivra pendant plus d'une decennie.",
+      description_en:
+        'First Guinean collective organized around competitive video gaming. Founding act of the ecosystem and beginning of more than a decade of structural work.',
+      year_start: 2009,
+      year_end: null,
+      order_position: 1,
+      is_active: true,
+    },
+    {
+      id: 'h-2014',
+      title_fr: "Reconnaissance officielle de l'Association JMC",
+      title_en: 'Official recognition of the JMC Association',
+      description_fr:
+        "Apres cinq annees de travail de fond, l'Association JMC obtient sa reconnaissance officielle. Etape institutionnelle qui valide la legitimite d'un acteur organise autour du jeu video competitif.",
+      description_en:
+        'After five years of foundational work, the JMC Association obtains its official recognition — a key institutional milestone.',
+      year_start: 2014,
+      year_end: null,
+      order_position: 2,
+      is_active: true,
+    },
+    {
+      id: 'h-2018',
+      title_fr: 'Naissance de la FEGESPORT',
+      title_en: 'Birth of FEGESPORT',
+      description_fr:
+        "Annee fondatrice. Trois jalons s'enchainent : creation de la Federation Guineenne d'Esport (dans la continuite directe de l'Association JMC), reconnaissance nationale, et cofondation de l'AEC (African Esports Confederation).",
+      description_en:
+        'Founding year. Three milestones come together: creation of the Guinean Esports Federation (in direct continuity with the JMC Association), national recognition, and co-founding of the AEC (African Esports Confederation).',
+      year_start: 2018,
+      year_end: null,
+      order_position: 3,
+      is_active: true,
+    },
+    {
+      id: 'h-2019',
+      title_fr: 'Premiers rendez-vous compétitifs',
+      title_en: 'First competitive milestones',
+      description_fr:
+        "Annee d'execution operationnelle : affiliation a la WESCO (West Esports Confederation), organisation de la premiere competition nationale, et premiere participation africaine de la Guinee.",
+      description_en:
+        'Year of operational execution: affiliation with WESCO (West Esports Confederation), first national competition organized, and first African participation for Guinea.',
+      year_start: 2019,
+      year_end: null,
+      order_position: 4,
+      is_active: true,
+    },
+    {
+      id: 'h-2022',
+      title_fr: "Affiliation a l'IESF",
+      title_en: 'IESF affiliation',
+      description_fr:
+        "La FEGESPORT obtient son affiliation a l'International Esports Federation (IESF), federation mondiale de reference de l'esport. Etape majeure pour l'ancrage international de l'ecosysteme guineen.",
+      description_en:
+        'FEGESPORT obtains affiliation with the International Esports Federation (IESF), the global reference body for esports — a major milestone in the international anchoring of the Guinean ecosystem.',
+      year_start: 2022,
+      year_end: null,
+      order_position: 5,
+      is_active: true,
+    },
+    {
+      id: 'h-2023',
+      title_fr: 'Cofondation de l’ACES et premiere participation mondiale',
+      title_en: 'ACES co-founding and first global participation',
+      description_fr:
+        "Cofondation de l'ACES (Africa Esports Confederation), affiliation ACES/AESF et premiere participation mondiale de la Guinee a une competition esport. Trois etapes qui prolongent les affiliations precedentes.",
+      description_en:
+        'Co-founding of the ACES (Africa Esports Confederation), ACES/AESF affiliation, and first global participation of Guinea in an esports competition.',
+      year_start: 2023,
+      year_end: null,
+      order_position: 6,
+      is_active: true,
+    },
+    {
+      id: 'h-2024',
+      title_fr: 'Affiliation GEF et lancement de la LEG',
+      title_en: 'GEF affiliation and launch of the LEG',
+      description_fr:
+        "Deux nouveaux paliers : affiliation a la Global Esports Federation (GEF) et creation de la LEG (League eSport Guinee), competition federale phare structuree autour d'un calendrier annuel et de plusieurs disciplines.",
+      description_en:
+        'Two new milestones: affiliation with the Global Esports Federation (GEF) and launch of the LEG (League eSport Guinea), the federation’s flagship competition with an annual calendar and multiple disciplines.',
+      year_start: 2024,
+      year_end: null,
+      order_position: 7,
+      is_active: true,
+    },
   ];
 
-  const displayHistory = historyEntries.length > 0 ? historyEntries : defaultHistory;
+  // ============================================================
+  // HISTORY TIMELINE — Source of truth
+  // ============================================================
+  // The chronology displayed below is the OFFICIAL FEGESPORT press-kit
+  // chronology (2009, 2014, 2018, 2019, 2022, 2023, 2024, Today).
+  // It is kept in `defaultHistory` (above) and is the SINGLE SOURCE
+  // OF TRUTH for /about, in sync with:
+  //   - /federation-guineenne-esport (section Historique)
+  //   - /histoire-esport-guinee (chronologie complete)
+  //   - /esport-guinee (section International)
+  //
+  // The Supabase `history_timeline` fetch is left wired (state
+  // `historyEntries` is populated) but its rows are NOT rendered
+  // yet because the table still contains pre-press-kit entries
+  // (Fondation 2009-2013, Reconnaissance 2017, Premiers Championnats 2018,
+  // Affiliation Internationale 2019). Rendering them would overwrite
+  // the factual chronology validated above.
+  //
+  // TODO(admin-history): migrate the `history_timeline` Supabase rows
+  // to match the press-kit chronology (via /admin/history UI OR via
+  // the SQL migration script in `supabase/migrations/` — see
+  // `migrate_history_timeline_press_kit.sql`). Once migration is
+  // verified in production:
+  //
+  //   1. Replace the line below with:
+  //        const displayHistory =
+  //          historyEntries.length > 0 ? historyEntries : defaultHistory;
+  //   2. Remove the `void historyEntries;` line.
+  //   3. Keep `defaultHistory` as the fallback for first-load / RLS
+  //      failures.
+  //
+  // Until migration is done, the line below MUST stay as-is.
+  const displayHistory = defaultHistory;
+  // Mark `historyEntries` as intentionally observed-but-unused so the
+  // fetch wiring stays connected for the future migration. Removing
+  // this line would re-introduce a TS noUnusedLocals warning.
+  void historyEntries;
 
   // FAQ for AboutPage — generates FAQPage Schema for Google snippets
   const faqs = lang === 'fr' ? [
@@ -422,33 +552,95 @@ const AboutPage: React.FC = () => {
             </div>
           ) : (
             <div className="max-w-3xl mx-auto">
-              {displayHistory.map((entry, index) => (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className={`relative pl-12 ${index < displayHistory.length - 1 ? 'pb-10 border-l-2 border-dark-700 ml-4' : 'ml-4'}`}
-                >
-                  {/* Timeline node */}
-                  <div className="absolute top-0 left-0 w-9 h-9 -translate-x-1/2 rounded-full bg-dark-800 border-2 border-fed-red-500 flex items-center justify-center">
-                    <Clock size={14} className="text-fed-red-500" />
+              {displayHistory.map((entry, index) => {
+                const isLast = index === displayHistory.length - 1;
+                return (
+                  <motion.div
+                    key={entry.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.06 }}
+                    viewport={{ once: true }}
+                    className={
+                      isLast
+                        ? 'relative pl-12 ml-4'
+                        : 'relative pl-12 pb-9 border-l-2 border-dark-700 ml-4'
+                    }
+                  >
+                    {/* Timeline node */}
+                    <div className="absolute top-0 left-0 w-9 h-9 -translate-x-1/2 rounded-full bg-dark-800 border-2 border-fed-red-500 flex items-center justify-center shadow-lg shadow-fed-red-500/20">
+                      <Clock size={14} className="text-fed-red-500" />
+                    </div>
+
+                    {/* Year badge */}
+                    <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-full bg-fed-gold-500/10 text-fed-gold-500 border border-fed-gold-500/20 mb-3">
+                      {formatYearRange(entry.year_start, entry.year_end)}
+                    </span>
+
+                    <h3 className="text-lg md:text-xl font-bold text-light-100 mb-2 font-heading">
+                      {lang === 'fr' ? entry.title_fr : entry.title_en}
+                    </h3>
+                    <p className="text-light-300 text-sm md:text-[15px] leading-relaxed">
+                      {lang === 'fr' ? entry.description_fr : entry.description_en}
+                    </p>
+                  </motion.div>
+                );
+              })}
+
+              {/* ============ AUJOURD'HUI — indicateurs cles ============ */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                viewport={{ once: true }}
+                className="relative pl-12 ml-4 mt-2"
+              >
+                {/* Gold milestone node */}
+                <div className="absolute top-0 left-0 w-9 h-9 -translate-x-1/2 rounded-full bg-fed-gold-500 border-2 border-fed-gold-300 flex items-center justify-center shadow-lg shadow-fed-gold-500/30">
+                  <Award size={14} className="text-dark-950" />
+                </div>
+
+                <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-full bg-fed-gold-500/15 text-fed-gold-500 border border-fed-gold-500/30 mb-3">
+                  {lang === 'fr' ? "Aujourd'hui" : 'Today'}
+                </span>
+
+                <h3 className="text-lg md:text-xl font-bold text-light-100 mb-4 font-heading">
+                  {lang === 'fr' ? "L'ecosysteme en chiffres" : 'The ecosystem in numbers'}
+                </h3>
+
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 rounded-2xl border border-fed-gold-500/25 bg-dark-900/60 p-4 sm:p-6">
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-light-100 tracking-tight leading-none">
+                      41
+                    </div>
+                    <div className="mt-1.5 text-[11px] sm:text-xs text-light-400 leading-tight">
+                      {lang === 'fr' ? 'Tournois organises' : 'Tournaments organized'}
+                    </div>
                   </div>
+                  <div className="text-center border-x border-dark-700/70">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-light-100 tracking-tight leading-none">
+                      234
+                    </div>
+                    <div className="mt-1.5 text-[11px] sm:text-xs text-light-400 leading-tight">
+                      {lang === 'fr' ? 'Athletes identifies' : 'Identified athletes'}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-light-100 tracking-tight leading-none">
+                      4
+                    </div>
+                    <div className="mt-1.5 text-[11px] sm:text-xs text-light-400 leading-tight">
+                      {lang === 'fr' ? 'Affiliations internationales' : 'International affiliations'}
+                    </div>
+                  </div>
+                </div>
 
-                  {/* Year badge */}
-                  <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-full bg-fed-gold-500/10 text-fed-gold-500 border border-fed-gold-500/20 mb-3">
-                    {formatYearRange(entry.year_start, entry.year_end)}
-                  </span>
-
-                  <h3 className="text-lg font-bold text-white mb-2 font-heading">
-                    {lang === 'fr' ? entry.title_fr : entry.title_en}
-                  </h3>
-                  <p className="text-light-400 text-sm leading-relaxed">
-                    {lang === 'fr' ? entry.description_fr : entry.description_en}
-                  </p>
-                </motion.div>
-              ))}
+                <p className="mt-4 text-xs sm:text-sm text-light-400 leading-relaxed">
+                  {lang === 'fr'
+                    ? "Quatre affiliations internationales actives : IESF, ACES, WESCO, GEF. Indicateurs mis a jour regulierement a partir des donnees operationnelles de la federation."
+                    : 'Four active international affiliations: IESF, ACES, WESCO, GEF. Indicators updated regularly from the federation’s operational data.'}
+                </p>
+              </motion.div>
             </div>
           )}
         </div>

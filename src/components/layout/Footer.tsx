@@ -1,289 +1,250 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, Globe } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone } from 'lucide-react';
 import { useSiteSettings } from '../../hooks/useSiteSettings';
 import { ManageCookiesLink } from '../cookie/CookieBanner';
 
+/**
+ * Premium federation footer — institutional grade.
+ *
+ * Inspired by FIFA, UEFA, Riot Games, ESL, IESF.
+ * 4 columns max, compact height, refined hover states, no aggressive animations.
+ */
 const Footer: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { getSetting } = useSiteSettings();
   const lang = i18n.language === 'fr' ? 'fr' : 'en';
   const currentYear = new Date().getFullYear();
 
   const contactInfo = getSetting('contact_info', {
-    address: "Conakry, Guinee",
-    postal_code: "BP 12345",
-    email: "contact@fegesport224.org",
-    phone: "+224 625878764",
+    address: 'Conakry, Guinee',
+    email: 'contact@fegesport224.org',
+    phone: '+224 625 87 87 64',
     social_media: {
-      facebook: "https://facebook.com/fegesport",
-      twitter: "https://twitter.com/fegesport",
-      instagram: "https://instagram.com/fegesport",
-      youtube: "https://youtube.com/fegesport"
-    }
+      facebook: 'https://facebook.com/fegesport',
+      twitter: 'https://twitter.com/fegesport',
+      instagram: 'https://instagram.com/fegesport',
+      youtube: 'https://youtube.com/fegesport',
+    },
   });
 
   const navigationSettings = getSetting('main_navigation', {
-    brand_text: "FEGESPORT",
-    items: []
+    brand_text: 'FEGESPORT',
+    items: [],
   });
-
-  const getTranslatedLabel = (label: string): string => {
-    const key = label.toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, '');
-    const translationKey = `navigation.${key}`;
-    return i18n.exists(translationKey) ? t(translationKey) : label;
-  };
 
   const socialLinks = [
     { url: contactInfo.social_media?.facebook, icon: Facebook, label: 'Facebook' },
     { url: contactInfo.social_media?.twitter, icon: Twitter, label: 'Twitter' },
     { url: contactInfo.social_media?.instagram, icon: Instagram, label: 'Instagram' },
     { url: contactInfo.social_media?.youtube, icon: Youtube, label: 'YouTube' },
-  ].filter(link => link.url);
+  ].filter((link) => link.url);
+
+  // Reusable link class for the 3 navigation columns — premium hover state
+  const navLinkClass =
+    'group inline-flex items-center text-light-400 hover:text-light-100 text-[13.5px] leading-tight transition-colors duration-200 relative';
+
+  const navLinkUnderline = (
+    <span
+      aria-hidden="true"
+      className="absolute left-0 -bottom-0.5 h-px w-0 bg-fed-gold-500 transition-all duration-200 group-hover:w-full"
+    />
+  );
 
   return (
-    <footer className="bg-dark-950 text-light-100 border-t border-dark-700">
-      {/* Main footer content */}
-      <div className="container-custom py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+    <footer className="bg-dark-950 text-light-100 border-t border-dark-800/80">
+      {/* gold thin accent line at the top of the footer — premium signal */}
+      <div
+        aria-hidden="true"
+        className="h-px w-full bg-gradient-to-r from-transparent via-fed-gold-500/40 to-transparent"
+      />
 
-          {/* Column 1 — Federation Identity */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-fed-red-500 flex items-center justify-center">
-                <span className="text-white font-bold text-sm font-heading">FGE</span>
+      {/* ================= Main grid ================= */}
+      <div className="container-custom pt-10 pb-7 md:pt-12 md:pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+
+          {/* ---------------- Column 1 — Brand + tagline ---------------- */}
+          <div className="lg:pr-4">
+            <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group">
+              <div className="w-9 h-9 rounded-md bg-fed-red-500 flex items-center justify-center shadow-sm shadow-fed-red-500/20 group-hover:shadow-fed-red-500/40 transition-shadow">
+                <span className="text-white font-bold text-[11px] font-heading tracking-wider">FGE</span>
               </div>
-              <span className="text-xl font-bold font-heading text-white">
-                {navigationSettings.brand_text || "FEGESPORT"}
+              <span className="text-lg font-bold font-heading text-light-100 tracking-tight">
+                {navigationSettings.brand_text || 'FEGESPORT'}
               </span>
-            </div>
-            <p className="text-light-400 text-sm leading-relaxed mb-6">
+            </Link>
+            <p className="text-light-400 text-[13.5px] leading-relaxed mb-5 max-w-xs">
               {lang === 'fr'
-                ? 'Federation Guineenne d\'Esport. Structurer, developper et representer l\'esport en Republique de Guinee.'
-                : 'Guinean Esports Federation. Structuring, developing and representing esports in the Republic of Guinea.'}
+                ? "Federation Guineenne d'Esport. Promouvoir, structurer et representer l'esport en Republique de Guinee."
+                : "Guinean Esports Federation. Promoting, structuring and representing esports in the Republic of Guinea."}
             </p>
-            <div className="flex space-x-3">
+
+            <div className="flex gap-2">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-light-400 hover:text-fed-red-500 hover:border-fed-red-500/30 transition-all duration-200"
+                  className="w-8 h-8 rounded-md border border-dark-800 bg-dark-900/60 flex items-center justify-center text-light-400 hover:text-fed-gold-500 hover:border-fed-gold-500/40 hover:bg-dark-900 transition-all duration-200"
                   aria-label={social.label}
                 >
-                  <social.icon size={16} />
+                  <social.icon size={14} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Column 2 — Navigation (primary internal links — SEO critical) */}
+          {/* ---------------- Column 2 — Federation ---------------- */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
-              {lang === 'fr' ? 'Navigation' : 'Navigation'}
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fed-gold-500 mb-4 font-heading">
+              {lang === 'fr' ? 'Federation' : 'Federation'}
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link
-                  to="/"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Page d\'accueil FEGESPORT' : 'FEGESPORT homepage'}
-                >
-                  {lang === 'fr' ? 'Accueil' : 'Home'}
+                <Link to="/about" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'A propos' : 'About'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/about"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'A propos de la Federation Guineenne d\'Esport' : 'About the Guinean Esports Federation'}
-                >
-                  {lang === 'fr' ? 'A propos' : 'About'}
+                <Link to="/federation-guineenne-esport" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'La Federation' : 'The Federation'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/federation-guineenne-esport"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Page institutionnelle officielle de la FEGESPORT' : 'Official institutional page of FEGESPORT'}
-                >
-                  {lang === 'fr' ? 'La Federation' : 'The Federation'}
+                <Link to="/partners" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Partenaires' : 'Partners'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/news"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Actualites de la FEGESPORT' : 'FEGESPORT news'}
-                >
-                  {lang === 'fr' ? 'Actualites' : 'News'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/events"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Evenements et competitions' : 'Events and competitions'}
-                >
-                  {lang === 'fr' ? 'Evenements' : 'Events'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/leg"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'League eSport de Guinee (LEG)' : 'Guinea eSports League (LEG)'}
-                >
-                  {lang === 'fr' ? 'eLeague (LEG)' : 'eLeague (LEG)'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/membership"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Adhesion FEGESPORT' : 'FEGESPORT membership'}
-                >
-                  {lang === 'fr' ? 'Adhesion' : 'Membership'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/membership/community"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                >
-                  {lang === 'fr' ? 'Communaute' : 'Community'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/partners"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Partenaires officiels' : 'Official partners'}
-                >
-                  {lang === 'fr' ? 'Partenaires' : 'Partners'}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                >
-                  Contact
+                <Link to="/contact" className={navLinkClass}>
+                  <span>Contact</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3 — Resources (institutional + legal) */}
+          {/* ---------------- Column 3 — Compétitions ---------------- */}
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
-              {lang === 'fr' ? 'Ressources' : 'Resources'}
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fed-gold-500 mb-4 font-heading">
+              {lang === 'fr' ? 'Competitions' : 'Competitions'}
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link
-                  to="/press-kit"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title={lang === 'fr' ? 'Kit de presse officiel FEGESPORT' : 'Official FEGESPORT press kit'}
-                >
-                  {lang === 'fr' ? 'Kit de presse' : 'Press kit'}
+                <Link to="/leg" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'eLeague (LEG)' : 'eLeague (LEG)'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/resources"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                >
-                  {lang === 'fr' ? 'Documents officiels' : 'Official Documents'}
+                <Link to="/events" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Evenements' : 'Events'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/direct"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                >
-                  {lang === 'fr' ? 'DIRECT (Streams)' : 'LIVE (Streams)'}
+                <Link to="/news" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Actualites' : 'News'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
               <li>
-                <a
-                  href="/sitemap.xml"
-                  className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200"
-                  title="Sitemap XML"
-                >
-                  Sitemap
+                <Link to="/direct" className={navLinkClass}>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-fed-red-500 animate-pulse" />
+                    DIRECT
+                  </span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* ---------------- Column 4 — Informations ---------------- */}
+          <div>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fed-gold-500 mb-4 font-heading">
+              {lang === 'fr' ? 'Informations' : 'Information'}
+            </h4>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/privacy" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Confidentialite' : 'Privacy'}</span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className={navLinkClass}>
+                  <span>{lang === 'fr' ? "Conditions d'utilisation" : 'Terms of use'}</span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+              <li>
+                <a href="/sitemap.xml" className={navLinkClass}>
+                  <span>Sitemap</span>
+                  {navLinkUnderline}
                 </a>
               </li>
               <li>
-                <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
-                  {t('footer.privacy')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-light-400 hover:text-fed-gold-500 text-sm transition-colors duration-200">
-                  {t('footer.terms')}
+                <Link to="/press-kit" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Kit de presse' : 'Press kit'}</span>
+                  {navLinkUnderline}
                 </Link>
               </li>
             </ul>
           </div>
+        </div>
 
-          {/* Column 4 — Contact */}
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-light-300 mb-4 font-heading">
-              {lang === 'fr' ? 'Contact' : 'Contact'}
-            </h4>
-            <address className="not-italic space-y-3">
-              {contactInfo.address && (
-                <div className="flex items-start gap-2.5 text-light-400 text-sm">
-                  <MapPin size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
-                  <span>{contactInfo.address}</span>
-                </div>
-              )}
-              {contactInfo.email && (
-                <div className="flex items-start gap-2.5 text-light-400 text-sm">
-                  <Mail size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
-                  <a href={`mailto:${contactInfo.email}`} className="hover:text-fed-gold-500 transition-colors break-all">
-                    {contactInfo.email}
-                  </a>
-                </div>
-              )}
-              {contactInfo.phone && (
-                <div className="flex items-start gap-2.5 text-light-400 text-sm">
-                  <Phone size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
-                  <a href={`tel:${contactInfo.phone}`} className="hover:text-fed-gold-500 transition-colors">
-                    {contactInfo.phone}
-                  </a>
-                </div>
-              )}
-              <div className="flex items-start gap-2.5 text-light-400 text-sm">
-                <Globe size={15} className="mt-0.5 flex-shrink-0 text-fed-red-500" />
-                <span>fegesport224.org</span>
-              </div>
-            </address>
-          </div>
+        {/* ---------------- Compact contact strip ---------------- */}
+        <div className="mt-9 pt-6 border-t border-dark-800/70 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 text-[12.5px] text-light-400">
+          {contactInfo.address && (
+            <div className="flex items-center gap-2">
+              <MapPin size={13} className="flex-shrink-0 text-fed-red-500" />
+              <span>{contactInfo.address}</span>
+            </div>
+          )}
+          {contactInfo.email && (
+            <div className="flex items-center gap-2">
+              <Mail size={13} className="flex-shrink-0 text-fed-red-500" />
+              <a
+                href={`mailto:${contactInfo.email}`}
+                className="hover:text-fed-gold-500 transition-colors truncate"
+              >
+                {contactInfo.email}
+              </a>
+            </div>
+          )}
+          {contactInfo.phone && (
+            <div className="flex items-center gap-2">
+              <Phone size={13} className="flex-shrink-0 text-fed-red-500" />
+              <a href={`tel:${contactInfo.phone}`} className="hover:text-fed-gold-500 transition-colors">
+                {contactInfo.phone}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-dark-800">
-        <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-light-400 text-xs text-center md:text-left">
-            &copy; {currentYear} FEGESPORT — {lang === 'fr' ? 'Federation Guineenne d\'Esport. Tous droits reserves.' : 'Guinean Esports Federation. All rights reserved.'}
+      {/* ================= Bottom bar ================= */}
+      <div className="border-t border-dark-800/80 bg-dark-950">
+        <div className="container-custom py-4 flex flex-col sm:flex-row justify-between items-center gap-2.5">
+          <p className="text-light-400 text-[11.5px] tracking-wide text-center sm:text-left">
+            &copy; {currentYear} FEGESPORT —{' '}
+            {lang === 'fr'
+              ? "Federation Guineenne d'Esport. Tous droits reserves."
+              : 'Guinean Esports Federation. All rights reserved.'}
           </p>
-          <div className="flex items-center gap-6 flex-wrap">
-            <Link to="/privacy" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
-              {t('footer.privacy')}
-            </Link>
-            <Link to="/terms" className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors">
-              {t('footer.terms')}
-            </Link>
-            {/* Re-show cookie banner — only rendered if analytics are configured */}
-            <ManageCookiesLink className="text-light-400 hover:text-fed-gold-500 text-xs transition-colors" />
+          <div className="flex items-center gap-5 text-[11.5px]">
+            <ManageCookiesLink className="text-light-400 hover:text-fed-gold-500 transition-colors" />
+            <span className="text-light-400/50 select-none">·</span>
+            <span className="text-light-400 inline-flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-fed-gold-500" />
+              {lang === 'fr' ? 'Membre IESF, ACES, WESCO, GEF' : 'Member of IESF, ACES, WESCO, GEF'}
+            </span>
           </div>
         </div>
       </div>

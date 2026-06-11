@@ -29,6 +29,17 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://fegesport224.org/about?lang=en" />
   </url>
 
+  <!-- ===== PILLAR — ESPORT EN GUINEE (KEYWORD COMPETITIF) ===== -->
+  <url>
+    <loc>https://fegesport224.org/esport-guinee</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://fegesport224.org/esport-guinee" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://fegesport224.org/esport-guinee?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fegesport224.org/esport-guinee" />
+  </url>
+
   <!-- ===== PILLAR — FEDERATION INSTITUTIONAL ===== -->
   <url>
     <loc>https://fegesport224.org/federation-guineenne-esport</loc>
@@ -96,13 +107,6 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- ===== RESOURCES ===== -->
-  <url>
-    <loc>https://fegesport224.org/resources</loc>
-    <lastmod>2026-06-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
 
   <!-- ===== PARTNERS ===== -->
   <url>

@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
         { label: "Communaute", path: "/membership/community" }
       ]},
       { label: "eLeague", path: "/leg", order: 4.5 },
-      { label: "Ressources", path: "/resources", order: 5 },
+      // "Ressources" item removed: /resources is now a private (gated) area, not public navigation.
       { label: "Partenaires", path: "/partners", order: 6 },
       { label: "Contact", path: "/contact", order: 7 },
       { label: "DIRECT", path: "/direct", order: 8 }

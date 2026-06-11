@@ -45,7 +45,7 @@ const TimelineList: React.FC<{ entries: TimelineEntry[] }> = ({ entries }) => (
         <span className="text-fed-gold-500 font-bold text-lg flex-shrink-0 w-28">
           {e.year}
         </span>
-        <div className="text-light-300 leading-snug text-sm m-0">
+        <div className="text-light-200 leading-snug text-sm m-0">
           {e.highlights}
         </div>
       </div>

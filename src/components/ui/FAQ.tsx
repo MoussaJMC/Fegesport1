@@ -167,7 +167,7 @@ const FAQ: React.FC<FAQProps> = ({
                 role="region"
                 aria-labelledby={buttonId}
                 hidden={!isOpen}
-                className="px-5 pb-5 text-light-300 leading-relaxed text-[15px]"
+                className="px-5 pb-5 text-light-200 leading-relaxed text-[15px]"
               >
                 {item.answer}
               </div>

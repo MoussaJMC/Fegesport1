@@ -1,10 +1,12 @@
 # ============================================================
 # FEGESPORT - Federation Guineenne d'Esport
 # Robots policy for https://fegesport224.org
-# Last updated: 2026-06-07
+# Last updated: 2026-06-11
 # ============================================================
 
 # Default rules — allow indexing all public content
+# /resources is the FEGESPORT private resource library: institutional
+# documents, media archives, official files. NOT to be indexed by any bot.
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -12,6 +14,8 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /backup
 Disallow: /download-backup
+Disallow: /resources
+Disallow: /resources/
 Disallow: /*?*
 
 # Google
@@ -19,72 +23,105 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: Googlebot-Image
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: Googlebot-News
 Allow: /news
 Allow: /events
+Disallow: /resources
 
 # Bing
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
+Disallow: /resources
+Disallow: /resources/
 
 # Social previews
 User-agent: Twitterbot
 Allow: /
+Disallow: /resources
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /resources
 
 User-agent: LinkedInBot
 Allow: /
+Disallow: /resources
 
 User-agent: WhatsApp
 Allow: /
+Disallow: /resources
 
 User-agent: Slackbot
 Allow: /
+Disallow: /resources
 
 User-agent: Discordbot
 Allow: /
+Disallow: /resources
 
-# AI / LLM Crawlers (allow for FEGESPORT discoverability)
+# AI / LLM Crawlers — discoverability of public content allowed,
+# but the private /resources library is OFF-LIMITS for AI training and citation.
 User-agent: GPTBot
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: cohere-ai
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 User-agent: CCBot
 Allow: /
+Disallow: /resources
+Disallow: /resources/
 
 # Aggressive SEO crawlers — limit rate
 User-agent: AhrefsBot
 Crawl-delay: 10
+Disallow: /resources
 
 User-agent: SemrushBot
 Crawl-delay: 10
+Disallow: /resources
 
 User-agent: MJ12bot
 Crawl-delay: 10
+Disallow: /resources
 
 # Sitemap
 Sitemap: https://fegesport224.org/sitemap.xml

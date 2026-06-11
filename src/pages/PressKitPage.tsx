@@ -382,12 +382,7 @@ FEGESPORT's mission is to structure, develop, and represent Guinean esports at n
                       {lang === 'fr' ? 'Actualites officielles' : 'Official news'}
                     </Link>
                   </li>
-                  <li>
-                    <Link to="/resources" className="flex items-center gap-2 text-light-300 hover:text-fed-gold-500 text-sm transition-colors">
-                      <FileText size={12} />
-                      {lang === 'fr' ? 'Documents officiels' : 'Official documents'}
-                    </Link>
-                  </li>
+                  {/* "Documents officiels" link removed — /resources is now a private (gated) area. */}
                   <li>
                     <Link to="/contact" className="flex items-center gap-2 text-light-300 hover:text-fed-gold-500 text-sm transition-colors">
                       <Mail size={12} />
