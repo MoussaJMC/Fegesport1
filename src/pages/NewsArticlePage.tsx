@@ -134,7 +134,8 @@ const NewsArticlePage: React.FC = () => {
         schema={buildArticleSchema({
           title: article.title,
           description: article.excerpt || article.content.substring(0, 200),
-          image: article.image_url || 'https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg',
+          // Wave 2.6: brand asset served locally (absolute URL required for Schema.org).
+          image: article.image_url || 'https://fegesport224.org/assets/brand/logo.jpg',
           url: `https://fegesport224.org/news/${article.id}`,
           datePublished: article.created_at,
           dateModified: article.updated_at,

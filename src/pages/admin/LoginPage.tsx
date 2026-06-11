@@ -35,7 +35,8 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const logoSettings = getSetting('site_logo', {
-    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
+    // Wave 2.6: brand asset served locally.
+    main_logo: "/assets/brand/logo.jpg",
     alt_text: "FEGESPORT Logo",
   });
 

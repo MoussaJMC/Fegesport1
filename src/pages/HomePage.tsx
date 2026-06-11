@@ -46,7 +46,8 @@ const HomePage: React.FC = () => {
   const lang = currentLanguage;
 
   const defaultLogoSettings = {
-    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
+    // Wave 2.6: brand asset served locally from Netlify. Settings table can override at runtime.
+    main_logo: "/assets/brand/logo.jpg",
     alt_text: "FEGESPORT Logo",
     width: 48,
     height: 48,

@@ -12,7 +12,10 @@ interface SiteSetting {
 
 const DEFAULT_SETTINGS = {
   site_logo: {
-    main_logo: "https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg",
+    // Wave 2.6: brand asset served locally from Netlify.
+    // Legacy Supabase fallback URL (kept here as comment for historical traceability):
+    //   https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg
+    main_logo: "/assets/brand/logo.jpg",
     alt_text: "FEGESPORT Logo",
     width: 48,
     height: 48,
