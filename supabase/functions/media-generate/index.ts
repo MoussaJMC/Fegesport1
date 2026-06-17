@@ -98,44 +98,39 @@ Médias joints :
 ${fileList}`;
 }
 
+// Consignes de style pour l'article de presse — fournies en PROSE (hors gabarit JSON)
+// pour ne PAS corrompre le JSON que le modèle doit produire.
+const PRESS_ARTICLE_STYLE = `STYLE ARTICLE ESPORT (pour le champ press_article.content) :
+- Commencer par un angle journalistique fort.
+- Présenter rapidement l'équipe, le pays représenté et la compétition.
+- Mentionner les joueurs dès le début lorsque leurs noms sont disponibles.
+- Structurer l'article avec des sous-titres clairs (intertitres ##).
+- Ajouter une section "## Composition de l'équipe" UNIQUEMENT si une composition est fournie.
+- Expliquer l'importance du résultat sans l'exagérer.
+- Conclure sur les perspectives futures pour la discipline en Guinée.
+- Éviter les phrases de remplissage et les répétitions.
+- Ne PAS transformer un test, un brouillon ou une information interne en fait public.
+
+OUVERTURE DES ARTICLES ESPORT — s'applique UNIQUEMENT aux contenus esport compétitifs (compétition, tournoi, championnat, participation internationale) :
+- Commencer l'article par le résultat sportif, l'enjeu compétitif ou le parcours réalisé.
+- Faire apparaître rapidement l'équipe, les joueurs ou la sélection concernée.
+- Mettre en avant l'impact pour l'esport guinéen et créer immédiatement l'intérêt du lecteur.
+- ÉVITER les ouvertures encyclopédiques (ex: "L'événement ... a accueilli", "La compétition ... est organisée par", "Le tournoi ... est une compétition").
+- PRIVILÉGIER une ouverture centrée sur : l'équipe, les joueurs, le parcours, la qualification, la participation internationale, la progression de l'esport guinéen.
+- Exemple de ton recherché : Face à des équipes venues de plusieurs pays africains, la sélection a porté les couleurs de la Guinée jusqu'aux phases finales — une campagne qui confirme la progression continue de l'esport guinéen.
+- Si le contenu n'est PAS une compétition esport (formation, communiqué institutionnel), conserver une ouverture journalistique classique sans appliquer cette règle d'ouverture compétitive.`;
+
 function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: string): string {
   const parts: string[] = [];
   if (targets.includes('press_article')) {
     parts.push(`"press_article": {
   "title": "titre journalistique avec un angle fort",
   "excerpt": "chapeau de 2-3 phrases",
-  "content": "article de presse complet en markdown, 600 à 1200 mots, en respectant le STYLE ARTICLE ESPORT ci-dessous",
+  "content": "article de presse complet en markdown, 600 à 1200 mots, en respectant le STYLE ARTICLE ESPORT décrit plus haut",
   "meta_title": "max 60 caractères",
   "meta_description": "max 155 caractères",
   "keywords": ["5 à 8 mots-clés SEO"]
-}
-// ## Style article esport (pour press_article)
-// - Commencer par un angle journalistique fort.
-// - Présenter rapidement l'équipe, le pays représenté et la compétition.
-// - Mentionner les joueurs dès le début lorsque leurs noms sont disponibles.
-// - Structurer l'article avec des sous-titres clairs (intertitres ##).
-// - Ajouter une section "## Composition de l'équipe" UNIQUEMENT si une composition est fournie.
-// - Expliquer l'importance du résultat sans l'exagérer.
-// - Conclure sur les perspectives futures pour la discipline en Guinée.
-// - Éviter les phrases de remplissage et les répétitions.
-// - Ne PAS transformer un test, un brouillon ou une information interne en fait public.
-//
-// ## Ouverture des articles esport
-// S'applique UNIQUEMENT aux contenus esport compétitifs (compétition, tournoi, championnat, participation internationale).
-// - Commencer l'article par le résultat sportif, l'enjeu compétitif ou le parcours réalisé.
-// - Faire apparaître rapidement l'équipe, les joueurs ou la sélection concernée.
-// - Mettre en avant l'impact pour l'esport guinéen.
-// - Créer immédiatement l'intérêt du lecteur.
-// ÉVITER les ouvertures institutionnelles ou encyclopédiques du type :
-//   "L'événement X a accueilli...", "La compétition X est organisée par...", "Le tournoi X est une compétition...".
-// PRIVILÉGIER une ouverture centrée sur : l'équipe ; les joueurs ; le parcours réalisé ;
-//   la qualification obtenue ; la participation internationale ; la progression de l'esport guinéen.
-// Exemple de style recherché :
-//   "Face à des équipes venues de plusieurs pays africains, la Team SHDW a porté les couleurs de la Guinée
-//    jusqu'en quarts de finale de l'AFL Season 2. Une campagne qui confirme la progression constante du
-//    Mobile Legends guinéen sur la scène continentale."
-// (Si le contenu n'est PAS une compétition esport — ex. formation, communiqué institutionnel —, conserver
-//  une ouverture journalistique classique sans appliquer cette règle d'ouverture compétitive.)`);
+}`);
   }
   if (targets.includes('short_news')) {
     parts.push(`"short_news": {
@@ -165,8 +160,8 @@ function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: 
   }
   return `${facts}
 
-${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
-PRODUIS ce JSON exactement (uniquement les clés listées) :
+${targets.includes('press_article') ? `${PRESS_ARTICLE_STYLE}\n\n` : ''}${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
+PRODUIS ce JSON exactement (uniquement les clés listées). IMPORTANT : retourne UNIQUEMENT du JSON valide, sans commentaire, sans texte hors JSON :
 {
   "analysis": {
     "summary": "résumé factuel de 3-4 phrases",
