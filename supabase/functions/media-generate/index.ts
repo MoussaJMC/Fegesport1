@@ -37,6 +37,31 @@ const PROMPT_VERSION = 'v2';
 // Prompts — protection contre les hallucinations : l'IA ne doit JAMAIS
 // inventer de faits, noms, chiffres ou citations absents des données.
 // ------------------------------------------------------------------
+// FEGESPORT Editorial Guardrails
+// These rules prevent unsupported claims, exaggerated wording, and generic administrative writing.
+// They must apply to all generated articles, newsletters and social posts.
+const FEGESPORT_EDITORIAL_RULES = `
+## Règles éditoriales FEGESPORT
+- Écrire comme un journaliste esport professionnel.
+- Ne pas rédiger comme un rapport administratif.
+- Ton institutionnel, mais vivant, humain et dynamique.
+- Mettre en avant les joueurs, les équipes, les clubs et la représentation de la Guinée.
+- Valoriser les performances sans exagération.
+- Donner envie au lecteur de suivre les prochaines activités de la FEGESPORT.
+- Utiliser uniquement les informations fournies par la source.
+- Ne jamais inventer de scores.
+- Ne jamais inventer d'adversaires.
+- Ne jamais inventer de statistiques.
+- Ne jamais inventer de citations.
+- Ne jamais supposer les conditions techniques de jeu (ping, lag, serveur difficile, problèmes de connexion), sauf si explicitement fournies.
+- Ne jamais attribuer une performance individuelle à un joueur si elle n'est pas documentée.
+- Les rôles esport (EXP Laner, Jungler, Gold Laner, Mid Laner, Roamer…) peuvent être expliqués brièvement, mais sans inventer ce que le joueur a fait dans le match.
+- Éviter les mots : historique, exploit, exceptionnel, domination, héroïque, majeur — sauf si la source démontre clairement ces qualificatifs.
+- Préférer les formulations sobres : progression, parcours prometteur, étape importante, participation encourageante, expérience internationale, visibilité continentale.
+- Pour les compétitions africaines, mettre en avant la progression de l'esport guinéen sans déclarer une supériorité non prouvée.
+- En cas de contradiction entre deux informations, signaler l'incohérence et privilégier la donnée structurée.
+- En cas d'information manquante, ne pas la deviner.`;
+
 const SYSTEM_PROMPT = `Tu es le rédacteur officiel du Centre Média de la FEGESPORT (Fédération Guinéenne d'Esport).
 Tu écris en français professionnel, dans un style journalistique sobre et factuel.
 
@@ -45,7 +70,8 @@ RÈGLES ABSOLUES (anti-hallucination) :
 2. Si une information manque (ex: résultats non fournis), n'en parle pas — ne la déduis pas.
 3. Aucune promesse ni annonce non fournie (dates futures, partenariats, dotations).
 4. Toute citation directe est interdite sauf si elle figure mot pour mot dans les données.
-5. Réponds STRICTEMENT au format JSON demandé, sans texte avant ni après.`;
+5. Réponds STRICTEMENT au format JSON demandé, sans texte avant ni après.
+${FEGESPORT_EDITORIAL_RULES}`;
 
 function eventFacts(event: Record<string, unknown>, files: Array<Record<string, unknown>>): string {
   const clubs = Array.isArray(event.clubs) ? (event.clubs as string[]).join(', ') : '';
@@ -76,13 +102,23 @@ function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: 
   const parts: string[] = [];
   if (targets.includes('press_article')) {
     parts.push(`"press_article": {
-  "title": "titre journalistique",
+  "title": "titre journalistique avec un angle fort",
   "excerpt": "chapeau de 2-3 phrases",
-  "content": "article de presse complet en markdown, 600 à 1200 mots, structuré (introduction, corps avec intertitres ##, conclusion), style journalistique professionnel",
+  "content": "article de presse complet en markdown, 600 à 1200 mots, en respectant le STYLE ARTICLE ESPORT ci-dessous",
   "meta_title": "max 60 caractères",
   "meta_description": "max 155 caractères",
   "keywords": ["5 à 8 mots-clés SEO"]
-}`);
+}
+// ## Style article esport (pour press_article)
+// - Commencer par un angle journalistique fort.
+// - Présenter rapidement l'équipe, le pays représenté et la compétition.
+// - Mentionner les joueurs dès le début lorsque leurs noms sont disponibles.
+// - Structurer l'article avec des sous-titres clairs (intertitres ##).
+// - Ajouter une section "## Composition de l'équipe" UNIQUEMENT si une composition est fournie.
+// - Expliquer l'importance du résultat sans l'exagérer.
+// - Conclure sur les perspectives futures pour la discipline en Guinée.
+// - Éviter les phrases de remplissage et les répétitions.
+// - Ne PAS transformer un test, un brouillon ou une information interne en fait public.`);
   }
   if (targets.includes('short_news')) {
     parts.push(`"short_news": {
@@ -105,9 +141,9 @@ function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: 
   }
   if (targets.includes('newsletter')) {
     parts.push(`"newsletter": {
-  "subject": "objet d'email accrocheur mais sobre, max 70 caractères",
-  "preheader": "texte d'aperçu, max 100 caractères",
-  "html": "newsletter HTML complète : table layout 600px max-width, styles inline uniquement, en-tête FEGESPORT (fond #111827, texte blanc), corps de l'actualité, bouton 'Lire sur le site' vers {{ARTICLE_URL}}, pied de page avec lien {{UNSUBSCRIBE_URL}}"
+  "subject": "objet COURT et clair, max 70 caractères, sans exagération",
+  "preheader": "texte d'aperçu NON VIDE, max 100 caractères",
+  "html": "newsletter HTML responsive : table layout 600px max-width, styles inline uniquement, en-tête FEGESPORT (fond #111827, texte blanc). Structure imposée : 1) introduction humaine et chaleureuse ; 2) résumé en 3 points MAXIMUM (liste) ; 3) bouton 'Lire l'article' vers {{ARTICLE_URL}} ; 4) pied de page avec lien de désabonnement {{UNSUBSCRIBE_URL}}. Ne pas exagérer les résultats. Ne pas annoncer comme historique ce qui n'est pas démontré."
 }`);
   }
   return `${facts}
@@ -133,13 +169,14 @@ PRODUIS ce JSON exactement (uniquement les clés listées) :
 }`;
 }
 
+// Spécifications par canal — limites strictes de longueur / hashtags / ton (règles éditoriales FEGESPORT).
 const SOCIAL_SPECS: Record<string, string> = {
-  facebook: '"facebook": { "content": "publication Facebook LONG format, 5-10 phrases, ton fédérateur, storytelling, emojis adaptés", "hashtags": ["3 à 5 hashtags"], "cta": "appel à l\'action clair (ex: Suivez la FEGESPORT…)", "visual_suggestion": "description du visuel idéal à publier" }',
-  linkedin: '"linkedin": { "content": "publication LinkedIn institutionnelle et professionnelle, 4-8 phrases, met en avant le développement de l\'esport guinéen, emojis très sobres", "hashtags": ["3 à 5 hashtags"], "cta": "appel à l\'action professionnel", "visual_suggestion": "visuel idéal" }',
-  twitter: '"twitter": { "content": "publication X/Twitter de 280 caractères MAXIMUM hashtags inclus, percutante", "hashtags": ["2 à 3 hashtags"], "cta": "CTA très court", "visual_suggestion": "visuel idéal" }',
-  instagram: '"instagram": { "content": "légende Instagram, 3-6 phrases, ton visuel et inspirant, emojis bienvenus, saut de lignes", "hashtags": ["8 à 15 hashtags pertinents"], "cta": "CTA engagement (commentez, taguez…)", "visual_suggestion": "description précise du visuel/carrousel idéal" }',
-  whatsapp: '"whatsapp": { "content": "message WhatsApp Channel court et direct, 2-4 phrases, *gras WhatsApp* autorisé, 1-2 emojis", "hashtags": [], "cta": "lien ou action simple", "visual_suggestion": "image unique recommandée" }',
-  telegram: '"telegram": { "content": "message Telegram informatif, 3-5 phrases, markdown léger autorisé", "hashtags": ["1 à 3 hashtags"], "cta": "action claire", "visual_suggestion": "image recommandée" }',
+  facebook: '"facebook": { "content": "publication Facebook, ton communautaire, valorise l\'équipe et les joueurs, storytelling sobre sans exagération", "hashtags": ["5 hashtags MAXIMUM"], "cta": "appel à l\'action clair (ex: Suivez la FEGESPORT…)", "visual_suggestion": "description du visuel idéal" }',
+  linkedin: '"linkedin": { "content": "publication LinkedIn, ton institutionnel, met en avant la structuration, la progression et la visibilité de l\'écosystème esport guinéen, emojis très sobres", "hashtags": ["3 à 5 hashtags"], "cta": "appel à l\'action professionnel", "visual_suggestion": "visuel idéal" }',
+  twitter: '"twitter": { "content": "publication X/Twitter, 240 caractères MAXIMUM hashtags inclus, message direct", "hashtags": ["2 hashtags MAXIMUM"], "cta": "CTA très court", "visual_suggestion": "visuel idéal" }',
+  instagram: '"instagram": { "content": "légende Instagram, ton visuel et inspirant, emojis bienvenus, sauts de ligne, sans exagération", "hashtags": ["8 à 15 hashtags pertinents"], "cta": "CTA engagement (commentez, taguez…)", "visual_suggestion": "description précise du visuel/carrousel idéal" }',
+  whatsapp: '"whatsapp": { "content": "message WhatsApp Channel TRÈS COURT, 80 à 180 caractères, ton chaleureux, pas de jargon technique, 1 à 2 emojis maximum", "hashtags": [], "cta": "CTA simple", "visual_suggestion": "image unique recommandée" }',
+  telegram: '"telegram": { "content": "message Telegram, 150 à 250 caractères, ton direct, pas de long paragraphe, 1 à 3 emojis maximum", "hashtags": ["2 à 4 hashtags maximum"], "cta": "action claire", "visual_suggestion": "image recommandée" }',
 };
 
 function socialPrompt(facts: string, targets: ContentTarget[], instructions?: string): string {
@@ -154,11 +191,19 @@ PRODUIS ce JSON exactement :
 }
 
 const FACT_CHECKER_SYSTEM = `Tu es le Fact Checker du Centre Média FEGESPORT (Agent 5).
-Ta mission : empêcher toute hallucination. INTERDICTIONS absolues dans un article :
-scores inventés, citations inventées, noms inventés, partenaires inventés, résultats inventés.
+Ta mission : empêcher toute hallucination ET faire respecter la ligne éditoriale FEGESPORT.
 Tu compares CHAQUE affirmation de l'article aux données sources fournies.
-Tu contrôles aussi qualité, orthographe et cohérence.
-Réponds STRICTEMENT en JSON.`;
+
+Tu dois DÉTECTER et SIGNALER :
+- toute exagération non sourcée ;
+- tout mot trop fort non justifié : historique, exploit, exceptionnel, domination, héroïque, majeur ;
+- toute hypothèse sur les conditions techniques de jeu (ping, lag, serveur, connexion) ;
+- toute attribution de performance individuelle non sourcée ;
+- toute contradiction entre la description libre et les champs structurés ;
+- tout score, adversaire, classement ou résultat inventé ;
+- toute citation attribuée sans source.
+
+Tu contrôles aussi qualité, orthographe et cohérence. Réponds STRICTEMENT en JSON.`;
 
 function factCheckerPrompt(facts: string, articleTitle: string, articleContent: string): string {
   return `${facts}
@@ -178,8 +223,13 @@ PRODUIS ce JSON :
   "checked_facts": [
     { "claim": "affirmation vérifiée", "source": "données événement | non trouvée", "confidence": 0-100, "date": "date de la donnée si connue, sinon null" }
   ],
+  "inconsistencies": ["incohérences détectées (contradiction description/champs structurés, etc.), vide si aucune"],
+  "claims_to_verify": ["affirmations à vérifier avant publication, vide si aucune"],
+  "overused_words": ["mots trop forts non justifiés trouvés (historique, exploit, exceptionnel, domination, héroïque, majeur…), vide si aucun"],
+  "editorial_recommendations": ["recommandations éditoriales concrètes, vide si aucune"],
   "issues": ["problèmes détectés (faits non sourcés, fautes, incohérences), vide si aucun"],
-  "corrected_content": "l'article corrigé en markdown SI des corrections sont nécessaires (faits non sourcés RETIRÉS, fautes corrigées), sinon null"
+  "status": "VALIDABLE | À RÉVISER | RELECTURE OBLIGATOIRE",
+  "corrected_content": "l'article corrigé en markdown SI des corrections sont nécessaires (faits non sourcés RETIRÉS, mots exagérés remplacés par des formulations sobres, fautes corrigées), sinon null"
 }`;
 }
 
@@ -303,8 +353,10 @@ Deno.serve(async (req: Request) => {
           editor_check: factCheck,
           fact_check: factCheck,
           fact_check_score: confidence,
-          // Score < 70 → RELECTURE OBLIGATOIRE avant approbation
-          needs_mandatory_review: confidence !== null && confidence < 70,
+          // RELECTURE OBLIGATOIRE si score < 70 OU si le Fact Checker rend ce statut
+          needs_mandatory_review:
+            (confidence !== null && confidence < 70) ||
+            factCheck?.status === 'RELECTURE OBLIGATOIRE',
         };
 
         // Régénération : on remplace la version en attente existante du même type
