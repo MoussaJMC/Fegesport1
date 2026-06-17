@@ -335,6 +335,152 @@ export async function publishArticleToSite(article: GeneratedArticle): Promise<s
   return newsId ?? '';
 }
 
+/** Construit l'objet SEO stocké dans news.seo (OG + Twitter Cards + Schema.org). */
+function buildNewsSeo(article: GeneratedArticle): Record<string, unknown> {
+  return {
+    meta_title: article.meta_title,
+    meta_description: article.meta_description,
+    keywords: article.keywords,
+    og_title: article.og_title ?? article.meta_title ?? article.title,
+    og_description: article.og_description ?? article.meta_description,
+    og_image: article.og_image,
+    twitter_card: {
+      card: article.og_image ? 'summary_large_image' : 'summary',
+      title: article.og_title ?? article.meta_title ?? article.title,
+      description: article.og_description ?? article.meta_description,
+      image: article.og_image,
+      site: '@fegesport224',
+    },
+    schema_org: article.schema_org,
+  };
+}
+
+// ------------------------------------------------------------------
+// Édition centralisée des articles générés (V4) — source de vérité = generated_articles
+// ------------------------------------------------------------------
+
+/** Champs éditables manuellement d'un article généré. */
+export type ArticleEditableFields = Partial<Pick<GeneratedArticle,
+  'title' | 'excerpt' | 'content' | 'slug' | 'meta_title' | 'meta_description' |
+  'keywords' | 'og_image' | 'status'>>;
+
+/**
+ * Enregistre une édition manuelle d'un article généré (source de vérité).
+ * La version éditée écrase la version IA. Journalise dans publication_logs.
+ * NE publie PAS et NE synchronise PAS automatiquement vers le site (action séparée).
+ */
+export async function saveArticleEdit(
+  current: GeneratedArticle,
+  updates: ArticleEditableFields,
+): Promise<GeneratedArticle> {
+  const currentRec = current as unknown as Record<string, unknown>;
+  const updatesRec = updates as Record<string, unknown>;
+  const changed = Object.keys(updates).filter((k) => updatesRec[k] !== currentRec[k]);
+  const { data, error } = await supabase
+    .from('generated_articles')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', current.id)
+    .select()
+    .single();
+  if (error) throw error;
+
+  await logAction({
+    entity_type: 'generated_article',
+    entity_id: current.id,
+    action: 'edited',
+    details: {
+      changed_fields: changed,
+      old_status: current.status,
+      new_status: updates.status ?? current.status,
+    },
+  });
+  return data as GeneratedArticle;
+}
+
+/**
+ * Pousse la version actuelle de l'article (déjà publié) vers la table news publique.
+ * À appeler explicitement (« Mettre à jour la publication »). Garde la même URL (UUID news.id).
+ */
+export async function updatePublishedArticle(article: GeneratedArticle): Promise<void> {
+  if (!article.published_news_id) {
+    throw new Error("Cet article n'est pas encore publié sur le site.");
+  }
+  // Contenu principal via le RPC admin (excerpt garanti non vide)
+  const { error: rpcError } = await supabase.rpc('update_news_as_admin', {
+    p_id: article.published_news_id,
+    p_title: article.title,
+    p_excerpt: buildExcerpt(article),
+    p_content: article.content,
+    p_category: 'esport',
+    p_image_url: article.og_image,
+    p_published: true,
+  });
+  if (rpcError) throw rpcError;
+
+  // SEO (slug + métadonnées) : le RPC ne les gère pas → mise à jour directe
+  const { error: seoError } = await supabase.from('news')
+    .update({ slug: article.slug, seo: buildNewsSeo(article) })
+    .eq('id', article.published_news_id);
+  if (seoError) throw seoError;
+
+  await supabase.from('generated_articles')
+    .update({ updated_at: new Date().toISOString() })
+    .eq('id', article.id);
+
+  await logAction({
+    entity_type: 'generated_article',
+    entity_id: article.id,
+    action: 'published_update',
+    channel: 'site',
+    details: { news_id: article.published_news_id },
+  });
+}
+
+/** Historique simple d'un article (depuis publication_logs). */
+export async function listArticleHistory(articleId: string): Promise<PublicationLog[]> {
+  const { data, error } = await supabase
+    .from('publication_logs')
+    .select('*')
+    .eq('entity_type', 'generated_article')
+    .eq('entity_id', articleId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  return (data ?? []) as PublicationLog[];
+}
+
+/**
+ * Back-sync : quand un article `news` lié à un generated_article est édité directement
+ * (NewsAdminPage), répercute les champs principaux sur le generated_article pour éviter
+ * la divergence. Silencieux si aucun generated_article n'est lié.
+ */
+export async function syncNewsToGeneratedArticle(
+  newsId: string,
+  fields: { title?: string; excerpt?: string; content?: string; image_url?: string | null },
+): Promise<void> {
+  const { data: linked } = await supabase
+    .from('generated_articles')
+    .select('id')
+    .eq('published_news_id', newsId)
+    .maybeSingle();
+  if (!linked) return;
+
+  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (fields.title !== undefined) updates.title = fields.title;
+  if (fields.excerpt !== undefined) updates.excerpt = fields.excerpt;
+  if (fields.content !== undefined) updates.content = fields.content;
+  if (fields.image_url !== undefined) updates.og_image = fields.image_url;
+
+  await supabase.from('generated_articles').update(updates).eq('id', linked.id);
+  await logAction({
+    entity_type: 'generated_article',
+    entity_id: linked.id,
+    action: 'synced_from_news',
+    channel: 'site',
+    details: { news_id: newsId, changed_fields: Object.keys(fields) },
+  });
+}
+
 /** Marque un post social approuvé comme prêt à publier (texte à copier). */
 export async function markSocialPostReady(id: string, platform: string): Promise<void> {
   const { error } = await supabase.from('social_posts').update({
