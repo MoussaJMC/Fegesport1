@@ -86,7 +86,12 @@ const LoginPage: React.FC = () => {
       setIsLocked(false);
       setLockoutTime(null);
 
-      window.location.href = from || '/admin';
+      // Navigation côté client (pas de rechargement complet) : l'état d'auth
+      // vient d'être établi en mémoire via onAuthStateChange, on l'utilise
+      // directement. Évite la course où le garde s'exécute avant que la session
+      // persistée ne soit relue après un window.location reload (cause des rebonds).
+      await supabase.auth.getSession();
+      navigate(from || '/admin', { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
 
