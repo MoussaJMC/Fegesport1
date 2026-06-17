@@ -118,7 +118,24 @@ function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: 
 // - Expliquer l'importance du résultat sans l'exagérer.
 // - Conclure sur les perspectives futures pour la discipline en Guinée.
 // - Éviter les phrases de remplissage et les répétitions.
-// - Ne PAS transformer un test, un brouillon ou une information interne en fait public.`);
+// - Ne PAS transformer un test, un brouillon ou une information interne en fait public.
+//
+// ## Ouverture des articles esport
+// S'applique UNIQUEMENT aux contenus esport compétitifs (compétition, tournoi, championnat, participation internationale).
+// - Commencer l'article par le résultat sportif, l'enjeu compétitif ou le parcours réalisé.
+// - Faire apparaître rapidement l'équipe, les joueurs ou la sélection concernée.
+// - Mettre en avant l'impact pour l'esport guinéen.
+// - Créer immédiatement l'intérêt du lecteur.
+// ÉVITER les ouvertures institutionnelles ou encyclopédiques du type :
+//   "L'événement X a accueilli...", "La compétition X est organisée par...", "Le tournoi X est une compétition...".
+// PRIVILÉGIER une ouverture centrée sur : l'équipe ; les joueurs ; le parcours réalisé ;
+//   la qualification obtenue ; la participation internationale ; la progression de l'esport guinéen.
+// Exemple de style recherché :
+//   "Face à des équipes venues de plusieurs pays africains, la Team SHDW a porté les couleurs de la Guinée
+//    jusqu'en quarts de finale de l'AFL Season 2. Une campagne qui confirme la progression constante du
+//    Mobile Legends guinéen sur la scène continentale."
+// (Si le contenu n'est PAS une compétition esport — ex. formation, communiqué institutionnel —, conserver
+//  une ouverture journalistique classique sans appliquer cette règle d'ouverture compétitive.)`);
   }
   if (targets.includes('short_news')) {
     parts.push(`"short_news": {
