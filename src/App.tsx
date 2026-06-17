@@ -65,6 +65,16 @@ import HistoryAdminPage from './pages/admin/HistoryAdminPage';
 import DocumentsAdminPage from './pages/admin/DocumentsAdminPage';
 import EventsUpdateTestPage from './pages/admin/EventsUpdateTestPage';
 import AnalyticsAdminPage from './pages/admin/AnalyticsAdminPage';
+import MediaDashboardPage from './pages/admin/media/MediaDashboardPage';
+import MediaEventFormPage from './pages/admin/media/MediaEventFormPage';
+import MediaDraftsPage from './pages/admin/media/MediaDraftsPage';
+import MediaReviewPage from './pages/admin/media/MediaReviewPage';
+import MediaArticlesPage from './pages/admin/media/MediaArticlesPage';
+import MediaWatchPage from './pages/admin/media/MediaWatchPage';
+import MediaSourcesPage from './pages/admin/media/MediaSourcesPage';
+import MediaNewslettersPage from './pages/admin/media/MediaNewslettersPage';
+import MediaStatsPage from './pages/admin/media/MediaStatsPage';
+import MediaGrowthPage from './pages/admin/media/MediaGrowthPage';
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -116,6 +126,18 @@ function App() {
             <Route path="emails" element={<EmailAdminPage />} />
             <Route path="email-test" element={<EmailTestDiagnosticPage />} />
             <Route path="events-test" element={<EventsUpdateTestPage />} />
+            {/* Centre Média IA */}
+            <Route path="media" element={<MediaDashboardPage />} />
+            <Route path="media/new" element={<MediaEventFormPage />} />
+            <Route path="media/events/:id/edit" element={<MediaEventFormPage />} />
+            <Route path="media/events/:id/review" element={<MediaReviewPage />} />
+            <Route path="media/drafts" element={<MediaDraftsPage />} />
+            <Route path="media/articles" element={<MediaArticlesPage />} />
+            <Route path="media/watch" element={<MediaWatchPage />} />
+            <Route path="media/sources" element={<MediaSourcesPage />} />
+            <Route path="media/newsletters" element={<MediaNewslettersPage />} />
+            <Route path="media/stats" element={<MediaStatsPage />} />
+            <Route path="media/growth" element={<MediaGrowthPage />} />
           </Route>
 
           {/* Public routes */}
