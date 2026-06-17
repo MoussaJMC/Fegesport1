@@ -9,7 +9,7 @@ import {
   Globe, Database, Book, Tag, Award, Layers, Image, Video,
   Mail, UserCheck, Settings, Gamepad2, Navigation,
   LayoutGrid as Layout, Clock, Target, Share2, BarChart3,
-  FileText, ChevronDown, Shield
+  FileText, ChevronDown, Shield, Sparkles, PlusCircle, FileEdit, Rss
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -180,6 +180,20 @@ const AdminLayout: React.FC = () => {
         { icon: BarChart3, label: 'Statistiques Web', path: '/admin/analytics' },
         { icon: Activity, label: 'Diagnostic', path: '/admin/diagnostic' },
         { icon: Database, label: 'Test DB', path: '/admin/test-database' },
+      ]
+    },
+    {
+      label: 'Centre Média IA',
+      items: [
+        { icon: Sparkles, label: 'Tableau de bord', path: '/admin/media' },
+        { icon: PlusCircle, label: 'Nouvel événement', path: '/admin/media/new' },
+        { icon: FileEdit, label: 'Brouillons', path: '/admin/media/drafts' },
+        { icon: Newspaper, label: 'Articles publiés', path: '/admin/media/articles' },
+        { icon: Globe, label: 'Veille mondiale', path: '/admin/media/watch' },
+        { icon: Rss, label: 'Sources', path: '/admin/media/sources' },
+        { icon: Mail, label: 'Newsletters', path: '/admin/media/newsletters' },
+        { icon: BarChart3, label: 'Statistiques', path: '/admin/media/stats' },
+        { icon: Target, label: 'Croissance (DG)', path: '/admin/media/growth' },
       ]
     },
     {
