@@ -104,6 +104,7 @@ export interface GeneratedArticle {
   fact_check_score: number | null;
   needs_mandatory_review: boolean;
   generation_count: number;
+  generated_from_watch?: boolean;
   published_news_id: string | null;
   published_at: string | null;
   created_at: string;
@@ -193,6 +194,8 @@ export interface CollectedNews {
   editorial_decision: EditorialDecision | null;
   editorial_reason: string | null;
   status: CollectedNewsStatus;
+  used_for_generation: boolean;
+  generated_article_id: string | null;
   created_at: string;
   news_sources?: Pick<NewsSource, 'name' | 'organization'> | null;
 }

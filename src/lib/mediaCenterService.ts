@@ -476,6 +476,151 @@ export async function runWatch(action: 'fetch' | 'analyze' | 'full' = 'full'): P
 }
 
 // ------------------------------------------------------------------
+// Pipeline Veille → Brouillons (généré côté frontend, validation humaine obligatoire)
+// AUCUNE publication ni envoi : produit uniquement des generated_articles pending_review.
+// ------------------------------------------------------------------
+
+/** Seuils de pertinence pour qu'une source de veille génère un brouillon (ajustables). */
+export const WATCH_DRAFT_THRESHOLDS = {
+  importance: 70,
+  impact: 70,
+  guinea: 60,
+  africa: 60,
+};
+
+/** Cibles générées automatiquement depuis une source de veille (les 2 demandées). */
+export const WATCH_DRAFT_TARGETS: GenerationTarget[] = ['press_article', 'short_news'];
+
+/** Une source est éligible si un score dépasse un seuil ET qu'elle n'est ni utilisée ni ignorée. */
+export function isSourceEligibleForDraft(news: CollectedNews): boolean {
+  if (news.used_for_generation || news.generated_article_id) return false;
+  if (news.status === 'used' || news.status === 'dismissed') return false;
+  const t = WATCH_DRAFT_THRESHOLDS;
+  return (
+    (news.ai_importance ?? 0) >= t.importance ||
+    (news.ai_impact ?? 0) >= t.impact ||
+    (news.ai_relevance_guinea ?? 0) >= t.guinea ||
+    (news.ai_impact_africa ?? 0) >= t.africa
+  );
+}
+
+export interface DraftFromSourceResult {
+  created: boolean;
+  reason?: string;
+  eventId?: string;
+}
+
+/**
+ * Transforme UNE source de veille en brouillon éditorial :
+ *  source → media_event (pont) → media-generate → generated_articles (pending_review).
+ * Idempotent : ne régénère pas si la source est déjà traitée.
+ */
+export async function generateDraftFromSource(news: CollectedNews): Promise<DraftFromSourceResult> {
+  // Dédup : relire l'état frais en base (évite double-clic / relance de veille)
+  const { data: fresh } = await supabase
+    .from('collected_news')
+    .select('used_for_generation, generated_article_id, status')
+    .eq('id', news.id)
+    .maybeSingle();
+  if (fresh?.used_for_generation || fresh?.generated_article_id) {
+    return { created: false, reason: 'already_processed' };
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  await logAction({
+    entity_type: 'collected_news', entity_id: news.id,
+    action: 'watch_draft_requested', channel: 'site',
+    details: { title: news.title, scores: { importance: news.ai_importance, impact: news.ai_impact, guinea: news.ai_relevance_guinea, africa: news.ai_impact_africa } },
+  });
+
+  try {
+    // 1) Pont : créer un media_event porteur (status draft, created_by = admin courant)
+    const description = [
+      news.summary || news.raw_excerpt || news.title,
+      '',
+      `Source (veille internationale) : ${news.url}`,
+      news.news_sources?.organization ? `Organisation : ${news.news_sources.organization}` : '',
+    ].filter(Boolean).join('\n');
+
+    const { data: event, error: eventError } = await supabase.from('media_events').insert({
+      title: news.title.slice(0, 300),
+      description,
+      category: 'international',
+      organizer: news.news_sources?.organization || 'Veille internationale',
+      status: 'draft',
+      editorial_priority: news.editorial_priority ?? null,
+      created_by: user?.id ?? null,
+    }).select().single();
+    if (eventError) throw eventError;
+    await logAction({ entity_type: 'media_event', entity_id: event.id, action: 'watch_event_created', details: { collected_news_id: news.id } });
+
+    // 2) Génération via la fonction EXISTANTE media-generate (instruction anti-fabrication)
+    const instructions = "Cette information provient de la veille esport INTERNATIONALE (source externe). " +
+      "Rédige un résumé éditorial neutre et factuel pour le public guinéen, en t'appuyant UNIQUEMENT sur les éléments fournis. " +
+      "Ne présente PAS cela comme une activité de la FEGESPORT et n'invente aucun détail. Cite la source.";
+    await logAction({ entity_type: 'collected_news', entity_id: news.id, action: 'watch_generate_called', details: { event_id: event.id, targets: WATCH_DRAFT_TARGETS } });
+    const result = await generateContent(event.id, WATCH_DRAFT_TARGETS, instructions);
+
+    // 3) Marquer les articles générés comme issus de la veille + lien vers la source
+    await supabase.from('generated_articles')
+      .update({ generated_from_watch: true, collected_news_id: news.id })
+      .eq('event_id', event.id);
+
+    const primary = (result.generated?.press_article ?? result.generated?.short_news) as { id?: string } | undefined;
+
+    // 4) Marquer la source comme traitée (anti-doublon) + lien retour
+    await supabase.from('collected_news').update({
+      used_for_generation: true,
+      generated_article_id: primary?.id ?? null,
+      status: 'used',
+    }).eq('id', news.id);
+
+    await logAction({
+      entity_type: 'collected_news', entity_id: news.id,
+      action: 'watch_draft_created', channel: 'site',
+      details: { event_id: event.id, generated_article_id: primary?.id ?? null },
+    });
+    return { created: true, eventId: event.id };
+  } catch (e) {
+    await logAction({
+      entity_type: 'collected_news', entity_id: news.id,
+      action: 'watch_generate_error', details: { error: String(e).slice(0, 300) },
+    });
+    throw e;
+  }
+}
+
+export interface AutoDraftSummary {
+  eligible: number;
+  created: number;
+  skipped: number;
+  errors: string[];
+}
+
+/**
+ * Parcourt les sources de veille éligibles et génère un brouillon pour chacune.
+ * `limit` borne le nombre de générations par passage (coût IA maîtrisé).
+ */
+export async function autoGenerateDraftsFromWatch(limit = 5): Promise<AutoDraftSummary> {
+  const all = await listCollectedNews();
+  const eligible = all.filter(isSourceEligibleForDraft);
+  const summary: AutoDraftSummary = { eligible: eligible.length, created: 0, skipped: 0, errors: [] };
+
+  for (const news of eligible.slice(0, limit)) {
+    try {
+      const res = await generateDraftFromSource(news);
+      if (res.created) summary.created += 1; else summary.skipped += 1;
+    } catch (e) {
+      summary.errors.push(`${news.title.slice(0, 60)} : ${(e as Error).message}`);
+    }
+  }
+  if (eligible.length > limit) {
+    summary.skipped += eligible.length - limit; // non traitées ce passage (cap)
+  }
+  return summary;
+}
+
+// ------------------------------------------------------------------
 // Statistiques & audit
 // ------------------------------------------------------------------
 
