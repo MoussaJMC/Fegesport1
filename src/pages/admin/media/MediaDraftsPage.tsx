@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { FileEdit, PlusCircle, Trash2, Loader2, Sparkles, Search } from 'lucide-react';
+import { FileEdit, PlusCircle, Trash2, Loader2, Sparkles, Search, Megaphone } from 'lucide-react';
 import { listMediaEvents, deleteMediaEvent } from '../../../lib/mediaCenterService';
 import type { MediaEvent } from '../../../types/mediaCenter';
+import DistributionPanel from '../../../components/admin/media/DistributionPanel';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   draft: { label: 'Brouillon', cls: 'bg-dark-700 text-light-300' },
@@ -18,6 +19,7 @@ const MediaDraftsPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<string>('');
+  const [distribute, setDistribute] = useState<MediaEvent | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -104,6 +106,10 @@ const MediaDraftsPage = () => {
                       className="p-2 text-light-400 hover:text-fed-gold-500" title="Revue & validation">
                       <Sparkles className="h-4 w-4" />
                     </Link>
+                    <button onClick={() => setDistribute(event)}
+                      className="inline-flex items-center text-xs text-white bg-fed-red-500 px-2.5 py-1.5 rounded-lg hover:bg-fed-red-600" title="Diffuser sur les réseaux">
+                      <Megaphone className="h-3.5 w-3.5 mr-1.5" /> Diffuser
+                    </button>
                     <button onClick={() => handleDelete(event)} className="p-2 text-light-400 hover:text-fed-red-500" title="Supprimer">
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -113,6 +119,14 @@ const MediaDraftsPage = () => {
             })}
           </ul>
         </div>
+      )}
+
+      {distribute && (
+        <DistributionPanel
+          eventId={distribute.id}
+          title={distribute.title}
+          onClose={() => setDistribute(null)}
+        />
       )}
     </div>
   );
