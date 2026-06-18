@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Check, X, RefreshCw, Pencil, Globe2, Mail, Copy,
-  Loader2, Sparkles, AlertTriangle, ShieldCheck, Send, SlidersHorizontal,
+  Loader2, Sparkles, AlertTriangle, ShieldCheck, Send, SlidersHorizontal, Megaphone,
 } from 'lucide-react';
 import {
   getMediaEvent, listGeneratedArticles, listSocialPosts, generateContent,
@@ -16,6 +16,7 @@ import type {
 } from '../../../types/mediaCenter';
 import { TARGET_LABELS } from '../../../types/mediaCenter';
 import ArticleEditor from '../../../components/admin/media/ArticleEditor';
+import DistributionPanel from '../../../components/admin/media/DistributionPanel';
 
 const STATUS_BADGE: Record<string, string> = {
   pending_review: 'bg-fed-gold-500/10 text-fed-gold-500',
@@ -51,6 +52,7 @@ const MediaReviewPage = () => {
   const [regenInstructions, setRegenInstructions] = useState('');
   const [showRegen, setShowRegen] = useState(false);
   const [fullEditor, setFullEditor] = useState<GeneratedArticle | null>(null);
+  const [showDistribute, setShowDistribute] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -184,6 +186,12 @@ const MediaReviewPage = () => {
           <Link to={`/admin/media/events/${event.id}/edit`} className="inline-flex items-center px-3 py-2 text-sm text-light-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white">
             <Pencil className="h-4 w-4 mr-1.5" /> Événement
           </Link>
+          {items.length > 0 && (
+            <button onClick={() => setShowDistribute(true)}
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-fed-red-500 rounded-lg hover:bg-fed-red-600">
+              <Megaphone className="h-4 w-4 mr-1.5" /> Diffuser
+            </button>
+          )}
           {items.length === 0 && (
             <button onClick={() => id && withBusy(async () => { await generateContent(id); }, 'Contenus générés')} disabled={busy}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-fed-red-500 rounded-lg hover:bg-fed-red-600 disabled:opacity-50">
@@ -390,6 +398,14 @@ const MediaReviewPage = () => {
           article={fullEditor}
           onClose={() => setFullEditor(null)}
           onSaved={() => { load(); }}
+        />
+      )}
+
+      {showDistribute && (
+        <DistributionPanel
+          eventId={event.id}
+          title={event.title}
+          onClose={() => setShowDistribute(false)}
         />
       )}
     </div>

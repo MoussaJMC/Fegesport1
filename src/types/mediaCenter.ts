@@ -366,6 +366,54 @@ export interface ExecutiveKpiMonthly {
   site_page_views: number;
 }
 
+// ------------------------------------------------------------------
+// Diffusion multicanale (Phase A — file d'attente, sans API externe)
+// ------------------------------------------------------------------
+
+export type DistributionChannel = 'facebook' | 'linkedin' | 'twitter' | 'telegram' | 'whatsapp' | 'newsletter';
+export type DistributionStatus = 'draft' | 'ready' | 'queued' | 'publishing' | 'published' | 'failed' | 'skipped';
+
+export interface DistributionItem {
+  id: string;
+  event_id: string;
+  generated_article_id: string | null;
+  channel: DistributionChannel;
+  status: DistributionStatus;
+  payload_ref: string | null;
+  content_preview: string | null;
+  external_id: string | null;
+  external_url: string | null;
+  error_message: string | null;
+  attempts: number;
+  queued_at: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const DISTRIBUTION_CHANNELS: DistributionChannel[] = [
+  'facebook', 'linkedin', 'twitter', 'telegram', 'whatsapp', 'newsletter',
+];
+
+export const DISTRIBUTION_CHANNEL_LABELS: Record<DistributionChannel, string> = {
+  facebook: 'Facebook',
+  linkedin: 'LinkedIn',
+  twitter: 'X / Twitter',
+  telegram: 'Telegram',
+  whatsapp: 'WhatsApp',
+  newsletter: 'Newsletter',
+};
+
+export const DISTRIBUTION_STATUS_LABELS: Record<DistributionStatus, { label: string; cls: string }> = {
+  draft: { label: 'Brouillon', cls: 'bg-dark-700 text-light-300' },
+  ready: { label: 'Prêt', cls: 'bg-accent-blue-400/10 text-accent-blue-400' },
+  queued: { label: 'En file', cls: 'bg-fed-gold-500/10 text-fed-gold-500' },
+  publishing: { label: 'Diffusion…', cls: 'bg-fed-gold-500/10 text-fed-gold-500' },
+  published: { label: 'Publié', cls: 'bg-emerald-500/10 text-emerald-400' },
+  failed: { label: 'Échec', cls: 'bg-fed-red-500/10 text-fed-red-400' },
+  skipped: { label: 'Ignoré', cls: 'bg-dark-700 text-light-400' },
+};
+
 export type GenerationTarget = GeneratedContentType | SocialPlatform;
 
 export const ALL_GENERATION_TARGETS: GenerationTarget[] = [

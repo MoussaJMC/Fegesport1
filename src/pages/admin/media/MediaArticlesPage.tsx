@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Newspaper, Loader2, ExternalLink, Copy, Share2, Pencil } from 'lucide-react';
+import { Newspaper, Loader2, ExternalLink, Copy, Share2, Pencil, Megaphone } from 'lucide-react';
 import { listGeneratedArticles, listSocialPosts } from '../../../lib/mediaCenterService';
 import type { GeneratedArticle, SocialPost } from '../../../types/mediaCenter';
 import { TARGET_LABELS } from '../../../types/mediaCenter';
 import ArticleEditor from '../../../components/admin/media/ArticleEditor';
+import DistributionPanel from '../../../components/admin/media/DistributionPanel';
 
 const MediaArticlesPage = () => {
   const [articles, setArticles] = useState<GeneratedArticle[]>([]);
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<GeneratedArticle | null>(null);
+  const [distribute, setDistribute] = useState<{ eventId: string; title: string } | null>(null);
 
   const load = async () => {
     try {
@@ -66,6 +68,12 @@ const MediaArticlesPage = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4 shrink-0">
+                  {article.event_id && (
+                    <button onClick={() => setDistribute({ eventId: article.event_id as string, title: article.title })}
+                      className="inline-flex items-center text-xs text-white bg-fed-red-500 px-2.5 py-1.5 rounded-lg hover:bg-fed-red-600">
+                      <Megaphone className="h-3.5 w-3.5 mr-1.5" /> Diffuser
+                    </button>
+                  )}
                   <button onClick={() => setEditing(article)}
                     className="inline-flex items-center text-xs text-light-300 bg-dark-700 px-2.5 py-1.5 rounded-lg hover:text-white">
                     <Pencil className="h-3.5 w-3.5 mr-1.5" /> Modifier
@@ -119,6 +127,14 @@ const MediaArticlesPage = () => {
           onSaved={(updated) => {
             setArticles((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
           }}
+        />
+      )}
+
+      {distribute && (
+        <DistributionPanel
+          eventId={distribute.eventId}
+          title={distribute.title}
+          onClose={() => setDistribute(null)}
         />
       )}
     </div>
