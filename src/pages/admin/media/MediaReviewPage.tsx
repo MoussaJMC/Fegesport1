@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Check, X, RefreshCw, Pencil, Globe2, Mail, Copy,
-  Loader2, Sparkles, AlertTriangle, ShieldCheck, Send,
+  Loader2, Sparkles, AlertTriangle, ShieldCheck, Send, SlidersHorizontal,
 } from 'lucide-react';
 import {
   getMediaEvent, listGeneratedArticles, listSocialPosts, generateContent,
@@ -15,6 +15,7 @@ import type {
   MediaEvent, GeneratedArticle, SocialPost, GenerationTarget,
 } from '../../../types/mediaCenter';
 import { TARGET_LABELS } from '../../../types/mediaCenter';
+import ArticleEditor from '../../../components/admin/media/ArticleEditor';
 
 const STATUS_BADGE: Record<string, string> = {
   pending_review: 'bg-fed-gold-500/10 text-fed-gold-500',
@@ -49,6 +50,7 @@ const MediaReviewPage = () => {
   const [editTitle, setEditTitle] = useState('');
   const [regenInstructions, setRegenInstructions] = useState('');
   const [showRegen, setShowRegen] = useState(false);
+  const [fullEditor, setFullEditor] = useState<GeneratedArticle | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -343,6 +345,12 @@ const MediaReviewPage = () => {
                   <button onClick={startEdit} disabled={busy} className="inline-flex items-center px-3.5 py-2 text-sm text-light-300 bg-dark-700 rounded-lg hover:text-white disabled:opacity-50">
                     <Pencil className="h-4 w-4 mr-1.5" /> Modifier
                   </button>
+                  {active.kind === 'article' && (
+                    <button onClick={() => setFullEditor(active.data as GeneratedArticle)} disabled={busy}
+                      className="inline-flex items-center px-3.5 py-2 text-sm text-light-300 bg-dark-700 rounded-lg hover:text-white disabled:opacity-50">
+                      <SlidersHorizontal className="h-4 w-4 mr-1.5" /> Éditeur complet
+                    </button>
+                  )}
                   <button onClick={() => setShowRegen((v) => !v)} disabled={busy} className="inline-flex items-center px-3.5 py-2 text-sm text-light-300 bg-dark-700 rounded-lg hover:text-white disabled:opacity-50">
                     <RefreshCw className="h-4 w-4 mr-1.5" /> Régénérer
                   </button>
@@ -375,6 +383,14 @@ const MediaReviewPage = () => {
             </div>
           )}
         </div>
+      )}
+
+      {fullEditor && (
+        <ArticleEditor
+          article={fullEditor}
+          onClose={() => setFullEditor(null)}
+          onSaved={() => { load(); }}
+        />
       )}
     </div>
   );

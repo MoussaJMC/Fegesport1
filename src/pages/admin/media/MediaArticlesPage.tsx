@@ -1,32 +1,34 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Newspaper, Loader2, ExternalLink, Copy, Share2 } from 'lucide-react';
+import { Newspaper, Loader2, ExternalLink, Copy, Share2, Pencil } from 'lucide-react';
 import { listGeneratedArticles, listSocialPosts } from '../../../lib/mediaCenterService';
 import type { GeneratedArticle, SocialPost } from '../../../types/mediaCenter';
 import { TARGET_LABELS } from '../../../types/mediaCenter';
+import ArticleEditor from '../../../components/admin/media/ArticleEditor';
 
 const MediaArticlesPage = () => {
   const [articles, setArticles] = useState<GeneratedArticle[]>([]);
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<GeneratedArticle | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [allArticles, allPosts] = await Promise.all([
-          listGeneratedArticles({ status: 'published' }),
-          listSocialPosts(),
-        ]);
-        setArticles(allArticles);
-        setPosts(allPosts.filter((p) => p.status === 'ready' || p.status === 'approved'));
-      } catch (e) {
-        toast.error((e as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const load = async () => {
+    try {
+      const [allArticles, allPosts] = await Promise.all([
+        listGeneratedArticles({ status: 'published' }),
+        listSocialPosts(),
+      ]);
+      setArticles(allArticles);
+      setPosts(allPosts.filter((p) => p.status === 'ready' || p.status === 'approved'));
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
 
   const copyPost = (post: SocialPost) => {
     navigator.clipboard.writeText(`${post.content}\n\n${(post.hashtags ?? []).join(' ')}`);
@@ -63,12 +65,18 @@ const MediaArticlesPage = () => {
                     {article.word_count ? ` · ${article.word_count} mots` : ''}
                   </p>
                 </div>
-                {article.published_news_id && (
-                  <a href={`/news/${article.published_news_id}`} target="_blank" rel="noreferrer"
-                    className="inline-flex items-center text-xs text-fed-gold-500 hover:text-fed-gold-400 ml-4 shrink-0">
-                    Voir <ExternalLink className="h-3.5 w-3.5 ml-1" />
-                  </a>
-                )}
+                <div className="flex items-center gap-2 ml-4 shrink-0">
+                  <button onClick={() => setEditing(article)}
+                    className="inline-flex items-center text-xs text-light-300 bg-dark-700 px-2.5 py-1.5 rounded-lg hover:text-white">
+                    <Pencil className="h-3.5 w-3.5 mr-1.5" /> Modifier
+                  </button>
+                  {article.published_news_id && (
+                    <a href={`/news/${article.published_news_id}`} target="_blank" rel="noreferrer"
+                      className="inline-flex items-center text-xs text-fed-gold-500 hover:text-fed-gold-400">
+                      Voir <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                    </a>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
@@ -103,6 +111,16 @@ const MediaArticlesPage = () => {
           </ul>
         )}
       </div>
+
+      {editing && (
+        <ArticleEditor
+          article={editing}
+          onClose={() => setEditing(null)}
+          onSaved={(updated) => {
+            setArticles((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+          }}
+        />
+      )}
     </div>
   );
 };

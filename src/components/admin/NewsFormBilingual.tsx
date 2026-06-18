@@ -124,6 +124,18 @@ const NewsFormBilingual: React.FC<NewsFormBilingualProps> = ({
           .update(saveData)
           .eq('id', initialData.id);
         if (error) throw error;
+        // Back-sync : si cette news provient du Centre Média IA, répercuter sur le generated_article lié
+        try {
+          const { syncNewsToGeneratedArticle } = await import('../../lib/mediaCenterService');
+          await syncNewsToGeneratedArticle(initialData.id, {
+            title: saveData.title,
+            excerpt: saveData.excerpt,
+            content: saveData.content,
+            image_url: saveData.image_url,
+          });
+        } catch (syncErr) {
+          console.warn('Back-sync generated_article ignorée:', syncErr);
+        }
         toast.success('Actualité mise à jour avec succès');
       } else {
         const { error } = await supabase
