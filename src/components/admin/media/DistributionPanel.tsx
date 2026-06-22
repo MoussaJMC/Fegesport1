@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
-  X, Send, Copy, Check, RefreshCw, Loader2, History, Megaphone, Mail, AlertTriangle,
+  X, Send, Copy, Check, RefreshCw, Loader2, History, Megaphone, Mail, AlertTriangle, Sparkles,
 } from 'lucide-react';
 import {
   ensureDistributionQueue, distributeSelected, markChannelPublishedManually,
-  retryChannel, listDistributionHistory,
+  retryChannel, listDistributionHistory, generateSocialContent,
 } from '../../../lib/mediaCenterService';
 import type { DistributionItem, DistributionChannel, PublicationLog } from '../../../types/mediaCenter';
 import {
@@ -32,8 +32,12 @@ const DistributionPanel = ({ eventId, title, onClose }: Props) => {
   const [history, setHistory] = useState<PublicationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [generatingSocial, setGeneratingSocial] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Canaux sociaux (hors newsletter) sans contenu généré → on propose de les générer
+  const missingSocial = items.filter((i) => i.channel !== 'newsletter' && !i.content_preview);
 
   const load = async () => {
     try {
@@ -69,6 +73,22 @@ const DistributionPanel = ({ eventId, title, onClose }: Props) => {
       toast.error((e as Error).message);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleGenerateSocial = async () => {
+    setGeneratingSocial(true);
+    toast.info('Génération des contenus sociaux (Facebook, LinkedIn, X, Telegram, WhatsApp, Instagram)…');
+    try {
+      const updated = await generateSocialContent(eventId);
+      setItems(updated);
+      setSelected(new Set(updated.filter((i) => i.content_preview && i.status !== 'published').map((i) => i.channel)));
+      setHistory(await listDistributionHistory(eventId).catch(() => []));
+      toast.success('Contenus sociaux générés. Aucune publication, aucun envoi.');
+    } catch (e) {
+      toast.error(`Génération échouée : ${(e as Error).message}`);
+    } finally {
+      setGeneratingSocial(false);
     }
   };
 
@@ -120,6 +140,19 @@ const DistributionPanel = ({ eventId, title, onClose }: Props) => {
             « Diffuser » marque les canaux cochés comme <b>Prêts</b> et les autres comme <b>Ignorés</b>, et journalise — <b>sans rien publier</b>.
             Réseaux : copiez le texte et publiez à la main, puis « Marquer comme publié ». Newsletter : envoi séparé avec confirmation (page Newsletters).
           </div>
+
+          {!loading && missingSocial.length > 0 && (
+            <div className="flex items-center justify-between gap-3 rounded-lg p-3 bg-fed-gold-500/10 border border-fed-gold-500/20">
+              <p className="text-xs text-fed-gold-500">
+                {missingSocial.length} canal/canaux social(aux) sans contenu généré. Générez-les à la demande (1 appel IA).
+              </p>
+              <button onClick={handleGenerateSocial} disabled={generatingSocial || busy}
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-fed-red-500 rounded-lg hover:bg-fed-red-600 disabled:opacity-50 shrink-0">
+                {generatingSocial ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                Générer les contenus sociaux
+              </button>
+            </div>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-10"><Loader2 className="w-7 h-7 animate-spin text-fed-red-500" /></div>

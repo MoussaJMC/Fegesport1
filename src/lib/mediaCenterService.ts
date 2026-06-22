@@ -793,39 +793,41 @@ export async function ensureDistributionQueue(eventId: string): Promise<Distribu
     supabase.from('generated_articles').select('id, content_type, title, content').eq('event_id', eventId),
   ]);
 
-  const have = new Set((existing ?? []).map((r) => r.channel));
+  const byChannel = new Map((existing ?? []).map((r) => [r.channel, r]));
   const pressId = (articles ?? []).find((a) => a.content_type === 'press_article')?.id ?? null;
   const newsletterArticle = (articles ?? []).find((a) => a.content_type === 'newsletter');
   const campaign = (campaigns ?? [])[0];
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Calcule le contenu disponible pour un canal (depuis social_posts / newsletter_campaigns).
+  const resolve = (channel: string): { payload_ref: string | null; content_preview: string | null } => {
+    if (channel === 'newsletter') {
+      return { payload_ref: campaign?.id ?? null, content_preview: campaign?.subject ?? newsletterArticle?.title ?? null };
+    }
+    const sp = (socials ?? []).find((s) => s.platform === CHANNEL_TO_SOCIAL_PLATFORM[channel]);
+    return {
+      payload_ref: sp?.id ?? null,
+      content_preview: sp ? `${sp.content}${Array.isArray(sp.hashtags) && sp.hashtags.length ? `\n\n${sp.hashtags.join(' ')}` : ''}` : null,
+    };
+  };
+
   const toInsert: Record<string, unknown>[] = [];
   for (const channel of DISTRIBUTION_CHANNELS) {
-    if (have.has(channel)) continue;
-    let payload_ref: string | null = null;
-    let content_preview: string | null = null;
+    const { payload_ref, content_preview } = resolve(channel);
+    const row = byChannel.get(channel);
 
-    if (channel === 'newsletter') {
-      payload_ref = campaign?.id ?? null;
-      content_preview = campaign?.subject ?? newsletterArticle?.title ?? null;
-    } else {
-      const platform = CHANNEL_TO_SOCIAL_PLATFORM[channel];
-      const sp = (socials ?? []).find((s) => s.platform === platform);
-      payload_ref = sp?.id ?? null;
-      content_preview = sp
-        ? `${sp.content}${Array.isArray(sp.hashtags) && sp.hashtags.length ? `\n\n${sp.hashtags.join(' ')}` : ''}`
-        : null;
+    if (!row) {
+      toInsert.push({
+        event_id: eventId, generated_article_id: pressId, channel,
+        status: 'draft', payload_ref, content_preview, created_by: user?.id ?? null,
+      });
+    } else if (!row.content_preview && content_preview) {
+      // Auto-réparation : le contenu vient d'être généré (ex: bouton "Générer les contenus sociaux")
+      // → on backfill le preview/payload sans écraser un statut déjà avancé.
+      await supabase.from('distribution_queue')
+        .update({ content_preview, payload_ref, generated_article_id: row.generated_article_id ?? pressId })
+        .eq('id', row.id);
     }
-
-    toInsert.push({
-      event_id: eventId,
-      generated_article_id: pressId,
-      channel,
-      status: 'draft',
-      payload_ref,
-      content_preview,
-      created_by: user?.id ?? null,
-    });
   }
 
   if (toInsert.length) {
@@ -842,6 +844,25 @@ export async function listDistribution(eventId: string): Promise<DistributionIte
     .from('distribution_queue').select('*').eq('event_id', eventId).order('channel');
   if (error) throw error;
   return (data ?? []) as DistributionItem[];
+}
+
+/** Cibles sociales générées à la demande (la newsletter N'est PAS incluse). */
+export const SOCIAL_GENERATION_TARGETS: GenerationTarget[] =
+  ['facebook', 'linkedin', 'twitter', 'telegram', 'whatsapp', 'instagram'];
+
+/**
+ * Génère à la demande les contenus sociaux d'un événement (via media-generate, fonction existante),
+ * puis rafraîchit la file de diffusion (backfill des content_preview). Ne génère PAS la newsletter,
+ * ne publie/n'envoie rien. Coût IA = 1 appel, sur clic explicite.
+ */
+export async function generateSocialContent(eventId: string): Promise<DistributionItem[]> {
+  await generateContent(eventId, SOCIAL_GENERATION_TARGETS);
+  await logAction({
+    entity_type: 'media_event', entity_id: eventId,
+    action: 'social_generated_on_demand', channel: 'multichannel',
+    details: { targets: SOCIAL_GENERATION_TARGETS },
+  });
+  return ensureDistributionQueue(eventId); // backfill content_preview / payload_ref
 }
 
 /**
