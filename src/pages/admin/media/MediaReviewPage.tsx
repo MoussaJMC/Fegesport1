@@ -344,7 +344,7 @@ const MediaReviewPage = () => {
                         )}
                       </div>
                       {activeArticle.strategic_scores && (
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {(Object.keys(STRATEGIC_SCORE_LABELS) as (keyof typeof STRATEGIC_SCORE_LABELS)[]).map((k) => (
                             <div key={k} className="bg-dark-900 rounded-lg p-2 text-center">
                               <p className="text-white font-bold text-sm">{activeArticle.strategic_scores?.[k] ?? '—'}</p>

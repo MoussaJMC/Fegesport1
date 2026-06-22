@@ -24,6 +24,7 @@ export interface ExtractedEntities {
 export interface StrategicScores {
   impact?: number;
   recruitment?: number;
+  volunteer_recruitment?: number;
   institutional?: number;
   media_visibility?: number;
   partnership?: number;
@@ -32,6 +33,7 @@ export interface StrategicScores {
 export const STRATEGIC_SCORE_LABELS: Record<keyof StrategicScores, string> = {
   impact: 'Impact FEGESPORT',
   recruitment: 'Potentiel recrutement',
+  volunteer_recruitment: 'Potentiel bénévoles',
   institutional: 'Valeur institutionnelle',
   media_visibility: 'Visibilité média',
   partnership: 'Potentiel partenariat',

@@ -132,6 +132,12 @@ Ordre imposé en fin d'article (markdown, intertitres ##) :
 2. "## La position de la FEGESPORT" — factuel et professionnel, JAMAIS de décision officielle inventée.
    Positionne la FEGESPORT comme acteur du développement (gouvernance, éducation, inclusion jeunesse,
    participation féminine, innovation numérique, détection de talents, coopération internationale).
+   RÈGLE STRICTE (anti-engagement fictif) : ne JAMAIS présenter comme une décision officielle, un programme
+   existant ou un engagement institutionnel ce qui n'a pas été explicitement validé dans les données source.
+   Formulations PRUDENTES autorisées : « la FEGESPORT considère que… », « la FEGESPORT suit avec intérêt… »,
+   « cette initiative pourrait inspirer… », « cette expérience constitue une piste de réflexion… ».
+   Formulations INTERDITES (sauf si présentes explicitement dans les données) : « la FEGESPORT lancera… »,
+   « la FEGESPORT mettra en place… », « la FEGESPORT a décidé… », « la FEGESPORT prévoit… ».
 3. "## Opportunités pour la Guinée" — UNIQUEMENT si sujet à forte valeur (esport scolaire/universitaire,
    fédérations nationales, partenariats internationaux, intégrité, développement de la jeunesse) :
    liste d'opportunités concrètes.
@@ -143,7 +149,7 @@ La position FEGESPORT et les opportunités restent prudentes et non inventées (
 const PERSPECTIVE_ANALYSIS_FIELDS = `,
     "fegesport_category": "Governance|Education|Esports School Programs|University Esports|Youth Development|Women in Esports|International Cooperation|Competition|Technology|Inclusion|Digital Innovation",
     "recruitment_objective": "recruit_clubs|recruit_volunteers|recruit_schools|recruit_universities|recruit_players|recruit_partners|recruit_sponsors (le plus pertinent)",
-    "strategic_scores": { "impact": 0-100, "recruitment": 0-100, "institutional": 0-100, "media_visibility": 0-100, "partnership": 0-100 }`;
+    "strategic_scores": { "impact": 0-100, "recruitment": 0-100, "volunteer_recruitment": 0-100, "institutional": 0-100, "media_visibility": 0-100, "partnership": 0-100 }`;
 
 function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: string, perspective = false): string {
   const parts: string[] = [];
