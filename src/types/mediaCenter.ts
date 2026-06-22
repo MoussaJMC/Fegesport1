@@ -21,6 +21,32 @@ export interface ExtractedEntities {
   quotes?: string[];
 }
 
+export interface StrategicScores {
+  impact?: number;
+  recruitment?: number;
+  institutional?: number;
+  media_visibility?: number;
+  partnership?: number;
+}
+
+export const STRATEGIC_SCORE_LABELS: Record<keyof StrategicScores, string> = {
+  impact: 'Impact FEGESPORT',
+  recruitment: 'Potentiel recrutement',
+  institutional: 'Valeur institutionnelle',
+  media_visibility: 'Visibilité média',
+  partnership: 'Potentiel partenariat',
+};
+
+export const RECRUITMENT_OBJECTIVE_LABELS: Record<string, string> = {
+  recruit_clubs: 'Recruter des clubs',
+  recruit_volunteers: 'Recruter des bénévoles',
+  recruit_schools: 'Recruter des écoles',
+  recruit_universities: 'Recruter des universités',
+  recruit_players: 'Recruter des joueurs',
+  recruit_partners: 'Recruter des partenaires',
+  recruit_sponsors: 'Recruter des sponsors',
+};
+
 export interface FactCheckResult {
   confidence?: number;
   quality_score?: number;
@@ -103,6 +129,11 @@ export interface GeneratedArticle {
   fact_check: FactCheckResult | null;
   fact_check_score: number | null;
   needs_mandatory_review: boolean;
+  // FEGESPORT Perspective (articles issus de la veille)
+  fegesport_category: string | null;
+  recruitment_objective: string | null;
+  strategic_scores: StrategicScores | null;
+  fegesport_impact_score: number | null;
   generation_count: number;
   generated_from_watch?: boolean;
   published_news_id: string | null;

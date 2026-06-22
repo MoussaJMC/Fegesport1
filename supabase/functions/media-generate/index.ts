@@ -120,7 +120,32 @@ OUVERTURE DES ARTICLES ESPORT — s'applique UNIQUEMENT aux contenus esport comp
 - Exemple de ton recherché : Face à des équipes venues de plusieurs pays africains, la sélection a porté les couleurs de la Guinée jusqu'aux phases finales — une campagne qui confirme la progression continue de l'esport guinéen.
 - Si le contenu n'est PAS une compétition esport (formation, communiqué institutionnel), conserver une ouverture journalistique classique sans appliquer cette règle d'ouverture compétitive.`;
 
-function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: string): string {
+// FEGESPORT Perspective — couche stratégique (UNIQUEMENT pour les articles issus de la veille).
+// Transforme une actu internationale en levier de positionnement + recrutement, SANS perdre
+// la crédibilité journalistique (règle d'or 70-80% info factuelle / 20-30% perspective FEGESPORT).
+const FEGESPORT_PERSPECTIVE_LAYER = `
+COUCHE « FEGESPORT PERSPECTIVE » (à intégrer À LA FIN du champ content, APRÈS le corps journalistique) :
+Règle d'or : 70 à 80% du texte = information factuelle/journalistique ; 20 à 30% MAXIMUM = perspective FEGESPORT.
+Ordre imposé en fin d'article (markdown, intertitres ##) :
+1. "## Et en Guinée ?" — pourquoi l'info compte pour la Guinée, leçons locales, lien avec le développement
+   de l'esport guinéen, opportunités pour jeunes/clubs/écoles/universités/institutions.
+2. "## La position de la FEGESPORT" — factuel et professionnel, JAMAIS de décision officielle inventée.
+   Positionne la FEGESPORT comme acteur du développement (gouvernance, éducation, inclusion jeunesse,
+   participation féminine, innovation numérique, détection de talents, coopération internationale).
+3. "## Opportunités pour la Guinée" — UNIQUEMENT si sujet à forte valeur (esport scolaire/universitaire,
+   fédérations nationales, partenariats internationaux, intégrité, développement de la jeunesse) :
+   liste d'opportunités concrètes.
+4. CTA de recrutement contextuel (titre ## court) aligné sur "recruitment_objective", avec contact
+   contact@fegesport224.org / fegesport224.org.
+Sujets légers (résultats de matchs, transferts, patchs) : se limiter à "## Et en Guinée ?" + un CTA discret.
+La position FEGESPORT et les opportunités restent prudentes et non inventées (respect des règles anti-hallucination).`;
+
+const PERSPECTIVE_ANALYSIS_FIELDS = `,
+    "fegesport_category": "Governance|Education|Esports School Programs|University Esports|Youth Development|Women in Esports|International Cooperation|Competition|Technology|Inclusion|Digital Innovation",
+    "recruitment_objective": "recruit_clubs|recruit_volunteers|recruit_schools|recruit_universities|recruit_players|recruit_partners|recruit_sponsors (le plus pertinent)",
+    "strategic_scores": { "impact": 0-100, "recruitment": 0-100, "institutional": 0-100, "media_visibility": 0-100, "partnership": 0-100 }`;
+
+function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: string, perspective = false): string {
   const parts: string[] = [];
   if (targets.includes('press_article')) {
     parts.push(`"press_article": {
@@ -160,7 +185,7 @@ function articlesPrompt(facts: string, targets: ContentTarget[], instructions?: 
   }
   return `${facts}
 
-${targets.includes('press_article') ? `${PRESS_ARTICLE_STYLE}\n\n` : ''}${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
+${targets.includes('press_article') ? `${PRESS_ARTICLE_STYLE}\n\n` : ''}${perspective ? `${FEGESPORT_PERSPECTIVE_LAYER}\n\n` : ''}${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
 PRODUIS ce JSON exactement (uniquement les clés listées). IMPORTANT : retourne UNIQUEMENT du JSON valide, sans commentaire, sans texte hors JSON :
 {
   "analysis": {
@@ -175,7 +200,7 @@ PRODUIS ce JSON exactement (uniquement les clés listées). IMPORTANT : retourne
       "scores": ["scores/résultats explicitement fournis, sinon []"],
       "quotes": ["citations mot pour mot présentes dans les données, sinon []"]
     },
-    "editorial_priority": "urgent | priority | standard | archive (selon importance, impact Guinée, nouveauté)"
+    "editorial_priority": "urgent | priority | standard | archive (selon importance, impact Guinée, nouveauté)"${perspective ? PERSPECTIVE_ANALYSIS_FIELDS : ''}
   },
   ${parts.join(',\n  ')}
 }`;
@@ -191,11 +216,18 @@ const SOCIAL_SPECS: Record<string, string> = {
   telegram: '"telegram": { "content": "message Telegram, 150 à 250 caractères, ton direct, pas de long paragraphe, 1 à 3 emojis maximum", "hashtags": ["2 à 4 hashtags maximum"], "cta": "action claire", "visual_suggestion": "image recommandée" }',
 };
 
-function socialPrompt(facts: string, targets: ContentTarget[], instructions?: string): string {
+const SOCIAL_PERSPECTIVE = `
+PERSPECTIVE FEGESPORT (obligatoire pour chaque post — ne JAMAIS faire un simple résumé d'actu internationale) :
+- une perspective LOCALE (ce que ça signifie pour la Guinée) ;
+- une perspective FEGESPORT (la fédération comme actrice du développement de l'esport guinéen) ;
+- un appel à l'action de recrutement quand c'est pertinent (clubs, bénévoles, écoles, universités, joueurs…).
+Rester factuel et sobre, sans inventer de décision officielle.`;
+
+function socialPrompt(facts: string, targets: ContentTarget[], instructions?: string, perspective = false): string {
   const parts = targets.filter((t) => SOCIAL_SPECS[t]).map((t) => SOCIAL_SPECS[t]);
   return `${facts}
 
-${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
+${perspective ? `${SOCIAL_PERSPECTIVE}\n\n` : ''}${instructions ? `CONSIGNES SUPPLÉMENTAIRES DE L'ADMINISTRATEUR : ${instructions}\n` : ''}
 PRODUIS ce JSON exactement :
 {
   ${parts.join(',\n  ')}
@@ -287,6 +319,8 @@ Deno.serve(async (req: Request) => {
       ? body.targets.filter((t: string) => ALL_TARGETS.includes(t as ContentTarget))
       : ALL_TARGETS;
     const instructions: string | undefined = body.instructions;
+    // FEGESPORT Perspective : activé pour les articles issus de la veille (drapeau explicite)
+    const perspective: boolean = body.fegesport_perspective === true;
     if (!eventId) return jsonResponse({ error: 'event_id requis' }, 400);
 
     // Quota API journalier
@@ -312,9 +346,10 @@ Deno.serve(async (req: Request) => {
     const generated: Record<string, unknown> = {};
 
     // --- Appel 1 : Analyseur + Rédacteur (contenus longs) ---
-    let analysis: { summary?: string; keywords?: string[]; categories?: string[]; seo_tags?: string[] } = {};
+    let analysis: { summary?: string; keywords?: string[]; categories?: string[]; seo_tags?: string[];
+      fegesport_category?: string; recruitment_objective?: string; strategic_scores?: Record<string, number> } = {};
     if (articleTargets.length) {
-      const { text, usage } = await callClaude(SYSTEM_PROMPT, articlesPrompt(facts, articleTargets, instructions), 12000);
+      const { text, usage } = await callClaude(SYSTEM_PROMPT, articlesPrompt(facts, articleTargets, instructions, perspective), 12000);
       totalIn += usage.input_tokens; totalOut += usage.output_tokens;
       const parsed = parseModelJson<Record<string, any>>(text);
       analysis = parsed.analysis ?? {};
@@ -369,6 +404,14 @@ Deno.serve(async (req: Request) => {
           needs_mandatory_review:
             (confidence !== null && confidence < 70) ||
             factCheck?.status === 'RELECTURE OBLIGATOIRE',
+          // FEGESPORT Perspective (uniquement si activé) — niveau événement, appliqué à chaque article
+          ...(perspective ? {
+            fegesport_category: analysis.fegesport_category ?? null,
+            recruitment_objective: analysis.recruitment_objective ?? null,
+            strategic_scores: analysis.strategic_scores ?? null,
+            fegesport_impact_score: typeof analysis.strategic_scores?.impact === 'number'
+              ? Math.min(100, Math.max(0, analysis.strategic_scores.impact)) : null,
+          } : {}),
         };
 
         // Régénération : on remplace la version en attente existante du même type
@@ -394,7 +437,7 @@ Deno.serve(async (req: Request) => {
 
     // --- Appel 2 : Rédacteur (réseaux sociaux) ---
     if (socialTargets.length) {
-      const { text, usage } = await callClaude(SYSTEM_PROMPT, socialPrompt(facts, socialTargets, instructions), 4000);
+      const { text, usage } = await callClaude(SYSTEM_PROMPT, socialPrompt(facts, socialTargets, instructions, perspective), 4000);
       totalIn += usage.input_tokens; totalOut += usage.output_tokens;
       const parsed = parseModelJson<Record<string, any>>(text);
 
