@@ -128,8 +128,8 @@ const OneCommunitySection: React.FC = () => {
               </div>
               <div className="text-sm font-bold leading-tight">
                 {lang === 'fr'
-                  ? 'Agréée par décision n° 000670 du 14/07/2025'
-                  : 'Agréée par décision n° 000670 du 14/07/2025'}
+                  ? "Membre de l'IESF, de l'ACES, de WESCO et de la GEF"
+                  : "Member of the IESF, ACES, WESCO and GEF"}
               </div>
             </motion.div>
           </motion.div>
