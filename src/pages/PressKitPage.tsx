@@ -120,13 +120,13 @@ const PressKitPage: React.FC = () => {
     },
   ];
 
-  const wikipediaIntroFR = `La **Federation Guineenne d'Esport** (en abrege **FEGESPORT**) est l'organisation nationale officielle qui regit le sport electronique (esport) en Republique de Guinee. Basee a Conakry, elle est reconnue par les autorites guineennes et est membre de plusieurs federations internationales d'esport, dont l'International Esports Federation (IESF), l'African Confederation of Electronic Sports (ACES), le World Esports Consortium (WESCO) et la Global Esports Federation (GEF).
+  const wikipediaIntroFR = `La **Federation Guineenne du Sport Electronique** (FEGeS), appellation d'usage **FEGESPORT**, est membre de l'International Esports Federation (IESF), de l'African Confederation of Electronic Sports (ACES), du World Esports Consortium (WESCO) et de la Global Esports Federation (GEF). Basee a Conakry, en Republique de Guinee, elle a pour mission de structurer, developper et representer l'esport guineen au niveau national et international.
 
-La FEGESPORT a pour mission de structurer, developper et representer l'esport guineen au niveau national et international. Elle organise des competitions officielles, soutient les clubs esport, accompagne les joueurs et represente la Guinee aux competitions internationales d'esport.`;
+Elle organise des competitions, soutient les clubs esport, accompagne les joueurs et represente la Guinee aux competitions internationales d'esport.`;
 
-  const wikipediaIntroEN = `The **Guinean Esports Federation** (in French: *Federation Guineenne d'Esport*, abbreviated **FEGESPORT**) is the official national organization governing electronic sports (esports) in the Republic of Guinea. Based in Conakry, it is recognized by Guinean authorities and is a member of several international esports federations, including the International Esports Federation (IESF), the African Confederation of Electronic Sports (ACES), the World Esports Consortium (WESCO), and the Global Esports Federation (GEF).
+  const wikipediaIntroEN = `The **Federation Guineenne du Sport Electronique** (FEGeS), usage name **FEGESPORT**, is a member of the International Esports Federation (IESF), the African Confederation of Electronic Sports (ACES), the World Esports Consortium (WESCO) and the Global Esports Federation (GEF). Based in Conakry, Republic of Guinea, it structures, develops, and represents Guinean esports at national and international levels.
 
-FEGESPORT's mission is to structure, develop, and represent Guinean esports at national and international levels. It organizes official competitions, supports esports clubs, mentors players, and represents Guinea in international esports competitions.`;
+It organizes competitions, supports esports clubs, mentors players, and represents Guinea in international esports competitions.`;
 
   const introText = lang === 'fr' ? wikipediaIntroFR : wikipediaIntroEN;
 

@@ -179,9 +179,9 @@ const AboutPage: React.FC = () => {
       title_fr: 'Naissance de la FEGESPORT',
       title_en: 'Birth of FEGESPORT',
       description_fr:
-        "Annee fondatrice. Trois jalons s'enchainent : creation de la Federation Guineenne d'Esport (dans la continuite directe de l'Association JMC), reconnaissance nationale, et cofondation de l'AEC (African Esports Confederation).",
+        "Annee fondatrice. Trois jalons s'enchainent : creation de la Federation Guineenne d'Esport (dans la continuite directe de l'Association JMC), agrément de la Ville de Conakry, et cofondation de l'AEC (African Esports Confederation).",
       description_en:
-        'Founding year. Three milestones come together: creation of the Guinean Esports Federation (in direct continuity with the JMC Association), national recognition, and co-founding of the AEC (African Esports Confederation).',
+        'Founding year. Three milestones come together: creation of the Guinean Esports Federation (in direct continuity with the JMC Association), accreditation by the City of Conakry, and co-founding of the AEC (African Esports Confederation).',
       year_start: 2018,
       year_end: null,
       order_position: 3,
@@ -218,9 +218,9 @@ const AboutPage: React.FC = () => {
       title_fr: 'Cofondation de l’ACES et premiere participation mondiale',
       title_en: 'ACES co-founding and first global participation',
       description_fr:
-        "Cofondation de l'ACES (Africa Esports Confederation), affiliation ACES/AESF et premiere participation mondiale de la Guinee a une competition esport. Trois etapes qui prolongent les affiliations precedentes.",
+        "Cofondation de l'ACES (Africa Esports Confederation), affiliation ACES et premiere participation mondiale de la Guinee a une competition esport. Trois etapes qui prolongent les affiliations precedentes.",
       description_en:
-        'Co-founding of the ACES (Africa Esports Confederation), ACES/AESF affiliation, and first global participation of Guinea in an esports competition.',
+        'Co-founding of the ACES (Africa Esports Confederation), ACES affiliation, and first global participation of Guinea in an esports competition.',
       year_start: 2023,
       year_end: null,
       order_position: 6,
@@ -283,7 +283,7 @@ const AboutPage: React.FC = () => {
   const faqs = lang === 'fr' ? [
     {
       question: 'Qu\'est-ce que la FEGESPORT ?',
-      answer: 'La FEGESPORT (Federation Guineenne d\'Esport) est l\'organisation nationale officielle reconnue qui regit le sport electronique en Republique de Guinee. Elle est membre de l\'IESF, ACES, WESCO et GEF.',
+      answer: 'La FEGESPORT (appellation d\'usage de la Federation Guineenne du Sport Electronique — FEGeS) est membre de l\'IESF, de l\'ACES, de WESCO et de la GEF.',
     },
     {
       question: 'Quelles sont les missions de la FEGESPORT ?',
@@ -299,12 +299,12 @@ const AboutPage: React.FC = () => {
     },
     {
       question: 'A quelles federations internationales appartient la FEGESPORT ?',
-      answer: 'La FEGESPORT est membre de quatre federations internationales majeures : IESF (International Esports Federation), ACES (African Confederation of Electronic Sports), WESCO (World Esports Consortium) et GEF (Global Esports Federation).',
+      answer: 'La FEGESPORT est membre de l\'IESF (International Esports Federation), de l\'ACES (African Confederation of Electronic Sports), de WESCO (World Esports Consortium) et de la GEF (Global Esports Federation).',
     },
   ] : [
     {
       question: 'What is FEGESPORT?',
-      answer: 'FEGESPORT (Guinean Esports Federation) is the official recognized national organization that governs electronic sports in the Republic of Guinea. It is a member of IESF, ACES, WESCO and GEF.',
+      answer: 'FEGESPORT (usage name of the Federation Guineenne du Sport Electronique — FEGeS) is a member of IESF, ACES, WESCO and GEF.',
     },
     {
       question: 'What are FEGESPORT\'s missions?',
@@ -320,7 +320,7 @@ const AboutPage: React.FC = () => {
     },
     {
       question: 'Which international federations does FEGESPORT belong to?',
-      answer: 'FEGESPORT is a member of four major international federations: IESF (International Esports Federation), ACES (African Confederation of Electronic Sports), WESCO (World Esports Consortium) and GEF (Global Esports Federation).',
+      answer: 'FEGESPORT is a member of IESF (International Esports Federation), ACES (African Confederation of Electronic Sports), WESCO (World Esports Consortium) and GEF (Global Esports Federation).',
     },
   ];
 
@@ -342,8 +342,8 @@ const AboutPage: React.FC = () => {
       <SEO
         title={lang === 'fr' ? 'A propos de la FEGESPORT' : 'About FEGESPORT'}
         description={lang === 'fr'
-          ? 'Decouvrez la Federation Guineenne d\'Esport : mission, vision, valeurs, equipe dirigeante de 20 membres, documents officiels et histoire depuis 2017. Membre IESF, ACES, WESCO, GEF.'
-          : 'Discover the Guinean Esports Federation: mission, vision, values, 20-member leadership team, official documents and history since 2017. Member of IESF, ACES, WESCO, GEF.'
+          ? "Découvrez la FEGeS (appellation d'usage FEGESPORT) : mission, vision, valeurs, équipe dirigeante, documents officiels et histoire. Membre de l'IESF, de l'ACES, de WESCO et de la GEF."
+          : "Discover the FEGeS (usage name FEGESPORT): mission, vision, values, leadership team, official documents and history. Member of IESF, ACES, WESCO and GEF."
         }
         keywords="FEGESPORT histoire, equipe FEGESPORT, direction FEGESPORT, mission federation esport Guinee, statuts FEGESPORT, gouvernance esport, federation esport Afrique, electronic sports Guinea"
         breadcrumbs={[{ name: lang === 'fr' ? 'A propos' : 'About', url: '/about' }]}

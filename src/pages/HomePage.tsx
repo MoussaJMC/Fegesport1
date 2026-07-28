@@ -224,12 +224,12 @@ const HomePage: React.FC = () => {
   return (
     <>
       <SEO
-        title={lang === 'fr' ? 'Federation officielle d\'esport en Guinee' : 'Official esports federation in Guinea'}
+        title={lang === 'fr' ? 'Accueil' : 'Home'}
         description={lang === 'fr'
-          ? 'La Federation Guineenne d\'Esport (FEGESPORT) est l\'organisation nationale officielle reconnue pour l\'esport en Republique de Guinee. Membre IESF, AESF, WESCO, GEF.'
-          : 'The Guinean Esports Federation (FEGESPORT) is the official national organization for esports in the Republic of Guinea. Member of IESF, AESF, WESCO, GEF.'
+          ? "Membre de l'IESF, de l'ACES, de WESCO et de la GEF."
+          : "Member of IESF, ACES, WESCO and GEF."
         }
-        keywords="FEGESPORT, esport Guinee, federation esport, federation esport Guinee, IESF Guinea, esport Conakry, jeux video Guinee"
+        keywords="FEGESPORT, esport Guinee, federation esport Guinee, IESF Guinea, esport Conakry, jeux video Guinee"
       />
 
       {/* ============================================================
@@ -278,7 +278,7 @@ const HomePage: React.FC = () => {
           >
             <span className="w-2 h-2 bg-fed-gold-500 rounded-full animate-pulse" />
             <span className="text-fed-gold-500 text-xs font-bold uppercase tracking-[0.2em]">
-              {lang === 'fr' ? 'Federation Officielle Reconnue' : 'Officially Recognized Federation'}
+              {lang === 'fr' ? "Membre guinéen de l'IESF" : "Guinean member of IESF"}
             </span>
           </motion.div>
 
@@ -337,8 +337,8 @@ const HomePage: React.FC = () => {
             className="text-base md:text-lg mb-2 text-fed-gold-500 font-medium tracking-wide"
           >
             {lang === 'fr'
-              ? 'Reconnaissance Officielle. Standards Internationaux. Excellence Esport.'
-              : 'Official Recognition. Global Standards. Esports Excellence.'}
+              ? "Membre de l'IESF, de l'ACES, de WESCO et de la GEF."
+              : "Member of IESF, ACES, WESCO and GEF."}
           </motion.p>
 
           {/* Subtitle */}

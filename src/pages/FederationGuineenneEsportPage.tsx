@@ -246,7 +246,7 @@ const sections: PillarSection[] = [
             </span>
             <p className="text-light-200 leading-snug text-sm m-0">
               <strong>Cofondation de l’ACES</strong>, affiliation
-              ACES/AESF et <strong>première participation mondiale</strong>{' '}
+              ACES et <strong>première participation mondiale</strong>{' '}
               de la Guinée à l’IESF World Esports Championship.
             </p>
           </div>
@@ -307,7 +307,7 @@ const sections: PillarSection[] = [
           subtitle="Indicateurs cumulés depuis la création de la fédération en 2018."
           stats={[
             { value: 2018, label: 'Année de création', icon: <Calendar size={14} /> },
-            { value: 2018, label: 'Reconnaissance nationale', icon: <Flag size={14} /> },
+            { value: 2018, label: 'Agréée par la Ville de Conakry', icon: <Flag size={14} /> },
             { value: 4, label: 'Affiliations internationales', icon: <Globe2 size={14} /> },
             { value: 41, label: 'Tournois organisés', icon: <Trophy size={14} /> },
             { value: 234, label: 'Athlètes identifiés', icon: <Medal size={14} /> },

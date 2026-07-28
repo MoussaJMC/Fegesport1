@@ -64,13 +64,10 @@ export const INTERNATIONAL_AFFILIATIONS = [
     logo: '/images/iesf-logo.png',
     url: 'https://iesf.org',
   },
-  {
-    id: 'aesf',
-    name: 'African Esports Federation',
-    shortName: 'AESF',
-    description_fr: 'Fédération continentale représentant l\'esport africain sur la scène internationale.',
-    description_en: 'Continental federation representing African esports on the international stage.',
-    logo: '/images/aesf-logo.png',
-    url: '#',
-  },
+  // NOTE: l'entrée `aesf` a été retirée. Le token portait le nom
+  // « African Esports Federation » avec un logo `/images/aesf-logo.png`
+  // qui n'existe pas dans le dépôt. Elle ne peut pas être remplacée par
+  // un logo ACES tant qu'aucun asset ACES n'est fourni. La liste des
+  // affiliations vivantes est complétée côté administration Supabase
+  // (table `page_sections`, section_key = 'international').
 ] as const;

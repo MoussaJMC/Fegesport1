@@ -3,9 +3,9 @@ import { NewsItem } from '../types/news';
 export const latestNews: NewsItem[] = [
   {
     id: '1',
-    title: 'Lancement officiel de la FEGESPORT',
-    excerpt: 'La Fédération Guinéenne d\'Esport (FEGESPORT) a été officiellement lancée lors d\'une cérémonie à Conakry.',
-    content: 'La Fédération Guinéenne d\'Esport (FEGESPORT) a été officiellement lancée lors d\'une cérémonie à Conakry en présence de représentants du Ministère des Sports, de clubs esport et de partenaires. Cette étape marque un tournant majeur pour l\'esport guinéen qui dispose désormais d\'un organe officiel de gouvernance.',
+    title: 'Lancement des activités de la Fédération',
+    excerpt: 'Lancement des activités de la Fédération.',
+    content: 'Lancement des activités de la Fédération.',
     date: '2025-01-15',
     image: 'https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg',
     category: 'Communiqué',
