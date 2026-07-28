@@ -25,8 +25,8 @@ const AuthorityBanner: React.FC<AuthorityBannerProps> = ({
   const items = [
     {
       icon: <Award size={18} />,
-      label: lang === 'fr' ? 'FEDERATION RECONNUE' : 'RECOGNIZED FEDERATION',
-      value: lang === 'fr' ? 'Officielle' : 'Official',
+      label: lang === 'fr' ? 'MEMBRE IESF & GEF' : 'IESF & GEF MEMBER',
+      value: lang === 'fr' ? 'Membre IESF' : 'IESF member',
       accent: 'fed-gold',
     },
     {

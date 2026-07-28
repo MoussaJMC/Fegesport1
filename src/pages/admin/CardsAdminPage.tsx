@@ -63,8 +63,8 @@ const CardsAdminPage: React.FC = () => {
     return [
       {
         id: '1',
-        title: 'Lancement officiel de la FEGESPORT',
-        content: 'La Fédération Guinéenne d\'Esport (FEGESPORT) a été officiellement lancée lors d\'une cérémonie à Conakry en présence de représentants du Ministère des Sports, de clubs esport et de partenaires.',
+        title: 'Lancement des activités de la Fédération',
+        content: 'Lancement des activités de la Fédération.',
         image_url: 'https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg',
         category: 'communiqué',
         is_active: true,

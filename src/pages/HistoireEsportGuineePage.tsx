@@ -161,10 +161,10 @@ const sections: PillarSection[] = [
           l’ambition au niveau d’une fédération nationale.
         </p>
         <p>
-          <strong>Ensuite, la reconnaissance nationale.</strong> Dès
-          2018, la FEGESPORT bénéficie d’une reconnaissance nationale
-          qui lui donne le cadre institutionnel pour structurer son
-          action sur l’ensemble du territoire.
+          <strong>Ensuite, l’agrément.</strong> Dès 2018, la FEGESPORT
+          est agréée par la Ville de Conakry qui lui donne le cadre
+          institutionnel pour structurer son action sur l’ensemble du
+          territoire.
         </p>
         <p>
           <strong>Enfin, la cofondation de l’AEC (African Esports
@@ -250,7 +250,7 @@ const sections: PillarSection[] = [
           continental.
         </p>
         <p>
-          <strong>Affiliation ACES / AESF.</strong> La fédération
+          <strong>Affiliation ACES.</strong> La fédération
           formalise son adhésion au cadre africain consolidé.
         </p>
         <p>
@@ -354,7 +354,7 @@ const sections: PillarSection[] = [
               highlights: (
                 <p className="m-0">
                   <strong>Cofondation de l’ACES</strong>, affiliation
-                  ACES/AESF et première <strong>participation mondiale</strong>.
+                  ACES et première <strong>participation mondiale</strong>.
                 </p>
               ),
             },
@@ -399,7 +399,7 @@ const sections: PillarSection[] = [
           subtitle="Indicateurs représentatifs cumulés depuis la création de la fédération en 2018."
           stats={[
             { value: 2018, label: 'Année de création', icon: <Calendar size={14} /> },
-            { value: 2018, label: 'Reconnaissance nationale', icon: <Flag size={14} /> },
+            { value: 2018, label: 'Agréée par la Ville de Conakry', icon: <Flag size={14} /> },
             { value: 4, label: 'Affiliations internationales', icon: <Globe2 size={14} /> },
             { value: 41, label: 'Tournois organisés', icon: <Trophy size={14} /> },
             { value: 234, label: 'Athlètes identifiés', icon: <Medal size={14} /> },
@@ -506,12 +506,12 @@ const faqItems: FAQItem[] = [
       <p>
         La FEGESPORT a été créée en 2018, dans le prolongement direct du
         travail mené depuis 2009 par l’Association JMC. La même année,
-        elle obtient sa reconnaissance nationale et participe à la
+        elle est agréée par la Ville de Conakry et participe à la
         cofondation de l’AEC (African Esports Confederation).
       </p>
     ),
     answerText:
-      "La FEGESPORT a été créée en 2018, dans le prolongement direct du travail mené depuis 2009 par l'Association JMC. La même année, elle obtient sa reconnaissance nationale et participe à la cofondation de l'AEC (African Esports Confederation).",
+      "La FEGESPORT a été créée en 2018, dans le prolongement direct du travail mené depuis 2009 par l'Association JMC. La même année, elle est agréée par la Ville de Conakry et participe à la cofondation de l'AEC (African Esports Confederation).",
   },
   {
     question: 'Quelles sont les affiliations internationales de la FEGESPORT ?',
@@ -630,7 +630,7 @@ const HistoireEsportGuineePage: React.FC = () => {
         bullets: [
           "2009 : création de l'Association JMC, première organisation guinéenne structurée.",
           "2014 : reconnaissance officielle de l'Association JMC.",
-          "2018 : création de la FEGESPORT, reconnaissance nationale, cofondation de l'AEC.",
+          "2018 : création de la FEGESPORT, agrément de la Ville de Conakry, cofondation de l'AEC.",
           "2019 : affiliation WESCO, première compétition nationale, première participation africaine.",
           "2022-2024 : affiliations IESF, ACES, GEF et création de la LEG.",
         ],

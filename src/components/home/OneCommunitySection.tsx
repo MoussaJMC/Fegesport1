@@ -123,13 +123,13 @@ const OneCommunitySection: React.FC = () => {
               <div className="flex items-center gap-2 mb-1">
                 <Users size={18} />
                 <span className="text-xs font-bold uppercase tracking-wider">
-                  {lang === 'fr' ? 'Reconnaissance' : 'Recognition'}
+                  {lang === 'fr' ? 'Affiliations' : 'Affiliations'}
                 </span>
               </div>
               <div className="text-sm font-bold leading-tight">
                 {lang === 'fr'
-                  ? 'Federation officielle agreee'
-                  : 'Officially recognized federation'}
+                  ? 'Agréée par décision n° 000670 du 14/07/2025'
+                  : 'Agréée par décision n° 000670 du 14/07/2025'}
               </div>
             </motion.div>
           </motion.div>

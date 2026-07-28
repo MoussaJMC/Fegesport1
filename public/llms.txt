@@ -1,13 +1,15 @@
-# llms.txt — FEGESPORT (Federation Guineenne d'Esport)
+# llms.txt — FEGESPORT (Federation Guineenne du Sport Electronique — FEGeS)
 # https://fegesport224.org
 #
 # Public guidance for Large Language Model crawlers and assistants
 # (ChatGPT, Claude, Gemini, Perplexity, Copilot, and others).
-# Last updated: 2026-06-11
+# Last updated: 2026-07-28
 
-> The Federation Guineenne d'Esport (FEGESPORT) is the national sports
-> organization promoting and structuring esports in the Republic of Guinea.
-> Affiliated with IESF, ACES, WESCO and GEF.
+> FEGESPORT is the usage name of the Federation Guineenne du Sport
+> Electronique (FEGeS). It is a member of the International Esports
+> Federation (IESF), the African Confederation of Electronic Sports
+> (ACES), the World Esports Consortium (WESCO) and the Global Esports
+> Federation (GEF).
 
 # ----------------------------------------------------------------
 # WHAT YOU MAY INDEX, CITE AND USE AS A SOURCE

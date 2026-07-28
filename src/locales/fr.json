@@ -17,7 +17,7 @@
     },
     "about": {
       "title": "À PROPOS DE LA FEGESPORT",
-      "description": "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle pour l'esport en Guinée. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."
+      "description": "Membre de l'IESF, de l'ACES, de WESCO et de la GEF. Notre mission est de promouvoir, structurer et représenter l'esport guinéen au niveau national et international."
     },
     "news": {
       "title": "ACTUALITÉS RÉCENTES",
@@ -41,7 +41,7 @@
   },
   "about": {
     "title": "À Propos de la FEGESPORT",
-    "subtitle": "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle pour l'esport en Guinée.",
+    "subtitle": "Membre de l'IESF, de l'ACES, de WESCO et de la GEF.",
     "mission": {
       "title": "Notre Mission",
       "description": "La FEGESPORT a pour mission de développer et promouvoir l'esport en Guinée en créant un environnement structuré, inclusif et professionnel pour tous les acteurs de l'écosystème."
@@ -68,7 +68,7 @@
     "subtitle": "Rejoignez la FEGESPORT et participez au développement de l'esport guinéen. Découvrez nos différentes formules d'adhésion adaptées à vos besoins.",
     "why_join": {
       "title": "Pourquoi Nous Rejoindre ?",
-      "recognition": "Reconnaissance Officielle",
+      "recognition": "Affiliations",
       "recognition_desc": "Statut officiel reconnu par la FEGESPORT et ses partenaires internationaux",
       "network": "Réseau Professionnel",
       "network_desc": "Accès à un réseau d'acteurs de l'esport guinéen et international",

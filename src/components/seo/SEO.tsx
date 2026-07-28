@@ -30,8 +30,8 @@ interface SEOProps {
   section?: string;
 }
 
-const DEFAULT_TITLE = "FEGESPORT - Fédération Guinéenne d'Esport";
-const DEFAULT_DESCRIPTION = "La Fédération Guinéenne d'Esport (FEGESPORT) est l'organisation nationale officielle reconnue pour l'esport en République de Guinée. Membre IESF, ACES, WESCO et GEF.";
+const DEFAULT_TITLE = "FEGESPORT — Fédération Guinéenne du Sport Électronique (FEGeS)";
+const DEFAULT_DESCRIPTION = "La Fédération Guinéenne du Sport Électronique (FEGeS), appellation d'usage FEGESPORT, est membre de l'IESF, de l'ACES, de WESCO et de la GEF. Disciplines, compétitions et communauté esport en Guinée.";
 // Wave 2.6: brand asset served locally from Netlify (absolute URL required by SEO crawlers).
 // Legacy Supabase URL kept here as a documented fallback only:
 //   https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg
