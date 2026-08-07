@@ -168,11 +168,13 @@ export async function generateContent(
   eventId: string,
   targets?: GenerationTarget[],
   instructions?: string,
+  options?: { perspective?: boolean },
 ): Promise<GenerationResult> {
   return invokeFunction<GenerationResult>('media-generate', {
     event_id: eventId,
     ...(targets && targets.length ? { targets } : {}),
     ...(instructions ? { instructions } : {}),
+    ...(options?.perspective ? { fegesport_perspective: true } : {}),
   });
 }
 
@@ -708,7 +710,8 @@ export async function generateDraftFromSource(news: CollectedNews): Promise<Draf
       "Rédige un résumé éditorial neutre et factuel pour le public guinéen, en t'appuyant UNIQUEMENT sur les éléments fournis. " +
       "Ne présente PAS cela comme une activité de la FEGESPORT et n'invente aucun détail. Cite la source.";
     await logAction({ entity_type: 'collected_news', entity_id: news.id, action: 'watch_generate_called', details: { event_id: event.id, targets: WATCH_DRAFT_TARGETS } });
-    const result = await generateContent(event.id, WATCH_DRAFT_TARGETS, instructions);
+    // Couche FEGESPORT Perspective activée : articles issus de la veille
+    const result = await generateContent(event.id, WATCH_DRAFT_TARGETS, instructions, { perspective: true });
 
     // 3) Marquer les articles générés comme issus de la veille + lien vers la source
     await supabase.from('generated_articles')
@@ -856,7 +859,11 @@ export const SOCIAL_GENERATION_TARGETS: GenerationTarget[] =
  * ne publie/n'envoie rien. Coût IA = 1 appel, sur clic explicite.
  */
 export async function generateSocialContent(eventId: string): Promise<DistributionItem[]> {
-  await generateContent(eventId, SOCIAL_GENERATION_TARGETS);
+  // Active la perspective FEGESPORT si l'événement provient de la veille internationale
+  const { data: watchArticle } = await supabase
+    .from('generated_articles').select('id')
+    .eq('event_id', eventId).eq('generated_from_watch', true).limit(1).maybeSingle();
+  await generateContent(eventId, SOCIAL_GENERATION_TARGETS, undefined, { perspective: !!watchArticle });
   await logAction({
     entity_type: 'media_event', entity_id: eventId,
     action: 'social_generated_on_demand', channel: 'multichannel',

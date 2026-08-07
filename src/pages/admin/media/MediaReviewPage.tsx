@@ -14,7 +14,7 @@ import {
 import type {
   MediaEvent, GeneratedArticle, SocialPost, GenerationTarget,
 } from '../../../types/mediaCenter';
-import { TARGET_LABELS } from '../../../types/mediaCenter';
+import { TARGET_LABELS, STRATEGIC_SCORE_LABELS, RECRUITMENT_OBJECTIVE_LABELS } from '../../../types/mediaCenter';
 import ArticleEditor from '../../../components/admin/media/ArticleEditor';
 import DistributionPanel from '../../../components/admin/media/DistributionPanel';
 
@@ -328,6 +328,31 @@ const MediaReviewPage = () => {
                       <p><span className="text-light-400">SEO slug :</span> {(active.data as GeneratedArticle).slug}</p>
                       <p><span className="text-light-400">Meta :</span> {(active.data as GeneratedArticle).meta_description}</p>
                       <p><span className="text-light-400">Mots-clés :</span> {((active.data as GeneratedArticle).keywords ?? []).join(', ')}</p>
+                    </div>
+                  )}
+                  {activeArticle && (activeArticle.strategic_scores || activeArticle.fegesport_category) && (
+                    <div className="border-t border-dark-700 pt-3">
+                      <p className="text-xs uppercase tracking-wide text-fed-gold-500 font-bold mb-2">FEGESPORT Perspective</p>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {activeArticle.fegesport_category && (
+                          <span className="text-xs bg-accent-blue-400/10 text-accent-blue-400 px-2 py-0.5 rounded-full">{activeArticle.fegesport_category}</span>
+                        )}
+                        {activeArticle.recruitment_objective && (
+                          <span className="text-xs bg-fed-red-500/10 text-fed-red-400 px-2 py-0.5 rounded-full">
+                            {RECRUITMENT_OBJECTIVE_LABELS[activeArticle.recruitment_objective] ?? activeArticle.recruitment_objective}
+                          </span>
+                        )}
+                      </div>
+                      {activeArticle.strategic_scores && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {(Object.keys(STRATEGIC_SCORE_LABELS) as (keyof typeof STRATEGIC_SCORE_LABELS)[]).map((k) => (
+                            <div key={k} className="bg-dark-900 rounded-lg p-2 text-center">
+                              <p className="text-white font-bold text-sm">{activeArticle.strategic_scores?.[k] ?? '—'}</p>
+                              <p className="text-light-500 text-[10px] leading-tight mt-0.5">{STRATEGIC_SCORE_LABELS[k]}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </>
