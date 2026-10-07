@@ -31,7 +31,10 @@ const CONFIG = {
   key: 'f723d769fee290fc00b10a1f1a987fd2',
   keyLocation: 'https://fegesport224.org/f723d769fee290fc00b10a1f1a987fd2.txt',
   endpoint: 'https://api.indexnow.org/indexnow',
-  sitemap: path.resolve(__dirname, '../public/sitemap.xml'),
+  // Phase 2: sitemap is generated into dist/ at build time (combines
+  // static routes + Supabase-sourced news/events). The old static
+  // public/sitemap.xml has been removed.
+  sitemap: path.resolve(__dirname, '../dist/sitemap.xml'),
   // Max 10 000 URLs per call (IndexNow spec)
   batchSize: 10000,
 };
@@ -44,6 +47,31 @@ function parseSitemap(sitemapPath) {
     const xml = readFileSync(sitemapPath, 'utf-8');
     const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
     return urls;
+  } catch (err) {
+    console.error(`❌ Could not read sitemap at ${sitemapPath}:`, err.message);
+    return [];
+  }
+}
+
+// Returns [{ loc, lastmod }] so we can filter by freshness.
+function parseSitemapEntries(sitemapPath) {
+  try {
+    const xml = readFileSync(sitemapPath, 'utf-8');
+    const entries = [];
+    const urlBlockRe = /<url>([\s\S]*?)<\/url>/g;
+    let m;
+    while ((m = urlBlockRe.exec(xml)) !== null) {
+      const block = m[1];
+      const locMatch = block.match(/<loc>([^<]+)<\/loc>/);
+      const lastmodMatch = block.match(/<lastmod>([^<]+)<\/lastmod>/);
+      if (locMatch) {
+        entries.push({
+          loc: locMatch[1].trim(),
+          lastmod: lastmodMatch ? lastmodMatch[1].trim() : null,
+        });
+      }
+    }
+    return entries;
   } catch (err) {
     console.error(`❌ Could not read sitemap at ${sitemapPath}:`, err.message);
     return [];
@@ -142,6 +170,17 @@ async function main() {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   const args = process.argv.slice(2);
+  const force = args.includes('--force'); // allow local manual runs
+  // Netlify sets CONTEXT to 'production' | 'deploy-preview' | 'branch-deploy'.
+  // Hitting IndexNow from previews and local builds pollutes the quota and
+  // can get the key rate-limited by Bing/Yandex. Allow only the production
+  // context (or an explicit --force for one-off manual runs).
+  const context = process.env.CONTEXT || 'local';
+  if (!force && context !== 'production') {
+    console.log(`⏭️  IndexNow skipped (context=${context}). Use --force to override locally.`);
+    process.exit(0);
+  }
+
   let urls = [];
 
   // Handle --url flag
@@ -150,10 +189,21 @@ async function main() {
     urls = [args[urlFlag + 1]];
     console.log(`🎯 Single URL mode: ${urls[0]}`);
   } else {
-    // Default: read sitemap
+    // Default: read sitemap, then narrow down to URLs modified in the
+    // last 48 h using the sitemap's <lastmod>. This keeps the quota
+    // tight — big site-wide pushes only happen when something actually
+    // changed recently.
     console.log(`📖 Reading sitemap: ${CONFIG.sitemap}`);
-    urls = parseSitemap(CONFIG.sitemap);
-    console.log(`   Found ${urls.length} URLs\n`);
+    const entries = parseSitemapEntries(CONFIG.sitemap);
+    console.log(`   Found ${entries.length} URLs in sitemap`);
+    const cutoffMs = Date.now() - 48 * 60 * 60 * 1000;
+    const recent = entries.filter((e) => {
+      if (!e.lastmod) return false;
+      const t = Date.parse(e.lastmod);
+      return !Number.isNaN(t) && t >= cutoffMs;
+    });
+    urls = recent.map((e) => e.loc);
+    console.log(`   ${urls.length} URL(s) with <lastmod> within the past 48 h\n`);
   }
 
   // Filter: keep only HTTPS URLs from our host
@@ -179,7 +229,11 @@ async function main() {
   const success = await notifyIndexNow(validUrls);
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(success ? '✅ DONE — IndexNow notification successful' : '❌ FAILED — see above');
+  console.log(
+    success
+      ? `✅ IndexNow sent ${validUrls.length} URLs (context=${context})`
+      : '❌ FAILED — see above',
+  );
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   // Exit gracefully — never fail the build pipeline on IndexNow errors

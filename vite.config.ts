@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { writeFileSync } from 'node:fs';
@@ -55,12 +55,8 @@ function spaShellCopy() {
   };
 }
 
-// Routes that MUST ship as fully-rendered HTML to crawlers that do not
-// execute JavaScript (Bingbot, social preview bots, LLM crawlers).
-// Only stable, content-rich routes go here. Dynamic routes (/news/:id,
-// /events/:id) are handled by the SPA fallback and will be prerendered
-// in a dedicated phase that reads IDs from Supabase at build-time.
-const PRERENDER_ROUTES = [
+// Stable, hand-authored routes always prerendered.
+const STATIC_PRERENDER_ROUTES = [
   '/',
   '/about',
   '/federation-guineenne-esport',
@@ -79,7 +75,32 @@ const PRERENDER_ROUTES = [
   '/terms',
 ];
 
-export default defineConfig({
+// Dynamic routes come from Supabase: every published article and every
+// event not completed/cancelled. On Supabase failure we fall back to
+// the static set — a stale shell is better than a build that hangs.
+async function resolveDynamicRoutes(): Promise<string[]> {
+  // @ts-expect-error — .mjs module without .d.ts
+  const mod = await import('./scripts/supabase-fetch.mjs');
+  const { news, events, error } = await mod.fetchPublishedContent();
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.warn('[prerender-ph2] Supabase fetch failed — static routes only:', error);
+    return [];
+  }
+  const extras = [
+    ...news.map((n: { id: string }) => `/news/${n.id}`),
+    ...events.map((e: { id: string }) => `/events/${e.id}`),
+  ];
+  // eslint-disable-next-line no-console
+  console.log(`[prerender-ph2] ${news.length} news + ${events.length} events will be prerendered`);
+  return extras;
+}
+
+export default defineConfig(
+  (async (): Promise<UserConfig> => {
+  const dynamicRoutes = await resolveDynamicRoutes();
+  const PRERENDER_ROUTES = [...STATIC_PRERENDER_ROUTES, ...dynamicRoutes];
+  return {
   plugins: [
     react(),
     // IMPORTANT: spaShellCopy() must come BEFORE prerender() so its
@@ -177,4 +198,6 @@ export default defineConfig({
       },
     },
   },
-});
+  };
+  })(),
+);

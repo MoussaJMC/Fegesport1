@@ -15,14 +15,14 @@
  *
  * Exits non-zero on the first failure so Netlify's build fails loudly.
  */
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const SITE = 'https://fegesport224.org';
 
-const ROUTES = [
+const STATIC_ROUTES = [
   '/',
   '/about',
   '/federation-guineenne-esport',
@@ -40,6 +40,28 @@ const ROUTES = [
   '/privacy',
   '/terms',
 ];
+
+// Enumerate dynamic prerendered routes written by @prerenderer under
+// dist/news/<id>/index.html and dist/events/<id>/index.html.
+async function listDynamicRoutes() {
+  const out = [];
+  for (const subdir of ['news', 'events']) {
+    try {
+      const children = await readdir(path.join(DIST, subdir), { withFileTypes: true });
+      for (const entry of children) {
+        if (!entry.isDirectory()) continue;
+        try {
+          await readFile(path.join(DIST, subdir, entry.name, 'index.html'), 'utf8');
+          out.push(`/${subdir}/${entry.name}`);
+        } catch { /* no index.html — skip */ }
+      }
+    } catch { /* subdir missing — nothing dynamic */ }
+  }
+  return out;
+}
+
+const dynamicRoutes = await listDynamicRoutes();
+const ROUTES = [...STATIC_ROUTES, ...dynamicRoutes];
 
 const routeToFile = (route) =>
   route === '/' ? path.join(DIST, 'index.html') : path.join(DIST, route.slice(1), 'index.html');
@@ -79,6 +101,14 @@ for (const route of ROUTES) {
     if (canonicalMatch[1] !== expected) {
       errors.push(`${route}: canonical ${canonicalMatch[1]} does not match ${expected}`);
     }
+  }
+
+  // Accessibility: every <img> must carry an alt attribute. Empty alt
+  // ("") is intentional for decorative images and is allowed.
+  const imgs = html.match(/<img[^>]*>/g) || [];
+  const altMissing = imgs.filter((tag) => !/\balt\s*=/.test(tag));
+  if (altMissing.length) {
+    errors.push(`${route}: ${altMissing.length} <img> without alt= (first: ${altMissing[0].slice(0, 120)})`);
   }
 }
 

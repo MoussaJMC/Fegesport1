@@ -117,6 +117,7 @@ const EventPage: React.FC = () => {
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
       <SEO
+        prerenderReady={!loading && !!event}
         title={event.title}
         description={event.description?.substring(0, 160) || `${event.title} - Evenement FEGESPORT le ${event.formattedDate} a ${event.location}`}
         keywords={`${event.category || 'tournoi'}, FEGESPORT, ${event.title}, esport Guinee evenement, competition esport`}

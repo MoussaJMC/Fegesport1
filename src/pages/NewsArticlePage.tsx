@@ -123,6 +123,7 @@ const NewsArticlePage: React.FC = () => {
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
       <SEO
+        prerenderReady={!loading && !!article}
         title={article.title}
         description={article.excerpt || article.content.substring(0, 160)}
         keywords={`${article.category || 'esport'}, FEGESPORT, ${article.title}, actualites esport Guinee`}
