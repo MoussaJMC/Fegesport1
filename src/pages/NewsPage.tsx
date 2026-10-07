@@ -88,6 +88,7 @@ const NewsPage: React.FC = () => {
   return (
     <div className="pt-20">
       <SEO
+        prerenderReady={!loading && news.length > 0}
         title={lang === 'fr' ? 'Actualites Esport en Guinee' : 'Esports News in Guinea'}
         description={lang === 'fr'
           ? `Toutes les actualites de la Federation Guineenne d'Esport : competitions, partenariats, formations, communiques officiels et resultats des athletes esport en Guinee. ${news.length} articles publies.`

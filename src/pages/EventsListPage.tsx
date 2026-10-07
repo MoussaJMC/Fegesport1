@@ -136,20 +136,10 @@ const EventsListPage: React.FC = () => {
     currentParticipants: event.current_participants,
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-secondary-900 py-12">
       <SEO
+        prerenderReady={!loading}
         title={lang === 'fr' ? 'Evenements et Competitions' : 'Events and Competitions'}
         description={lang === 'fr'
           ? `Calendrier des evenements et competitions esport de la FEGESPORT en Guinee. Tournois, championnats, qualifications IESF, ${events.length} evenements programmes.`

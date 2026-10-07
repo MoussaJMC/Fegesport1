@@ -28,6 +28,15 @@ interface SEOProps {
   author?: string;
   /** Article section (category) */
   section?: string;
+  /**
+   * Gate for the `prerender-ready` dispatch at build-time. Pages that
+   * fetch their contents from Supabase should pass
+   * `prerenderReady={!loading && items.length > 0}` so Puppeteer waits
+   * for the real list before snapshotting the DOM. Omit the prop (or
+   * pass `undefined`) to signal readiness as soon as SEO is wired —
+   * fine for statically-authored pages.
+   */
+  prerenderReady?: boolean;
 }
 
 const DEFAULT_TITLE = "FEGESPORT — Fédération Guinéenne du Sport Électronique (FEGeS)";
@@ -133,6 +142,7 @@ const SEO: React.FC<SEOProps> = ({
   modifiedTime,
   author,
   section,
+  prerenderReady,
 }) => {
   const location = useLocation();
   const { i18n } = useTranslation();
@@ -217,6 +227,26 @@ const SEO: React.FC<SEOProps> = ({
       removeSchemaScript('breadcrumb-schema');
     }
 
+    // Signal the prerender runner that this route is ready to be
+    // snapshotted. Fires only at build-time (window.__PRERENDER__ is
+    // set then). If the caller passes `prerenderReady` explicitly,
+    // honour it — pages that fetch Supabase data pass `false` until
+    // the list is populated so Puppeteer does not capture a spinner.
+    // Pages that render statically can omit the prop (undefined) and
+    // the SEO wire-up itself is treated as the ready signal.
+    const canFireReady = prerenderReady === undefined || prerenderReady === true;
+    if (
+      canFireReady &&
+      typeof window !== 'undefined' &&
+      (window as unknown as { __PRERENDER__?: unknown }).__PRERENDER__
+    ) {
+      // Defer one frame so React has flushed title/meta/canonical to the
+      // DOM before Puppeteer serialises it.
+      requestAnimationFrame(() => {
+        document.dispatchEvent(new Event('prerender-ready'));
+      });
+    }
+
     // Cleanup on unmount
     return () => {
       removeSchemaScript('page-schema');
@@ -225,7 +255,7 @@ const SEO: React.FC<SEOProps> = ({
   }, [
     finalTitle, finalDescription, finalImage, fullUrl, keywords, type, noindex,
     schema, breadcrumbs, lang, ogLocale, ogLocaleAlt, imageWidth, imageHeight,
-    publishedTime, modifiedTime, author, section,
+    publishedTime, modifiedTime, author, section, prerenderReady,
   ]);
 
   return null;

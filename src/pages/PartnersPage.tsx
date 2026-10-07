@@ -90,17 +90,10 @@ const PartnersPage: React.FC = () => {
     }
   ];
 
-  if (loading) {
-    return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="pt-20">
       <SEO
+        prerenderReady={!loading}
         title={lang === 'fr' ? 'Partenaires Officiels' : 'Official Partners'}
         description={lang === 'fr'
           ? 'Decouvrez les partenaires officiels de la FEGESPORT : sponsors, partenaires techniques, medias et institutions qui soutiennent le developpement de l\'esport en Guinee.'

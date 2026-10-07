@@ -1,11 +1,28 @@
 [build]
-command = "npx vite build"
+command = "npm run build"
 publish = "dist"
+
+# Netlify's default `pretty_urls = true` would 301 /esport-guinee to
+# /esport-guinee/ (trailing slash) now that `dist/esport-guinee/index.html`
+# exists on disk. That split URL from the self-referential canonical the
+# <SEO> component posts (/esport-guinee, no slash) and would re-create
+# the same "autre page avec balise canonique" bucket we just closed in
+# Search Console. Disabling pretty_urls keeps the no-slash URL as the
+# single served canonical.
+[build.processing.html]
+pretty_urls = false
 
 [build.environment]
 NODE_VERSION = "20"
 NODE_ENV = "production"
 NPM_FLAGS = "--include=dev"
+# Node heap bump for the prerender Puppeteer run (Chrome tabs x 16 routes).
+NODE_OPTIONS = "--max-old-space-size=4096"
+# Puppeteer v23 downloads its own Chromium at `npm install` time by
+# default (into node_modules/puppeteer/.local-chromium). No env var is
+# needed — explicit "false" was ambiguous and has been removed. If
+# quota or runner limits bite, flip to puppeteer-core + @sparticuz/chromium
+# in a follow-up (plan A).
 VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
 VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 # VITE_GOOGLE_MAPS_API_KEY → defined in Netlify dashboard env vars (secret-scoped)
@@ -64,14 +81,18 @@ status = 301
 force = true
 
 # ============================================================
-# IMPORTANT: SPA fallback — sends all non-existent paths to index.html
-# Specific static files (sitemap.xml, robots.txt, *.txt, *.json, /assets/*)
-# are served directly since they exist in dist/ — no rewrite needed.
-# force = false means: only fallback if the file does NOT exist.
+# SPA fallback — serves the ROUTE-AGNOSTIC shell for every URL that
+# does not match a prerendered file in dist/.
+# Pointing this at /_spa.html (a pristine copy of the Vite shell,
+# captured BEFORE the prerender plugin wrote dist/index.html) avoids
+# shipping the homepage HTML — including its canonical, meta robots
+# and H1 — to unknown URLs or uncaptured dynamic routes
+# (/news/<id>, /events/<id>, 404s).
+# force = false → applies only when no prerendered file exists.
 # ============================================================
 [[redirects]]
 from = "/*"
-to = "/index.html"
+to = "/_spa.html"
 status = 200
 force = false
 
