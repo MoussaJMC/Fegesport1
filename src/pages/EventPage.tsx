@@ -90,11 +90,16 @@ const EventPage: React.FC = () => {
   if (!event) {
     return (
       <div className="pt-20 min-h-screen bg-secondary-900">
+        <SEO
+          title={t('common.notFound')}
+          description={t('common.notFoundMessage')}
+          noindex={true}
+        />
         <div className="container-custom py-20 text-center">
           <h1 className="text-3xl font-bold text-white mb-4">{t('common.notFound')}</h1>
           <p className="text-gray-300 mb-8">{t('common.notFoundMessage')}</p>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center text-primary-500 hover:text-primary-400"
           >
             <ArrowLeft size={20} className="mr-2" />

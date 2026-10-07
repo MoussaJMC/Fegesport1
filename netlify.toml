@@ -40,6 +40,29 @@ to = "/admin/:splat"
 status = 301
 force = true
 
+# Legacy demo-event URLs retired on 2026-10-07.
+# Permanent redirect so Search Console can resolve the "page without interest"
+# signal (crawled on 2026-04 for /events/1 and /events/3).
+[[redirects]]
+from = "/events/1"
+to = "/events"
+status = 301
+force = true
+
+[[redirects]]
+from = "/events/3"
+to = "/events"
+status = 301
+force = true
+
+# Canonicalisation /presse → /press-kit : alias historique, meme page
+# React. La 301 cote CDN evite le contenu duplique vu de Googlebot.
+[[redirects]]
+from = "/presse"
+to = "/press-kit"
+status = 301
+force = true
+
 # ============================================================
 # IMPORTANT: SPA fallback — sends all non-existent paths to index.html
 # Specific static files (sitemap.xml, robots.txt, *.txt, *.json, /assets/*)
