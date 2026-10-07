@@ -2,6 +2,16 @@
 command = "npm run build"
 publish = "dist"
 
+# Netlify's default `pretty_urls = true` would 301 /esport-guinee to
+# /esport-guinee/ (trailing slash) now that `dist/esport-guinee/index.html`
+# exists on disk. That split URL from the self-referential canonical the
+# <SEO> component posts (/esport-guinee, no slash) and would re-create
+# the same "autre page avec balise canonique" bucket we just closed in
+# Search Console. Disabling pretty_urls keeps the no-slash URL as the
+# single served canonical.
+[build.processing.html]
+pretty_urls = false
+
 [build.environment]
 NODE_VERSION = "20"
 NODE_ENV = "production"
