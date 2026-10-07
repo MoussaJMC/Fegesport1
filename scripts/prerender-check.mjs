@@ -56,10 +56,13 @@ for (const route of ROUTES) {
     continue;
   }
 
+  // Note: content attributes rendered by browsers always use double
+  // quotes, so matching `[^"]` is safe and lets apostrophes through
+  // (otherwise "L'IESF" or "d'utilisation" trips the check).
   const checks = [
     { label: '<title>', test: /<title>[^<]{3,}<\/title>/ },
-    { label: 'meta description', test: /<meta[^>]+name=["']description["'][^>]+content=["'][^"']{20,}["']/ },
-    { label: 'canonical', test: /<link[^>]+rel=["']canonical["'][^>]+href=["'][^"']+["']/ },
+    { label: 'meta description', test: /<meta[^>]+name="description"[^>]*content="[^"]{20,}"/ },
+    { label: 'canonical', test: /<link[^>]+rel="canonical"[^>]*href="[^"]+"/ },
     { label: '<h1>', test: /<h1[^>]*>[^<]{1,}/ },
   ];
   for (const { label, test } of checks) {
