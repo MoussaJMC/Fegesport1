@@ -82,10 +82,32 @@ for (const route of ROUTES) {
   }
 }
 
+// --- Shell check (_spa.html) --------------------------------------
+// The SPA catch-all serves /_spa.html for every URL that is not a
+// prerendered file. It MUST stay route-agnostic: no canonical, no
+// page-specific H1, no page-specific meta description. Otherwise it
+// would re-advertise the homepage identity on every unknown URL.
+try {
+  const shell = await readFile(path.join(DIST, '_spa.html'), 'utf8');
+  if (/<link[^>]+rel=["']canonical["']/.test(shell)) {
+    errors.push('_spa.html: must NOT contain a <link rel="canonical">');
+  }
+  if (/<meta[^>]+name=["']robots["'][^>]+content=["']index/.test(shell)) {
+    errors.push('_spa.html: must NOT advertise `index` in meta robots');
+  }
+  // The React root should be empty in the shell. If React has already
+  // mounted content, the shell is no longer route-agnostic.
+  if (/<div id="root"><[a-zA-Z]/.test(shell)) {
+    errors.push('_spa.html: #root is not empty — the shell was captured after React hydrated');
+  }
+} catch (err) {
+  errors.push(`_spa.html: file missing — the vite plugin spaShellCopy did not run (${err.code || err.message})`);
+}
+
 if (errors.length) {
   console.error(`\n❌ prerender-check FAILED (${errors.length}):`);
   for (const e of errors) console.error('  - ' + e);
   process.exit(1);
 }
 
-console.log(`✅ prerender-check OK (${ROUTES.length} routes).`);
+console.log(`✅ prerender-check OK (${ROUTES.length} routes + _spa.html shell).`);

@@ -81,14 +81,18 @@ status = 301
 force = true
 
 # ============================================================
-# IMPORTANT: SPA fallback — sends all non-existent paths to index.html
-# Specific static files (sitemap.xml, robots.txt, *.txt, *.json, /assets/*)
-# are served directly since they exist in dist/ — no rewrite needed.
-# force = false means: only fallback if the file does NOT exist.
+# SPA fallback — serves the ROUTE-AGNOSTIC shell for every URL that
+# does not match a prerendered file in dist/.
+# Pointing this at /_spa.html (a pristine copy of the Vite shell,
+# captured BEFORE the prerender plugin wrote dist/index.html) avoids
+# shipping the homepage HTML — including its canonical, meta robots
+# and H1 — to unknown URLs or uncaptured dynamic routes
+# (/news/<id>, /events/<id>, 404s).
+# force = false → applies only when no prerendered file exists.
 # ============================================================
 [[redirects]]
 from = "/*"
-to = "/index.html"
+to = "/_spa.html"
 status = 200
 force = false
 

@@ -227,6 +227,7 @@ const DirectPage: React.FC = () => {
   return (
     <div className="pt-20 min-h-screen bg-secondary-900">
       <SEO
+        prerenderReady={!loading}
         title={lang === 'fr' ? 'DIRECT - Streams en Direct' : 'LIVE - Live Streams'}
         description={lang === 'fr'
           ? 'Suivez en direct les competitions et evenements esport de la FEGESPORT. Streams Twitch et YouTube officiels, tournois nationaux et internationaux.'

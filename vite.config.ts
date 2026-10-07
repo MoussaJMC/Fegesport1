@@ -1,12 +1,65 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { writeFileSync } from 'node:fs';
 // Prerender toolkit (devDependencies). Loaded at build-time only;
 // the dev server (`vite dev`) does not run it.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import prerender from '@prerenderer/rollup-plugin';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import PuppeteerRenderer from '@prerenderer/renderer-puppeteer';
+
+// Copies the untouched Vite index.html to dist/_spa.html BEFORE the
+// prerender plugin overwrites it with the "/" snapshot. The Netlify
+// SPA catch-all points at this clean shell, so unknown URLs and
+// uncaptured dynamic routes (/news/<id>, /events/<id>, 404s) no longer
+// receive the homepage HTML — they receive a route-agnostic shell with
+// no canonical, no robots and no page-specific H1.
+function spaShellCopy() {
+  // Capture the final transformed index.html at the LAST transformIndexHtml
+  // step (`order: 'post'`). At that moment Vite has injected its script
+  // tags but no prerender has run, and the HTML is still the pristine
+  // route-agnostic shell with an empty <div id="root"></div>. We stash the
+  // string in memory and only touch the disk in `closeBundle` — Netlify
+  // then serves this file to any URL that is not a prerendered route.
+  let shellHtml = '';
+  return {
+    name: 'spa-shell-copy',
+    apply: 'build' as const,
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(html: string) {
+        shellHtml = html;
+      },
+    },
+    closeBundle: {
+      sequential: true,
+      handler() {
+        if (!shellHtml) {
+          // eslint-disable-next-line no-console
+          console.warn('[spa-shell] transformIndexHtml never fired — no _spa.html written');
+          return;
+        }
+        // The shell inherits index.html's default `<meta name="robots"
+        // content="index, follow …">`. For the SPA fallback that is wrong:
+        // the shell is served to unknown URLs (soft-404, uncaptured
+        // dynamic routes) that must not be indexed. Rewrite the robots
+        // meta to `noindex, follow` so these URLs never enter Google's
+        // index while still letting link juice through.
+        let out = shellHtml;
+        const robotsRe = /<meta[^>]+name="robots"[^>]*>/i;
+        const noindexMeta = '<meta name="robots" content="noindex, follow" />';
+        out = robotsRe.test(out)
+          ? out.replace(robotsRe, noindexMeta)
+          : out.replace('</head>', `    ${noindexMeta}\n  </head>`);
+        const dst = resolve(__dirname, 'dist/_spa.html');
+        writeFileSync(dst, out);
+        // eslint-disable-next-line no-console
+        console.log(`[spa-shell] wrote dist/_spa.html (${out.length} bytes, robots→noindex)`);
+      },
+    },
+  };
+}
 
 // Routes that MUST ship as fully-rendered HTML to crawlers that do not
 // execute JavaScript (Bingbot, social preview bots, LLM crawlers).
@@ -35,6 +88,11 @@ const PRERENDER_ROUTES = [
 export default defineConfig({
   plugins: [
     react(),
+    // IMPORTANT: spaShellCopy() must come BEFORE prerender() so its
+    // writeBundle runs first (both are sequential/post) and snapshots
+    // the pristine dist/index.html before the prerender plugin rewrites
+    // it with the "/" HTML.
+    spaShellCopy(),
     prerender({
       routes: PRERENDER_ROUTES,
       renderer: new PuppeteerRenderer({
