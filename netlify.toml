@@ -8,10 +8,11 @@ NODE_ENV = "production"
 NPM_FLAGS = "--include=dev"
 # Node heap bump for the prerender Puppeteer run (Chrome tabs x 16 routes).
 NODE_OPTIONS = "--max-old-space-size=4096"
-# Puppeteer v23 ships its own Chromium — keep the download enabled on
-# Netlify (default). If quota becomes an issue, flip to puppeteer-core
-# + @sparticuz/chromium in a follow-up.
-PUPPETEER_SKIP_DOWNLOAD = "false"
+# Puppeteer v23 downloads its own Chromium at `npm install` time by
+# default (into node_modules/puppeteer/.local-chromium). No env var is
+# needed — explicit "false" was ambiguous and has been removed. If
+# quota or runner limits bite, flip to puppeteer-core + @sparticuz/chromium
+# in a follow-up (plan A).
 VITE_SUPABASE_URL = "https://geozovninpeqsgtzwchu.supabase.co"
 VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3pvdm5pbnBlcXNndHp3Y2h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MDA4NTIsImV4cCI6MjA2NDQ3Njg1Mn0.bmh2KxxuoBKqDE9ek9GdG2mFBz8htd9r8355zRssYWU"
 # VITE_GOOGLE_MAPS_API_KEY → defined in Netlify dashboard env vars (secret-scoped)

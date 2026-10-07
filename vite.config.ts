@@ -52,7 +52,9 @@ export default defineConfig({
         // `window` is set by `injectProperty` below.
         inject: { ssg: true },
         injectProperty: '__PRERENDER__',
-        headless: 'new',
+        // v1.2.4 types this as boolean; puppeteer v23 defaults to the
+        // new headless mode when `true` is passed.
+        headless: true,
         // Netlify's build image ships Chromium but denies the default
         // Chrome sandbox syscalls. These flags are the standard CI set.
         launchOptions: {
@@ -66,7 +68,8 @@ export default defineConfig({
       postProcess(renderedRoute) {
         // VERIFICATION ONLY — never rewrite the HTML here. All SEO
         // elements must come from the <SEO> React component so there
-        // is a single source of truth.
+        // is a single source of truth. Must return void: mutate the
+        // route in place (or throw) and don't return a value.
         const route = renderedRoute.route;
         const html = renderedRoute.html;
         const expect = (needle: string, label: string) => {
@@ -80,7 +83,6 @@ export default defineConfig({
         expect('name="description"', 'meta description');
         expect('rel="canonical"', 'canonical');
         expect('<h1', '<h1>');
-        return renderedRoute;
       },
     }),
   ],
