@@ -84,12 +84,77 @@ Dans tous les cas : **ne jamais commiter sans que le build Netlify du
 deploy preview soit vert**. Le script `prerender-check.mjs` est là pour
 ça.
 
-## Phase 2 (PR séparée)
+## Phase 2 — dynamiques (`/news/:id`, `/events/:id`) et sitemap
 
-- Génération d'un sitemap dynamique au build à partir de Supabase
-  (articles publiés + événements actifs).
-- Prerender des `/news/:id` et `/events/:id` correspondant.
-- Build hook Netlify déclenché par un trigger Supabase à chaque
-  publication.
+### Ce que fait le build en phase 2
 
-À ne pas démarrer tant que cette phase 1 n'est pas stable en prod.
+- **`vite.config.ts`** interroge Supabase au démarrage via
+  `scripts/supabase-fetch.mjs` (clé anon publique, en lecture seule).
+  Il récupère :
+  - `news` filtré sur `published = true`,
+  - `events` filtré sur `status NOT IN (completed, cancelled)`.
+  Les ids trouvés sont ajoutés à `PRERENDER_ROUTES`. Puppeteer
+  prerender ces routes au même titre que les 16 routes statiques.
+- **`scripts/build-sitemap.mjs`** rejoue la même requête et génère
+  `dist/sitemap.xml` : 15 routes statiques (`/leg` reste exclue tant
+  qu'elle est en `noindex`) + une entrée par article et par
+  événement, avec `lastmod` dérivé de `updated_at`. Si Supabase
+  échoue, le sitemap tombe à 15 URLs seulement et le build continue.
+- **`scripts/prerender-check.mjs`** liste les sous-dossiers
+  `dist/news/*` et `dist/events/*` et applique les mêmes contrôles
+  qu'aux routes statiques — title, meta description, canonical self,
+  `<h1>`, images avec `alt`.
+- **`notify-indexnow.js`** lit désormais `dist/sitemap.xml` et non
+  plus `public/sitemap.xml` (qui a été supprimé).
+
+### Mettre en place le rebuild automatique à chaque publication
+
+Deux configurations hors code sont nécessaires. Documentées ici
+une fois pour toutes, vous les faites manuellement.
+
+#### Côté Netlify — créer un build hook
+
+1. Netlify dashboard → votre site `fegesport224` → **Site settings**
+2. **Build & deploy** → **Build hooks** → **Add build hook**
+3. Nom : `Supabase publish` · branche : `main` → **Save**
+4. Copiez l'URL (`https://api.netlify.com/build_hooks/<id>`). **Elle
+   est secrète** — toute personne qui la connaît peut déclencher un
+   build. Stockez-la côté Supabase (étape suivante), pas dans le
+   dépôt.
+
+#### Côté Supabase — Database Webhook
+
+Pas d'Edge Function. Les Database Webhooks font un `POST` HTTP natif
+à chaque mutation.
+
+1. Supabase dashboard → **Database** → **Webhooks** → **Create a new
+   hook**
+2. Première hook — table `news` :
+   - Table: `news`
+   - Events: cocher `INSERT`, `UPDATE`, `DELETE`
+   - Type: `HTTP Request`
+   - Method: `POST`
+   - URL: l'URL du build hook Netlify ci-dessus
+   - HTTP Headers: aucun (Netlify ignore le body)
+3. Deuxième hook — même configuration pour la table `events`.
+
+Netlify n'empile qu'un seul build en attente par site : même en cas
+de publications multiples quasi-simultanées, un seul rebuild est
+déclenché. Pas de debounce à écrire côté Supabase.
+
+### Quand le prerender capture-t-il « prêt » ?
+
+`src/pages/NewsArticlePage.tsx` et `src/pages/EventPage.tsx` passent
+`prerenderReady={!loading && !!article}` (ou `!!event`) à `<SEO>`.
+Puppeteer attend ce signal avant la capture — la page est
+sérialisée avec son titre, sa description, sa canonical, son `<h1>`
+et son contenu, pas pendant le spinner initial.
+
+### Rollback
+
+- Pour désactiver le prerender des dynamiques tout en gardant le
+  sitemap dynamique : commenter l'appel `resolveDynamicRoutes()`
+  dans `vite.config.ts`.
+- Pour revenir à la phase 1 : annuler la PR phase 2. Les Database
+  Webhooks restent inoffensifs (ils déclencheront un rebuild qui
+  ne connaîtra plus les routes dynamiques).

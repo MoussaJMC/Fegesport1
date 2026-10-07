@@ -31,7 +31,10 @@ const CONFIG = {
   key: 'f723d769fee290fc00b10a1f1a987fd2',
   keyLocation: 'https://fegesport224.org/f723d769fee290fc00b10a1f1a987fd2.txt',
   endpoint: 'https://api.indexnow.org/indexnow',
-  sitemap: path.resolve(__dirname, '../public/sitemap.xml'),
+  // Phase 2: sitemap is generated into dist/ at build time (combines
+  // static routes + Supabase-sourced news/events). The old static
+  // public/sitemap.xml has been removed.
+  sitemap: path.resolve(__dirname, '../dist/sitemap.xml'),
   // Max 10 000 URLs per call (IndexNow spec)
   batchSize: 10000,
 };
