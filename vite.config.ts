@@ -40,22 +40,16 @@ function spaShellCopy() {
           console.warn('[spa-shell] transformIndexHtml never fired — no _spa.html written');
           return;
         }
-        // The shell inherits index.html's default `<meta name="robots"
-        // content="index, follow …">`. For the SPA fallback that is wrong:
-        // the shell is served to unknown URLs (soft-404, uncaptured
-        // dynamic routes) that must not be indexed. Rewrite the robots
-        // meta to `noindex, follow` so these URLs never enter Google's
-        // index while still letting link juice through.
-        let out = shellHtml;
-        const robotsRe = /<meta[^>]+name="robots"[^>]*>/i;
-        const noindexMeta = '<meta name="robots" content="noindex, follow" />';
-        out = robotsRe.test(out)
-          ? out.replace(robotsRe, noindexMeta)
-          : out.replace('</head>', `    ${noindexMeta}\n  </head>`);
+        // The shell is written as-is: NO meta robots, NO canonical, NO
+        // page-specific title. The <SEO> React component posts the
+        // correct values at hydration (index for live content, noindex
+        // for real 404 branches, see NewsArticlePage/EventPage/NotFound).
+        // Writing a pre-JS `noindex` here would risk Googlebot
+        // de-indexing real article URLs served through the SPA shell.
         const dst = resolve(__dirname, 'dist/_spa.html');
-        writeFileSync(dst, out);
+        writeFileSync(dst, shellHtml);
         // eslint-disable-next-line no-console
-        console.log(`[spa-shell] wrote dist/_spa.html (${out.length} bytes, robots→noindex)`);
+        console.log(`[spa-shell] wrote dist/_spa.html (${shellHtml.length} bytes, neutral)`);
       },
     },
   };

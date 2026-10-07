@@ -84,16 +84,19 @@ for (const route of ROUTES) {
 
 // --- Shell check (_spa.html) --------------------------------------
 // The SPA catch-all serves /_spa.html for every URL that is not a
-// prerendered file. It MUST stay route-agnostic: no canonical, no
-// page-specific H1, no page-specific meta description. Otherwise it
-// would re-advertise the homepage identity on every unknown URL.
+// prerendered file. It MUST stay neutral: no canonical AND no meta
+// robots (not even noindex — a pre-JS noindex can take real article
+// pages served through the SPA shell out of Google's index without
+// the JS that would lift it ever running). The SEO component posts
+// the correct robots per route at hydration — index for live content,
+// noindex for 404 and `!article` / `!event` branches.
 try {
   const shell = await readFile(path.join(DIST, '_spa.html'), 'utf8');
   if (/<link[^>]+rel=["']canonical["']/.test(shell)) {
     errors.push('_spa.html: must NOT contain a <link rel="canonical">');
   }
-  if (/<meta[^>]+name=["']robots["'][^>]+content=["']index/.test(shell)) {
-    errors.push('_spa.html: must NOT advertise `index` in meta robots');
+  if (/<meta[^>]+name=["']robots["']/.test(shell)) {
+    errors.push('_spa.html: must NOT contain a <meta name="robots"> — SEO component posts it at hydration');
   }
   // The React root should be empty in the shell. If React has already
   // mounted content, the shell is no longer route-agnostic.

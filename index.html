@@ -61,8 +61,18 @@
     <meta name="author" content="FEGESPORT - Federation Guineenne d'Esport" />
     <meta name="copyright" content="FEGESPORT" />
     <meta name="application-name" content="FEGESPORT" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow" />
+    <!-- Robots and canonical are intentionally NOT emitted statically.
+         - On the 16 prerendered routes, the <SEO> React component posts
+           `index, follow` (or `noindex, follow` for /leg empty state) at
+           hydration, and the Puppeteer snapshot captures it in source.
+         - On the SPA shell (dist/_spa.html) served to dynamic routes
+           and unknown URLs, there is NO meta robots in the initial HTML.
+           Googlebot's documented behaviour: a pre-JS `noindex` can take
+           a page out of the index without ever running the JS that
+           would lift it. Omitting the directive lets the SPA mount
+           and <SEO> post the correct value per route (noindex on real
+           404 and on `!article` / `!event` branches; index on live
+           article/event pages). -->
 
     <!-- ============== SEARCH ENGINE VERIFICATION ============== -->
     <!-- Google Search Console — verified property fegesport224.org -->
