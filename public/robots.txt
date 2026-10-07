@@ -1,12 +1,18 @@
 # ============================================================
-# FEGESPORT - Federation Guineenne d'Esport
+# FEGESPORT - Federation Guineenne du Sport Electronique
 # Robots policy for https://fegesport224.org
-# Last updated: 2026-06-11
+# Last updated: 2026-10-07
+# ============================================================
+#
+# Policy applied uniformly to every user agent (one source of truth).
+# /resources is a private, admin-gated library. It is excluded here AND
+# receives a <meta name="robots" content="noindex"> at render time
+# (see ResourcesPage.tsx). The Googlebot "indexed despite robots.txt"
+# signal is accepted as a known residual.
+#
+# Query strings are allowed: ?lang=en must be reachable by every bot.
 # ============================================================
 
-# Default rules — allow indexing all public content
-# /resources is the FEGESPORT private resource library: institutional
-# documents, media archives, official files. NOT to be indexed by any bot.
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -16,112 +22,133 @@ Disallow: /backup
 Disallow: /download-backup
 Disallow: /resources
 Disallow: /resources/
-Disallow: /*?*
 
-# Google
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+Disallow: /backup
+Disallow: /download-backup
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: Googlebot-Image
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: Googlebot-News
 Allow: /news
 Allow: /events
+Disallow: /admin
 Disallow: /resources
 
-# Bing
 User-agent: Bingbot
 Allow: /
 Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /backup
+Disallow: /download-backup
 Disallow: /resources
 Disallow: /resources/
 
 # Social previews
 User-agent: Twitterbot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
 User-agent: LinkedInBot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
 User-agent: WhatsApp
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
 User-agent: Slackbot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
 User-agent: Discordbot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 
-# AI / LLM Crawlers — discoverability of public content allowed,
-# but the private /resources library is OFF-LIMITS for AI training and citation.
+# AI / LLM crawlers — public content discoverable; /resources off-limits.
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: cohere-ai
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
 Disallow: /resources
 Disallow: /resources/
 
-# Aggressive SEO crawlers — limit rate
+# Aggressive SEO crawlers — rate-limited.
 User-agent: AhrefsBot
 Crawl-delay: 10
+Disallow: /admin
 Disallow: /resources
 
 User-agent: SemrushBot
 Crawl-delay: 10
+Disallow: /admin
 Disallow: /resources
 
 User-agent: MJ12bot
 Crawl-delay: 10
+Disallow: /admin
 Disallow: /resources
 
-# Sitemap
 Sitemap: https://fegesport224.org/sitemap.xml

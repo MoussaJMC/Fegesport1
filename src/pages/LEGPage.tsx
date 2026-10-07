@@ -226,15 +226,26 @@ const LEGPage: React.FC = () => {
     );
   }
 
-  // Si pas de données, afficher un message
+  // Si pas de données, afficher un message. On rend aussi un <SEO noindex>
+  // car cet écran ne contient pas de contenu indexable ; le noindex se lève
+  // automatiquement quand des disciplines ou des clubs apparaissent (branche
+  // normale ci-dessous).
   if (disciplines.length === 0 && clubs.length === 0) {
     return (
       <div className="min-h-screen bg-dark-950 text-white flex items-center justify-center">
+        <SEO
+          title={lang === 'fr' ? 'LEG - en preparation' : 'LEG - coming soon'}
+          description={lang === 'fr'
+            ? "League eSport de Guinee (LEG) : page en cours de configuration, les disciplines et clubs seront bientot disponibles."
+            : "Guinea eSports League (LEG): page under configuration, disciplines and clubs will be published soon."
+          }
+          noindex={true}
+        />
         <div className="text-center max-w-2xl px-4">
           <Trophy className="w-24 h-24 mx-auto mb-6 text-dark-700" />
-          <h2 className="text-3xl font-black mb-4 text-light-100 font-heading">
+          <h1 className="text-3xl font-black mb-4 text-light-100 font-heading">
             LEG en Preparation
-          </h2>
+          </h1>
           <p className="text-xl text-light-400 mb-6">
             La League eSport de Guinee est en cours de configuration. Les disciplines et clubs seront bientot disponibles.
           </p>

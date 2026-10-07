@@ -143,6 +143,10 @@ const SEO: React.FC<SEOProps> = ({
   const finalImage = image || DEFAULT_IMAGE;
   const ogLocale = lang === 'fr' ? 'fr_FR' : 'en_US';
   const ogLocaleAlt = lang === 'fr' ? 'en_US' : 'fr_FR';
+  // English variants (?lang=en) are not advertised in the sitemap and the
+  // canonical here already resolves to the FR URL (no ?lang query), so the
+  // duplicate signal is handled by canonical alone. No automatic noindex on
+  // ?lang=en — keeping links followable.
 
   useEffect(() => {
     // <html lang>
@@ -157,17 +161,16 @@ const SEO: React.FC<SEOProps> = ({
     if (keywords) setMeta('meta[name="keywords"]', 'content', keywords);
     setMeta('meta[name="robots"]', 'content',
       noindex
-        ? 'noindex, nofollow'
+        ? 'noindex, follow'
         : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
     );
 
-    // Canonical
+    // Canonical — always self-referential to the FR path. The ?lang=en
+    // variant is noindex (above), so it points to the FR canonical by design.
     setLink('canonical', fullUrl);
 
-    // hreflang
-    setLink('alternate', fullUrl, 'fr');
-    setLink('alternate', `${fullUrl}?lang=en`, 'en');
-    setLink('alternate', fullUrl, 'x-default');
+    // hreflang alternates are intentionally not emitted while the site is
+    // FR-only in the sitemap. They will come back when /en/* URLs ship.
 
     // Open Graph
     setMeta('meta[property="og:title"]', 'content', finalTitle);

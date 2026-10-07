@@ -78,14 +78,13 @@
     <meta name="geo.position" content="9.6412;-13.5784" />
     <meta name="ICBM" content="9.6412, -13.5784" />
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://fegesport224.org/" />
-
-    <!-- Alternate Languages -->
-    <link rel="alternate" hreflang="fr" href="https://fegesport224.org/" />
-    <link rel="alternate" hreflang="fr-GN" href="https://fegesport224.org/" />
-    <link rel="alternate" hreflang="en" href="https://fegesport224.org/?lang=en" />
-    <link rel="alternate" hreflang="x-default" href="https://fegesport224.org/" />
+    <!-- Canonical and hreflang are intentionally NOT emitted statically here. -->
+    <!-- A static canonical=https://fegesport224.org/ in index.html is served  -->
+    <!-- for every SPA route and mislabels pages whose JS canonical would be   -->
+    <!-- self-referential. The <SEO> React component (src/components/seo)      -->
+    <!-- sets rel="canonical" per route at hydration. Alternate languages are  -->
+    <!-- not advertised until /en/* URLs exist (?lang=en is excluded from the  -->
+    <!-- sitemap).                                                              -->
 
     <!-- ============== OPEN GRAPH / FACEBOOK ============== -->
     <meta property="og:type" content="website" />

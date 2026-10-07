@@ -115,6 +115,24 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/esport-guinee" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Esport en Guinee' : 'Esports in Guinea'}</span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+              <li>
+                <Link to="/membership" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Adhesion' : 'Membership'}</span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+              <li>
+                <Link to="/membership/community" className={navLinkClass}>
+                  <span>{lang === 'fr' ? 'Communaute' : 'Community'}</span>
+                  {navLinkUnderline}
+                </Link>
+              </li>
+              <li>
                 <Link to="/partners" className={navLinkClass}>
                   <span>{lang === 'fr' ? 'Partenaires' : 'Partners'}</span>
                   {navLinkUnderline}

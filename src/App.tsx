@@ -171,7 +171,7 @@ function App() {
           <Route path="/events/:id" element={<PublicLayout><EventPage /></PublicLayout>} />
           <Route path="/card/:id" element={<PublicLayout><CardPage /></PublicLayout>} />
           <Route path="/direct" element={<PublicLayout><DirectPage /></PublicLayout>} />
-          <Route path="/leg" element={<LEGPage />} />
+          <Route path="/leg" element={<PublicLayout><LEGPage /></PublicLayout>} />
           <Route path="/privacy" element={<PublicLayout><PrivacyPage /></PublicLayout>} />
           <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
           <Route path="/download-backup" element={<DownloadBackupPage />} />
