@@ -217,6 +217,19 @@ const SEO: React.FC<SEOProps> = ({
       removeSchemaScript('breadcrumb-schema');
     }
 
+    // Signal the prerender runner that this route's SEO is wired. The
+    // Puppeteer renderer listens for this event (see vite.config.ts,
+    // `renderAfterDocumentEvent: 'prerender-ready'`) and snapshots the
+    // DOM right after. Fires only at build-time (window.__PRERENDER__
+    // is set then); the no-op `event` dispatch is cheap at runtime.
+    if (typeof window !== 'undefined' && (window as unknown as { __PRERENDER__?: unknown }).__PRERENDER__) {
+      // Defer one frame so React has flushed title/meta/canonical to the
+      // DOM before Puppeteer serialises it.
+      requestAnimationFrame(() => {
+        document.dispatchEvent(new Event('prerender-ready'));
+      });
+    }
+
     // Cleanup on unmount
     return () => {
       removeSchemaScript('page-schema');
