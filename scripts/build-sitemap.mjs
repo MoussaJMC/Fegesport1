@@ -124,16 +124,31 @@ function pickMaxDate(...isoDates) {
 const newsLatest = latestUpdatedAt(news);
 const eventsLatest = latestUpdatedAt(events);
 
+let gitMisses = 0;
 const staticBlocks = STATIC.map((r) => {
   // Prefer the real editorial date (last commit on the page source).
   // Falls back to today only when git can't resolve the file history
-  // (e.g. shallow clone that stripped it). Avoids the "lastmod rolls
-  // every build" anti-pattern that Googlebot learns to ignore.
-  let lastmod = gitLastModified(r.src) || today;
+  // (e.g. shallow clone that stripped it — Netlify's build runner used
+  // to default to depth 50 before the `prebuild: git fetch --unshallow`
+  // ran). Avoids the "lastmod rolls every build" anti-pattern that
+  // Googlebot learns to ignore.
+  const gitDate = gitLastModified(r.src);
+  if (!gitDate) gitMisses += 1;
+  let lastmod = gitDate || today;
   if (r.loc === '/news') lastmod = pickMaxDate(lastmod, newsLatest);
   if (r.loc === '/events') lastmod = pickMaxDate(lastmod, eventsLatest);
   return urlBlock({ loc: r.loc, lastmod, changefreq: r.cf, priority: r.p });
 });
+
+if (gitMisses === STATIC.length) {
+  console.warn(
+    `[build-sitemap] WARNING: git has no history for any static page — likely a shallow clone. ` +
+    `All ${gitMisses} static <lastmod> fell back to today. ` +
+    `Fix: ensure \`git fetch --unshallow\` runs before build (see package.json prebuild).`,
+  );
+} else if (gitMisses > 0) {
+  console.warn(`[build-sitemap] ${gitMisses} static route(s) had no git history and fell back to today.`);
+}
 
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
