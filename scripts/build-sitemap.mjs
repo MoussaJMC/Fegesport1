@@ -104,16 +104,36 @@ const dynamicBlocks = [
   })),
 ];
 
-const staticBlocks = STATIC.map((r) => urlBlock({
-  loc: r.loc,
+// Index pages (/news, /events) do not change when their source
+// component is edited — they change when the list they render changes.
+// For these two, take the max of the component's git date and the most
+// recent `updated_at` in the backing table.
+function latestUpdatedAt(rows) {
+  const dates = rows
+    .map((r) => Date.parse(r.updated_at || ''))
+    .filter((n) => !Number.isNaN(n));
+  if (!dates.length) return null;
+  return new Date(Math.max(...dates)).toISOString().slice(0, 10);
+}
+function pickMaxDate(...isoDates) {
+  const valid = isoDates.filter(Boolean).map((d) => d.slice(0, 10));
+  if (!valid.length) return today;
+  return valid.sort().at(-1);
+}
+
+const newsLatest = latestUpdatedAt(news);
+const eventsLatest = latestUpdatedAt(events);
+
+const staticBlocks = STATIC.map((r) => {
   // Prefer the real editorial date (last commit on the page source).
   // Falls back to today only when git can't resolve the file history
   // (e.g. shallow clone that stripped it). Avoids the "lastmod rolls
   // every build" anti-pattern that Googlebot learns to ignore.
-  lastmod: gitLastModified(r.src) || today,
-  changefreq: r.cf,
-  priority: r.p,
-}));
+  let lastmod = gitLastModified(r.src) || today;
+  if (r.loc === '/news') lastmod = pickMaxDate(lastmod, newsLatest);
+  if (r.loc === '/events') lastmod = pickMaxDate(lastmod, eventsLatest);
+  return urlBlock({ loc: r.loc, lastmod, changefreq: r.cf, priority: r.p });
+});
 
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',

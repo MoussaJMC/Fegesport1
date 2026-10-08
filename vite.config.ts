@@ -143,10 +143,17 @@ export default defineConfig(
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
+            // Switch Chromium's shared memory from the 64 MB /dev/shm
+            // Netlify provides to /tmp. Without this, long prerender
+            // runs OOM with "Target.createTarget: Session with given id
+            // not found".
             '--disable-dev-shm-usage',
             '--disable-gpu',
             '--disable-features=IsolateOrigins,site-per-process',
-            '--single-process',
+            // DO NOT add `--single-process`: it is known to crash
+            // Puppeteer when opening multiple pages in sequence, which
+            // is exactly what the renderer does. Rely on
+            // `maxConcurrentRoutes: 1` (above) to keep memory flat.
           ],
           // Give Chrome 60 s to boot on a cold Netlify runner. The
           // previous default (30 s) can hit the Target.createTarget
