@@ -127,16 +127,30 @@ une fois pour toutes, vous les faites manuellement.
 Pas d'Edge Function. Les Database Webhooks font un `POST` HTTP natif
 à chaque mutation.
 
-1. Supabase dashboard → **Database** → **Webhooks** → **Create a new
-   hook**
-2. Première hook — table `news` :
-   - Table: `news`
+Le projet Supabase utilisé par fegesport224.org s'appelle
+**« Reussite »** (pas FORMALPRO) — vérifier dans l'URL Supabase ou
+dans la liste des projets. C'est le projet qui héberge les tables
+`public.news` et `public.events`.
+
+**Prérequis** — activer l'intégration **Database Webhooks** si ce
+n'est pas déjà fait. Elle installe l'extension PostgreSQL `pg_net`,
+sans laquelle la création du premier hook échoue avec
+`schema "supabase_functions" does not exist`.
+
+1. Supabase dashboard → **Database** → **Webhooks**.
+2. Si le bouton **Install integration** est affiché → cliquer, laisser
+   installer `pg_net` seule (c'est la dépendance strictement requise).
+3. **Create a new hook** — première hook, table `news` :
+   - Name: `netlify_rebuild_news`
+   - Table: `public.news`
    - Events: cocher `INSERT`, `UPDATE`, `DELETE`
    - Type: `HTTP Request`
    - Method: `POST`
    - URL: l'URL du build hook Netlify ci-dessus
-   - HTTP Headers: aucun (Netlify ignore le body)
-3. Deuxième hook — même configuration pour la table `events`.
+   - HTTP Headers: `Content-Type: application/json` (optionnel)
+   - Timeout: 5000 ms
+4. Deuxième hook — même configuration pour `public.events`
+   (Name: `netlify_rebuild_events`).
 
 Netlify n'empile qu'un seul build en attente par site : même en cas
 de publications multiples quasi-simultanées, un seul rebuild est

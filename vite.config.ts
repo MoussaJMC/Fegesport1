@@ -119,7 +119,14 @@ export default defineConfig(
         // Supabase timeout), fall back to the current DOM after 15 s so
         // the build does not hang.
         maxConcurrentRoutes: 1,
-        timeout: 20_000,
+        timeout: 30_000,
+        // No native retry in @prerenderer/renderer-puppeteer@1.2.4 —
+        // the hardening below (launchOptions.timeout, --single-process,
+        // --disable-dev-shm-usage) is what prevents the
+        // "Protocol error (Target.createTarget): Session with given id
+        // not found" crash seen on 2026-10-08 when Chromium's /dev/shm
+        // ran out during a long run. If a crash still happens, the
+        // Netlify dashboard offers a one-click "Retry deploy".
         // Flag the browser context so main.tsx can skip analytics and
         // the cookie banner at build-time. The actual property on
         // `window` is set by `injectProperty` below.
@@ -129,13 +136,29 @@ export default defineConfig(
         // new headless mode when `true` is passed.
         headless: true,
         // Netlify's build image ships Chromium but denies the default
-        // Chrome sandbox syscalls. These flags are the standard CI set.
+        // Chrome sandbox syscalls. --disable-dev-shm-usage switches to
+        // /tmp instead of the 64 MB /dev/shm Netlify provides —
+        // critical when prerender runs for 20+ pages in sequence.
         launchOptions: {
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
+            // Switch Chromium's shared memory from the 64 MB /dev/shm
+            // Netlify provides to /tmp. Without this, long prerender
+            // runs OOM with "Target.createTarget: Session with given id
+            // not found".
             '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--disable-features=IsolateOrigins,site-per-process',
+            // DO NOT add `--single-process`: it is known to crash
+            // Puppeteer when opening multiple pages in sequence, which
+            // is exactly what the renderer does. Rely on
+            // `maxConcurrentRoutes: 1` (above) to keep memory flat.
           ],
+          // Give Chrome 60 s to boot on a cold Netlify runner. The
+          // previous default (30 s) can hit the Target.createTarget
+          // race when the image is cold.
+          timeout: 60_000,
         },
       }),
       postProcess(renderedRoute) {
