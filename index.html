@@ -20,10 +20,11 @@
          https://geozovninpeqsgtzwchu.supabase.co/storage/v1/object/public/static-files/uploads/d5b2ehmnrec.jpg -->
     <link rel="shortcut icon" type="image/jpeg" href="/assets/brand/logo.jpg" />
 
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <!-- Security headers (X-Frame-Options, X-Content-Type-Options,
+         X-XSS-Protection) are served as HTTP response headers from
+         netlify.toml. Modern browsers IGNORE them when posted via
+         <meta http-equiv> (and log a console warning for X-Frame-
+         Options). Only the referrer policy below is honoured as meta. -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Content Security Policy: served exclusively as a response header

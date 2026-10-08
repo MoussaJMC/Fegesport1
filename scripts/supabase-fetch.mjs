@@ -20,10 +20,16 @@ async function supabaseGet(table, query, { url = DEFAULT_URL, key = DEFAULT_KEY 
 
 /**
  * Returns { news, events } where each row has at least `id` and
- * `updated_at`. Filters match the live app:
- *   news   → published = true
- *   events → status NOT IN (completed, cancelled)
- * On any error, the caller receives { news: [], events: [], error }.
+ * `updated_at`. Filters MUST match EventsListPage.tsx exactly so every
+ * event visible to a human visitor on /events is also prerendered and
+ * listed in sitemap.xml.
+ *
+ * Rule (2026-10-08 regression fix): the only event status that must
+ * never be public is `cancelled`. `completed` events are kept in the
+ * public archive (EventsListPage renders them under "Événements
+ * passés"), so they must also be prerendered and listed. If this
+ * filter diverges from EventsListPage again, Googlebot will follow
+ * public links to pages that serve the neutral SPA shell.
  */
 export async function fetchPublishedContent() {
   try {
@@ -31,7 +37,7 @@ export async function fetchPublishedContent() {
       supabaseGet('news', 'select=id,updated_at,title&published=eq.true'),
       supabaseGet(
         'events',
-        'select=id,updated_at,title&status=not.eq.completed&status=not.eq.cancelled',
+        'select=id,updated_at,title,status,date&status=not.eq.cancelled',
       ),
     ]);
     return { news, events, error: null };

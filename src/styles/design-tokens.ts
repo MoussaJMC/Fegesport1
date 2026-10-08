@@ -61,7 +61,14 @@ export const INTERNATIONAL_AFFILIATIONS = [
     shortName: 'IESF',
     description_fr: 'Organisme mondial de gouvernance de l\'esport, regroupant plus de 140 fédérations nationales membres.',
     description_en: 'Global esports governing body, uniting over 140 national member federations.',
-    logo: '/images/iesf-logo.png',
+    // No logo asset shipped yet. Leaving an empty string makes
+    // InternationalSection render the shortName badge instead
+    // (`affiliation.logo ? <img> : <div badge>`). The previous value
+    // `/images/iesf-logo.png` 404ed into the SPA shell, which Netlify
+    // served as text/html, which the browser then refused with
+    // ERR_BLOCKED_BY_RESPONSE.NotSameOrigin — polluting the console
+    // on every homepage view.
+    logo: '',
     url: 'https://iesf.org',
   },
   // NOTE: l'entrée `aesf` a été retirée. Le token portait le nom
