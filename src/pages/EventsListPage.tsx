@@ -95,10 +95,16 @@ const EventsListPage: React.FC = () => {
   const fetchPastEvents = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
+      // Must stay in sync with scripts/supabase-fetch.mjs
+      // (prerender + sitemap). Rule: only `cancelled` events are
+      // excluded; `completed` events belong in the public archive and
+      // must be reachable both from this list AND from the prerendered
+      // routes. See the comment in supabase-fetch.mjs.
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .lt('date', today)
+        .not('status', 'eq', 'cancelled')
         .order('date', { ascending: false });
       if (error) throw error;
       setPastEvents(data || []);
