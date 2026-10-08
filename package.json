@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npx --no-install puppeteer browsers install chrome",
+    "prebuild": "git fetch --unshallow 2>/dev/null || true && npx --no-install puppeteer browsers install chrome",
     "build": "tsc && vite build && node scripts/build-sitemap.mjs && node scripts/prerender-check.mjs",
     "postbuild": "node scripts/notify-indexnow.js || true",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
