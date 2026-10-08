@@ -13,31 +13,53 @@
 // Any warnings go to stderr but the script never fails the build.
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fetchPublishedContent } from './supabase-fetch.mjs';
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// Resolve the <lastmod> of a static route to the ISO date of the last
+// commit that touched the file. Googlebot ignores lastmod values that
+// change on every build; tying them to the real editorial history keeps
+// the signal meaningful. Falls back to today only when git is not
+// available (e.g. shallow clone that stripped the file's history).
+function gitLastModified(relPath) {
+  try {
+    const iso = execFileSync('git', ['log', '-1', '--format=%cI', '--', relPath], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return iso ? iso.slice(0, 10) : null;
+  } catch {
+    return null;
+  }
+}
 
 const SITE = 'https://fegesport224.org';
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'sitemap.xml');
 
 // Mirrors STATIC_PRERENDER_ROUTES in vite.config.ts, minus /leg.
+// `src` points at the file whose last-commit date drives <lastmod>.
 // Priority / changefreq hand-authored.
 const STATIC = [
-  { loc: '/',                            cf: 'daily',   p: '1.0' },
-  { loc: '/about',                       cf: 'weekly',  p: '0.9' },
-  { loc: '/esport-guinee',               cf: 'monthly', p: '1.0' },
-  { loc: '/federation-guineenne-esport', cf: 'monthly', p: '1.0' },
-  { loc: '/histoire-esport-guinee',      cf: 'monthly', p: '0.9' },
-  { loc: '/press-kit',                   cf: 'monthly', p: '0.8' },
-  { loc: '/membership',                  cf: 'monthly', p: '0.8' },
-  { loc: '/membership/community',        cf: 'weekly',  p: '0.7' },
-  { loc: '/partners',                    cf: 'monthly', p: '0.7' },
-  { loc: '/contact',                     cf: 'monthly', p: '0.6' },
-  { loc: '/news',                        cf: 'daily',   p: '0.9' },
-  { loc: '/events',                      cf: 'daily',   p: '0.9' },
-  { loc: '/direct',                      cf: 'daily',   p: '0.7' },
+  { loc: '/',                            cf: 'daily',   p: '1.0', src: 'src/pages/HomePage.tsx' },
+  { loc: '/about',                       cf: 'weekly',  p: '0.9', src: 'src/pages/AboutPage.tsx' },
+  { loc: '/esport-guinee',               cf: 'monthly', p: '1.0', src: 'src/pages/EsportGuineePage.tsx' },
+  { loc: '/federation-guineenne-esport', cf: 'monthly', p: '1.0', src: 'src/pages/FederationGuineenneEsportPage.tsx' },
+  { loc: '/histoire-esport-guinee',      cf: 'monthly', p: '0.9', src: 'src/pages/HistoireEsportGuineePage.tsx' },
+  { loc: '/press-kit',                   cf: 'monthly', p: '0.8', src: 'src/pages/PressKitPage.tsx' },
+  { loc: '/membership',                  cf: 'monthly', p: '0.8', src: 'src/pages/MembershipPage.tsx' },
+  { loc: '/membership/community',        cf: 'weekly',  p: '0.7', src: 'src/pages/CommunityPage.tsx' },
+  { loc: '/partners',                    cf: 'monthly', p: '0.7', src: 'src/pages/PartnersPage.tsx' },
+  { loc: '/contact',                     cf: 'monthly', p: '0.6', src: 'src/pages/ContactPage.tsx' },
+  { loc: '/news',                        cf: 'daily',   p: '0.9', src: 'src/pages/NewsPage.tsx' },
+  { loc: '/events',                      cf: 'daily',   p: '0.9', src: 'src/pages/EventsListPage.tsx' },
+  { loc: '/direct',                      cf: 'daily',   p: '0.7', src: 'src/pages/DirectPage.tsx' },
   // /leg intentionally left out — noindex while LEG data is empty.
-  { loc: '/privacy',                     cf: 'yearly',  p: '0.3' },
-  { loc: '/terms',                       cf: 'yearly',  p: '0.3' },
+  { loc: '/privacy',                     cf: 'yearly',  p: '0.3', src: 'src/pages/PrivacyPage.tsx' },
+  { loc: '/terms',                       cf: 'yearly',  p: '0.3', src: 'src/pages/TermsPage.tsx' },
 ];
 
 const today = new Date().toISOString().slice(0, 10);
@@ -84,7 +106,11 @@ const dynamicBlocks = [
 
 const staticBlocks = STATIC.map((r) => urlBlock({
   loc: r.loc,
-  lastmod: today,
+  // Prefer the real editorial date (last commit on the page source).
+  // Falls back to today only when git can't resolve the file history
+  // (e.g. shallow clone that stripped it). Avoids the "lastmod rolls
+  // every build" anti-pattern that Googlebot learns to ignore.
+  lastmod: gitLastModified(r.src) || today,
   changefreq: r.cf,
   priority: r.p,
 }));
