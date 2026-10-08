@@ -28,6 +28,8 @@ const EventsListPage: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const lang = currentLanguage;
   const [events, setEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [pastEventsLoaded, setPastEventsLoaded] = useState(false);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,6 +39,7 @@ const EventsListPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
+    fetchPastEvents();
   }, [selectedStatus]);
 
   useEffect(() => {
@@ -81,6 +84,28 @@ const EventsListPage: React.FC = () => {
       console.error('Error fetching events:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Past events are fetched separately so the "Événements passés" section
+  // can appear underneath the main (upcoming / status-filtered) grid,
+  // regardless of what filter the visitor picked. Needed for crawl: it
+  // is these cards (real <a href="/events/<id>">) that let Googlebot
+  // reach every event prerendered by the build.
+  const fetchPastEvents = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .lt('date', today)
+        .order('date', { ascending: false });
+      if (error) throw error;
+      setPastEvents(data || []);
+    } catch (err) {
+      console.error('Error fetching past events:', err);
+    } finally {
+      setPastEventsLoaded(true);
     }
   };
 
@@ -139,7 +164,7 @@ const EventsListPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-secondary-900 py-12">
       <SEO
-        prerenderReady={!loading}
+        prerenderReady={!loading && pastEventsLoaded}
         title={lang === 'fr' ? 'Evenements et Competitions' : 'Events and Competitions'}
         description={lang === 'fr'
           ? `Calendrier des evenements et competitions esport de la FEGESPORT en Guinee. Tournois, championnats, qualifications IESF, ${events.length} evenements programmes.`
@@ -285,6 +310,30 @@ const EventsListPage: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ============================================================
+            Événements passés — rendus comme vrais <a href="/events/<id>">
+            via EventCard. Objectif crawl : Googlebot peut suivre vers
+            chaque fiche d'événement passée (prerendue au build), même
+            quand le filtre « À venir » laisse la grille principale vide.
+            ============================================================ */}
+        {pastEvents.length > 0 && (
+          <section className="mt-16 pt-12 border-t border-secondary-700">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              {lang === 'fr' ? 'Événements passés' : 'Past events'}
+            </h2>
+            <p className="text-gray-400 mb-8">
+              {lang === 'fr'
+                ? `Historique des ${pastEvents.length} événement${pastEvents.length > 1 ? 's' : ''} publié${pastEvents.length > 1 ? 's' : ''} par la FEGESPORT, du plus récent au plus ancien.`
+                : `Archive of the ${pastEvents.length} past event${pastEvents.length > 1 ? 's' : ''} published by FEGESPORT, most recent first.`}
+            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {pastEvents.map((event) => (
+                <EventCard key={event.id} event={mapEvent(event)} />
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>

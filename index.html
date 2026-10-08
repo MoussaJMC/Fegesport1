@@ -26,20 +26,11 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://www.paypal.com https://www.paypalobjects.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' data: https: blob:;
-      connect-src 'self' https://*.supabase.co https://geozovninpeqsgtzwchu.supabase.co;
-      frame-src 'self' https://www.paypal.com https://www.sandbox.paypal.com https://www.youtube.com;
-      object-src 'none';
-      base-uri 'self';
-      form-action 'self';
-      upgrade-insecure-requests;
-    " />
+    <!-- Content Security Policy: served exclusively as a response header
+         from netlify.toml ([[headers]] for = "/*"). A duplicate meta
+         http-equiv here would intersect with the response header, which
+         silently stripped GA/Clarity origins the response header allows.
+         Single source of truth = the header. -->
 
     <!-- Permissions Policy -->
     <meta http-equiv="Permissions-Policy" content="
